@@ -1,0 +1,46 @@
+{
+  "name": "kalm",
+  "version": "1.0.0",
+  "description": "NodeJS Framework specifically designed for micro-service architectures and minimal network overhead.",
+  "main": ".src/index.js",
+  "scripts": {
+    "test": "mocha tests/index.js",
+    "docs": "yuidoc ./src/ -o ./docs/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fed135/Kalm.git"
+  },
+  "bin": {
+    "kalm": "./bin/kalm.js"
+  },
+  "keywords": [
+    "framework",
+    "socket",
+    "zmq"
+  ],
+  "author": "kyle chan thim, frederic charette",
+  "license": "GNU GPL 2.0",
+  "bugs": {
+    "url": "https://github.com/fed135/Kalm/issues"
+  },
+  "homepage": "https://github.com/fed135/Kalm#readme",
+  "devDependencies": {
+    "chai": "^2.3.0",
+    "debug": "^2.2.0",
+    "joi": "^6.0.8",
+    "mocha": "2.2.4",
+    "sails-memory": "^0.10.3",
+    "yuidocjs": "^0.6.0"
+  },
+  "dependencies": {
+    "circuit-breaker-js": "0.0.1",
+    "cli-color": "^0.3.3",
+    "portscanner": "^1.0.0",
+    "signals": "^1.0.0",
+    "stack-trace": "0.0.9",
+    "commander": "^2.7.1",
+    "fs-extra": "^0.18.0",
+    "gift": "^0.5.0"
+  }
+}
