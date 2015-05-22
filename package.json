@@ -5,7 +5,7 @@
   "main": ".src/index.js",
   "scripts": {
     "test": "mocha tests/index.js",
-    "docs": "yuidoc ./src/ -o ./docs/"
+    "docs": "yuidoc ./src/ -o ./api_docs/"
   },
   "repository": {
     "type": "git",
