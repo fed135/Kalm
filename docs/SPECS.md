@@ -10,6 +10,10 @@ Use RAML/swagger to define APIs
 - No need for a framework. Try to use as fewer libraries as possible.
 Install process should be fast.
 
+- Interface to manage services, binding and instances
+Should be able to auto-scale, deploy, everything. Simply provide AWS/ GAE key
+Need scaling algorithm, dedicated + shared space logic.
+
 ## Not sures
 
 - ES6 classes (later versions of iojs)
