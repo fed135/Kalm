@@ -2,8 +2,9 @@
   "name": "kalm",
   "version": "1.0.0",
   "description": "NodeJS Framework specifically designed for micro-service architectures and minimal network overhead.",
-  "main": ".src/index.js",
+  "main": "./src/index.js",
   "scripts": {
+    "start": "node ./src/index.js",
     "test": "mocha tests/index.js",
     "docs": "yuidoc ./src/ -o ./api_docs/"
   },
@@ -17,7 +18,8 @@
   "keywords": [
     "framework",
     "socket",
-    "zmq"
+    "zmq",
+    "micro-service"
   ],
   "author": "kyle chan thim, frederic charette",
   "license": "GNU GPL 2.0",
@@ -36,11 +38,12 @@
   "dependencies": {
     "circuit-breaker-js": "0.0.1",
     "cli-color": "^0.3.3",
+    "commander": "^2.7.1",
+    "fs-extra": "^0.18.0",
+    "gift": "^0.5.0",
     "portscanner": "^1.0.0",
     "signals": "^1.0.0",
     "stack-trace": "0.0.9",
-    "commander": "^2.7.1",
-    "fs-extra": "^0.18.0",
-    "gift": "^0.5.0"
+    "walk": "^2.3.9"
   }
 }
