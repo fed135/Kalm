@@ -1,10 +1,10 @@
 {
   "name": "kalm",
   "version": "1.0.0",
-  "description": "NodeJS Framework specifically designed for micro-service architectures and minimal network overhead.",
+  "description": "A Kalm Application.",
   "main": "./src/index.js",
   "scripts": {
-    "start": "node ./src/index.js",
+    "start": "node ./index.js",
     "test": "mocha tests/index.js",
     "docs": "yuidoc ./src/ -o ./api_docs/"
   },

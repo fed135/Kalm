@@ -1,8 +1,7 @@
 var bootstrap = require('./app/bootstrap');
-var singleton = null;
 
-function Kalm() {
-	this.comfig = {};
+function Kalm(pkg) {
+	this.pkg = pkg;
 	this._components = {};
 
 	bootstrap(this);
@@ -10,17 +9,19 @@ function Kalm() {
 
 Kalm.prototype.registerComponent = function(pkg, path) {
 	var _self = this;
+	var p;
 
 	if (!pkg.pkgName) {
 		console.error('No pkg name! ' + path);
 		return false;
 	}
 	
-	this._components[pkg.pkgName] = pkg.properties || {};
+	this._components[pkg.pkgName] = pkg.attributes || {};
 
 	if (pkg.methods) {
 		Object.keys(pkg.methods).forEach(function(e) {
-			_self._components[pkg.pkgName][e] = pkg.methods[e].bind(_self);
+			p =	_self._components[pkg.pkgName];
+			p[e] = pkg.methods[e].bind(p);
 		});
 	}
 
@@ -33,5 +34,4 @@ Kalm.prototype.getComponent = function(pkgName) {
 	return this._components[pkgName];
 };
 
-singleton = new Kalm();
-module.exports = singleton;
+module.exports = Kalm;

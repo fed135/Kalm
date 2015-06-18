@@ -7,7 +7,6 @@
 /* Requires *******************************************************************/
 
 var walk = require('walk');
-var fs = require('fs');
 var path = require('path');
 
 /* Local variables ************************************************************/
@@ -16,14 +15,13 @@ var _classMarker = '.class.js';
 
 /* Methods ********************************************************************/
 
-function main(K) {
-	_loadComponents(K, function() {
-		console.log('load completed');
-		console.log(K.getComponent('manifest'));
+function main(app) {
+	_loadComponents(function() {
+		console.log(K.getComponent('manifest').print());
 	});
 }
 
-function _loadComponents(K, callback) {
+function _loadComponents(callback) {
 	var mod;
 	var walker = walk.walk("./src/app", {
 		followLinks: true
