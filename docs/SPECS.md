@@ -5,6 +5,9 @@
 - RESTful API via Socket for Client-Gate-keeper communications.
 Use RAML/swagger to define APIs
 
+- Can choose between tcp and udp socket channels for app-2-server
+Great for game servers
+
 - ZMQ for inter-server communications.
 
 - No need for a framework. Try to use as fewer libraries as possible.
