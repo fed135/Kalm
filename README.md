@@ -8,6 +8,7 @@ NodeJS Framework specifically designed for micro-service architectures and minim
 1. [Needs](./docs/NEEDS.md)
 1. [Roadmap](./docs/ROADMAP.md)
 1. [Rules](./docs/RULES.md)
+1. [Specs](./docs/SPECS.md)
 
 ## Installation
 
