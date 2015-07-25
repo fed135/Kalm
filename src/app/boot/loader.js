@@ -8,6 +8,7 @@
 
 var walk = require('walk');
 var path = require('path');
+var configure = require('./configure');
 
 /* Local variables ************************************************************/
 
@@ -23,7 +24,7 @@ function main(app) {
 
 function _loadComponents(callback) {
 	var mod;
-	var walker = walk.walk("./src/app", {
+	var walker = walk.walk("./src/app/components", {
 		followLinks: true
 	});
 
@@ -42,6 +43,7 @@ function _loadComponents(callback) {
 	 
 	walker.on("end", function () {
 		callback();
+		configure();
 	});
 }
 

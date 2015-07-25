@@ -1,4 +1,4 @@
-var bootstrap = require('./app/bootstrap');
+var bootstrap = require('./app/boot/loader');
 
 function Kalm(pkg) {
 	this.pkg = pkg;
