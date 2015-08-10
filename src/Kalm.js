@@ -1,18 +1,23 @@
 var bootstrap = require('./app/boot/loader');
+var stdOut = require('./app/system/console/console.class');
 
 function Kalm(pkg) {
 	this.pkg = pkg;
 	this._components = {};
+
+	//Load console first
+	this.registerComponent(stdOut);
 
 	bootstrap(this);
 }
 
 Kalm.prototype.registerComponent = function(pkg, path) {
 	var _self = this;
+	var cl = this.getComponent('console');
 	var p;
 
 	if (!pkg.pkgName) {
-		console.error('No pkg name! ' + path);
+		cl.error('No pkg name! ' + path);
 		return false;
 	}
 	

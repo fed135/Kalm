@@ -17,21 +17,19 @@ var _classMarker = '.class.js';
 /* Methods ********************************************************************/
 
 function main(app) {
-	_loadComponents(function() {
-		console.log(K.getComponent('manifest').print());
-	});
+	_loadComponents(configure);
 }
 
 function _loadComponents(callback) {
 	var mod;
-	var walker = walk.walk("./src/app/components", {
+	var walker = walk.walk("./src/app", {
 		followLinks: true
 	});
 
 	walker.on("file", function (root, fileStats, next) {
 		if (fileStats.name.indexOf(_classMarker) !== -1) {
 			mod = require(path.join(process.cwd(), root, fileStats.name));
-			K.registerComponent(mod);
+			K.registerComponent(mod, fileStats.name);
 		}
 		
 		next();
@@ -41,10 +39,7 @@ function _loadComponents(callback) {
 		next();
 	});
 	 
-	walker.on("end", function () {
-		callback();
-		configure();
-	});
+	walker.on("end", callback);
 }
 
 /* Exports ********************************************************************/
