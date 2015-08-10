@@ -17,6 +17,11 @@ Install process should be fast.
 Should be able to auto-scale, deploy, everything. Simply provide AWS/ GAE key
 Need scaling algorithm, dedicated + shared space logic.
 
+- Default route = manifest
+
+- Find a way to share filters, controllers and other components accross 
+services of a same project
+
 ## Not sures
 
 - ES6 classes (later versions of iojs)

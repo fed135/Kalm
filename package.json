@@ -1,11 +1,12 @@
 {
   "name": "kalm",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A Kalm Application.",
   "main": "./src/index.js",
   "scripts": {
     "start": "node ./index.js",
-    "test": "mocha tests/index.js"
+    "smoke-test": "mocha tests/smoke/index.js",
+    "unit-test": "mocha tests/unit/index.js"
   },
   "repository": {
     "type": "git",
