@@ -1,4 +1,12 @@
+/**
+ * Initializes modules once they are loaded
+ */
+
+/* Requires ------------------------------------------------------------------*/
+
 var logo = require('./logo');
+
+/* Methods -------------------------------------------------------------------*/
 
 //print logo
 //Merge config
@@ -12,11 +20,47 @@ var logo = require('./logo');
 //*var server = http.createServer();
 //server.listen('/var/tmp/http.sock'); 
 
-function printLogo() {
+function _promisify(method) {
+	return new Promise(method);
+}
+
+function main() {
+	var cl = K.getComponent('console');
+
+	var _startTime = Date.now();
+
+	Promise.all([
+		_printLogo,
+		_holdProcess
+	].map(_promisify)).then(function() {
+		cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
+	},
+	function() {
+		cl.log('Failed');
+	});
+}
+
+
+function _printLogo(resolve) {
+
 	var cl = K.getComponent('console');
   cl.print(logo.big());
 
-  process.stdin.resume();
+  cl.log('Starting service...');
+  resolve();
 }
 
-module.exports = printLogo;
+
+function _holdProcess(resolve) {
+
+	process.on('uncaughtException', function(err) {
+		cl.error(err);
+	});
+  process.stdin.resume();
+
+  resolve();
+}
+
+/* Exports -------------------------------------------------------------------*/
+
+module.exports = main;
