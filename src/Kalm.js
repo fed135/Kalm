@@ -1,8 +1,9 @@
 var bootstrap = require('./app/boot/loader');
 var stdOut = require('./app/system/console/console.class');
 
-function Kalm(pkg) {
+function Kalm(pkg, config) {
 	this.pkg = pkg;
+	this.appConf = config;
 	this._components = {};
 
 	//Load console first
@@ -25,8 +26,10 @@ Kalm.prototype.registerComponent = function(pkg, path) {
 
 	if (pkg.methods) {
 		Object.keys(pkg.methods).forEach(function(e) {
-			p =	_self._components[pkg.pkgName];
-			p[e] = pkg.methods[e].bind(p);
+			if (pkg.methods[e].bind) {
+				p =	_self._components[pkg.pkgName];
+				p[e] = pkg.methods[e].bind(p);
+			}
 		});
 	}
 

@@ -44,8 +44,6 @@
 
 ## General
 
-- Avoid vague regroupements. Ex: Instead of putting utility methods 
-  under 'utils', opt for 'math' or 'string' or 'array', etc.
 - Be aware of the service size once packaged with dependencies. 
 - Avoid packages with addons when available.
 - Build your paths.
@@ -57,4 +55,5 @@
   and should not have a number of arguments greater than 4
 - Disk operations should be kept to a minimum.
 - Favor decoupling over closures, when possible.
-
+- Avoid structures where you would need to perform a require
+  from a higher directory. (../)

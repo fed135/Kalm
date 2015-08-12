@@ -22,6 +22,9 @@ Need scaling algorithm, dedicated + shared space logic.
 - Find a way to share filters, controllers and other components accross 
 services of a same project
 
+- Track requests accross the network. (emitter-id, request-id, origin, destination
+completed?)
+
 ## Not sures
 
 - ES6 classes (later versions of iojs)

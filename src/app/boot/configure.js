@@ -31,12 +31,39 @@ function main() {
 
 	Promise.all([
 		_printLogo,
+		_initRoutes,
+		_setupConnections,
 		_holdProcess
 	].map(_promisify)).then(function() {
 		cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
 	},
-	function() {
-		cl.log('Failed');
+	function(err) {
+		cl.error('Boot failure: ');
+		cl.error(err);
+	});
+}
+
+function _initRoutes(resolve, reject) {
+	var cl = K.getComponent('console');
+	var routes = K.getComponent('routes');
+
+	cl.log(' - Initializing routes');	
+
+	routes.init(function(err) {
+		if (err) return reject(err);
+		resolve();
+	});
+}
+
+function _setupConnections(resolve, reject) {
+	var cl = K.getComponent('console');
+	var connection = K.getComponent('connection');
+
+	cl.log(' - Initializing connections');
+
+	connection.init(function(err) {
+		if (err) return reject(err);
+		resolve();
 	});
 }
 

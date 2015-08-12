@@ -3,4 +3,7 @@ var pkg = require('./package');
 
 //Get config file
 
-global['K'] = new Kalm(pkg);
+module.exports = function(config){
+	global['K'] = new Kalm(pkg, config);
+	return K;
+};

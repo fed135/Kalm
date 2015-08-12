@@ -4,7 +4,7 @@
   "description": "A Kalm Application.",
   "main": "./src/index.js",
   "scripts": {
-    "start": "node ./index.js",
+    "start": "node ./test.js",
     "smoke-test": "mocha tests/smoke/index.js",
     "unit-test": "mocha tests/unit/index.js"
   },
