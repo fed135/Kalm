@@ -34,16 +34,18 @@ var connectors = {
 function main(callback) {
 
 	var routes = K.getComponent('routes');
+	var utils = K.getComponent('utils');
 
-	zmq.listen();
-	ipc.listen();
+	var listeners = [];
 
-	if (routes.has('http')) http.listen();
-	if (routes.has('tcp')) tcp.listen();
-	if (routes.has('udp')) udp.listen();
+	listeners.push(zmq.listen);
+	listeners.push(ipc.listen);
 
-	//TODO: wait for all listeners to finish before calling
-	if (callback) callback();
+	if (routes.has('http')) listeners.push(http.listen);
+	if (routes.has('tcp')) listeners.push(tcp.listen);
+	if (routes.has('udp')) listeners.push(udp.listen);
+
+	utils.async.all(listeners, callback)
 }
 
 function send(type, options, payload, callback) {

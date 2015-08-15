@@ -41,6 +41,7 @@
     "circuit-breaker-js": "0.0.1",
     "cli-color": "0.3.3",
     "memory-cache": "^0.1.4",
+    "node-ipc": "^1.2.2",
     "portscanner": "1.0.0",
     "signals": "1.0.0",
     "socket.io": "^1.3.6",

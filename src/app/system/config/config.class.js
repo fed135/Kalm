@@ -1,9 +1,11 @@
 module.exports = {
 	pkgName: 'config',
 	attributes: {
-		server: {
-			port: 3000,
-			location: '127.0.0.1'
+		connections: {
+			ipc: {
+				evt: 'message',
+				path: '/var/local/socket/kalm.socket'
+			}
 		}
 	}
 };

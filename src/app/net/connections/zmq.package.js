@@ -1,7 +1,24 @@
-function listen() {
+/**
+ * ZMQ connector methods
+ */
+
+/* Requires ------------------------------------------------------------------*/
+
+/* Local variables -----------------------------------------------------------*/
+
+/* Methods -------------------------------------------------------------------*/
+
+function listen(done, error) {
+	done();
+}
+
+function send() {
 
 }
 
+/* Exports -------------------------------------------------------------------*/
+
 module.exports = {
-	listen: listen
+	listen: listen,
+	send: send
 };

@@ -20,26 +20,25 @@ var logo = require('./logo');
 //*var server = http.createServer();
 //server.listen('/var/tmp/http.sock'); 
 
-function _promisify(method) {
-	return new Promise(method);
-}
-
 function main() {
 	var cl = K.getComponent('console');
+	var utils = K.getComponent('utils');
 
 	var _startTime = Date.now();
 
-	Promise.all([
+	utils.async.all([
 		_printLogo,
 		_initRoutes,
 		_setupConnections,
 		_holdProcess
-	].map(_promisify)).then(function() {
-		cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
-	},
-	function(err) {
-		cl.error('Boot failure: ');
-		cl.error(err);
+	], function(err) {
+		if (err) {
+			cl.error('Boot failure: ');
+			cl.error(err);
+		}
+		else {
+			cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
+		}
 	});
 }
 
@@ -80,9 +79,10 @@ function _printLogo(resolve) {
 
 function _holdProcess(resolve) {
 
-	process.on('uncaughtException', function(err) {
+
+	/*process.on('uncaughtException', function(err) {
 		cl.error(err);
-	});
+	});*/
   process.stdin.resume();
 
   resolve();

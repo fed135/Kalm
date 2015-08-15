@@ -13,7 +13,6 @@ function Kalm(pkg, config) {
 }
 
 Kalm.prototype.registerComponent = function(pkg, path) {
-	var _self = this;
 	var cl = this.getComponent('console');
 	var p;
 
@@ -22,16 +21,20 @@ Kalm.prototype.registerComponent = function(pkg, path) {
 		return false;
 	}
 	
-	this._components[pkg.pkgName] = pkg.attributes || {};
+	p = pkg.attributes || {};
 
 	if (pkg.methods) {
 		Object.keys(pkg.methods).forEach(function(e) {
 			if (pkg.methods[e].bind) {
-				p =	_self._components[pkg.pkgName];
 				p[e] = pkg.methods[e].bind(p);
+			}
+			else {
+				cl.warn(e + 'is not a method in ' + pkg.pkgName)
 			}
 		});
 	}
+
+	this._components[pkg.pkgName] = p;
 
 	if (this._components[pkg.pkgName]._init) {
 		this._components[pkg.pkgName]._init();

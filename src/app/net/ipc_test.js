@@ -1,27 +1,17 @@
-//var io = require('node-zmq');
-var net = require('net');
+var ipc = require('node-ipc');
 
-function initializeIPC(callback) {
-	var config = K.getComponent('config');
-	var _self = this;
-
-	//Creating...
-	this.ipc_connection = net.createServer(function(socket) {
-		_self.ipc_socket = socket;
-		callback();
-	});
-	this.ipc_connection.listen(config.ipc.path);
-
-	//Connecting...
-	this.ipc_connection = net.createConnection('/path/to/socket');
-	this.ipc_connection.on('connect', function(socket) {
-    console.log('connected to unix socket server');
-	});
-
-	//Sending...
-	socket.write();
+function send(options, message, callback) {
+	ipc.of.local.emit(options.path, message, callback);
 }
 
-module.exports = {
-
-};
+ipc.connectTo('local', function() {
+	send(
+		{
+			path: '/'
+		},
+		'test',
+		function() {
+			console.log(arguments);
+		}
+	);
+});
