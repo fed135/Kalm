@@ -4,10 +4,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var ipc = require('node-ipc');	//TODO: fork node-ipc
-ipc.config.silent = true;
-
-//Remove colors, add debug, clear architecture, lint
+var ipc = require('ipc-light');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -15,30 +12,19 @@ function listen(done, failure) {
 	var config = K.getComponent('config');
 	var request = K.getComponent('request');
 	
-	ipc.serve(config.connections.ipc.path, function() {
-		ipc.server.on(config.connections.ipc.evt, function(data) {
-			request.init(data);
-		});
-		done();
-	});
-	ipc.server.define.listen[config.connections.ipc.evt]='This event type listens for message strings as value of data key.';
-
-	ipc.server.start();
+	ipc.createServer(function(req, reply) {
+		request.init(req, reply);
+	}).listen(config.connections.ipc.path);
 }
 
 function send(options, message, callback) {
-	var _self = this;
+	options.body = message;
 
-	if (!ipc.of.local) {
-		ipc.connectTo('local', config.connections.ipc.path, function() {
-			_self.send(options, message, callback);
-		});
-		return;
-	}
-
-	options.payload = message;
-
-	ipc.of.local.emit(config.connections.ipc.evt, options, callback);
+	var socket = ipc.connect(config.connections.ipc.path, function() {
+		socket.emit(options);
+		socket.disconnect();
+		callback();
+	});
 }
 
 /* Exports -------------------------------------------------------------------*/

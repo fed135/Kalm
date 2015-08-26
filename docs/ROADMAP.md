@@ -1,29 +1,57 @@
 # Roadmap
 
-## v.1
+## v.0.1.0
 
-(put tasks here)
+- Functionnal connectors (http, tcp socket, udp socket)
+  With interface class and universal handler
+
+- Config properly populates the routes list
+  Need to figure out a pretty syntax
+
+- ZMQ and unix sockets (ipc)
+  Note: ZMQ is going to be tricky: node client has binaries deps
+
+- Print stats, manifest, healthcheck
+  {status:'ok', details:{service1: 'ok', ...}}
+
+- Handle server up, server down and error recovery
+  Add signals or w/e
+
+- Circuit breaking
+  For forwarding methods
+
+- Port-scanning
+  For connectors that use the network card
+
+- Environments
+  Add in config
+
+- API docs
+  Generated from docblocks
+
+- Internal map
+  Generated from class-loader
+
+- Logging destination
+  Provided by debug > file.log (pipe)
+
+- Routing (connector-agnostic)
+  Create event-based routing
+
+- Handle redirection (gatekeeper)
+	Keep track of request.
 
 ## Backlog
 
-- Functionnal connectors (http, tcp socket, udp socket)
-- Config properly populates the routes and models list
-- Print stats, manifest
-- Handle server up, server down and error recovery
-- Handle redirection (gatekeeper)
 - Handle filtering middleware
+  Check Sails for implementation example
+
 - Unit tests
+
 - Smoke tests
-- Good code coverage
-- Cross-platform compatibility
-- ZMQ and unix sockets (ipc)
+
+- Code coverage tests
+
 - Load-balancing
-- Circuit breaking
-- Port-scanning
-- TTL memcache
-- Environments
-- Mock mode
-- API docs
-- Internal map
-- Logging destination
-- Routing (connector-agnostic)
+
+- Mock mode (needs definition)

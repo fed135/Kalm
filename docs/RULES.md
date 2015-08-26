@@ -18,6 +18,38 @@
 1. Methods
 
 
+## Example Module
+
+```javascript
+/**
+ * InterProcessCall connector methods
+ */
+
+/* Requires ------------------------------------------------------------------*/
+
+var path = require('path');
+
+/* Local variables -----------------------------------------------------------*/
+
+var loc = 'local';
+
+/* Methods -------------------------------------------------------------------*/
+
+function merge() {
+  return path.join(loc, this.foo, this.bar);
+}
+
+/* Exports -------------------------------------------------------------------*/
+
+module.exports = {
+  pkgName: 'myPackage',
+  attributes: {
+    foo: 'foo',
+    bar: 'bar'
+  }
+};
+```
+
 ## Definitions
 
 1. Module folders
@@ -42,18 +74,50 @@
   ease of maintenance. They can be compared to npm packages.
 
 
-## General
+## Coding
+
+1. Style
+
+- No more than 80 characters per line.
+- Use short, but meaningful variable names.
+- Avoid structures where you would need to perform a require
+  from a higher directory. (../)
+- ALWAYS run the linter before sending.
+
+1. Philosophy
+
+- Functions and procedures should be identified as such
+  and should not have a number of arguments greater than 4
+- Favor decoupling over closures, when possible.
+- Choose clarity over optimization (unless you can get both)
+
+1. Technical considerations
 
 - Be aware of the service size once packaged with dependencies. 
 - Avoid packages with addons when available.
 - Build your paths.
 - Use ES6 constructs only if necessary.
 - Avoid constructors, the 'new' keyword and prototypes.
-- Use short, but meaningful variable names.
 - Avoid variable names with keywords in them. Ex: 'newThing'
-- Functions and procedures should be identified as such
-  and should not have a number of arguments greater than 4
 - Disk operations should be kept to a minimum.
-- Favor decoupling over closures, when possible.
-- Avoid structures where you would need to perform a require
-  from a higher directory. (../)
+
+
+## Contributing
+
+1. Branching
+
+Use the industry-wide branching conventions. 
+
+1. Merge requests
+
+Needs to be reviewed by a commity of contributors before integrating
+
+1. Help wanted
+
+People with low-level networking skills are more than welcommed.
+
+1. Using Kalm
+
+If you or your company use Kalm, or are planning to do so; please let
+me know and I will do my best to provide support. Only remember that 
+I have a job and family that take priority over releasing updates.

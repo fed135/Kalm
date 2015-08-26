@@ -5,19 +5,14 @@ NodeJS Framework specifically designed for micro-service architectures and minim
 ## Documentation
 
 1. [Why](./docs/WHY.md)
-1. [Needs](./docs/NEEDS.md)
 1. [Roadmap](./docs/ROADMAP.md)
 1. [Rules](./docs/RULES.md)
-1. [Specs](./docs/SPECS.md)
+1. [Wishlist](./docs/WISHLIST.md)
+
 
 ## Installation
 
     npm install
-
-
-## Compiling Documentation
-
-    npm runScript docs
 
 
 ## Run tests
