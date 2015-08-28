@@ -1,5 +1,16 @@
+/**
+ * Kalm App singleton
+ * Reference to this class will be available accross the project
+ * under the global property K
+ */
+
+/* Requires ------------------------------------------------------------------*/
+
 var bootstrap = require('./app/boot/loader');
+//Hack to get access to the console before the class initialization
 var stdOut = require('./app/system/console/console.class');
+
+/* Methods -------------------------------------------------------------------*/
 
 function Kalm(pkg, config) {
 	this.pkg = pkg;
@@ -44,5 +55,7 @@ Kalm.prototype.registerComponent = function(pkg, path) {
 Kalm.prototype.getComponent = function(pkgName) {
 	return this._components[pkgName];
 };
+
+/* Exports -------------------------------------------------------------------*/
 
 module.exports = Kalm;

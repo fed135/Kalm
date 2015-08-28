@@ -2,9 +2,8 @@
   "name": "kalm",
   "version": "0.1.0",
   "description": "A Kalm Application.",
-  "main": "./src/index.js",
+  "main": "./index.js",
   "scripts": {
-    "start": "node ./test.js",
     "smoke-test": "mocha tests/smoke/index.js",
     "unit-test": "mocha tests/unit/index.js"
   },
@@ -19,7 +18,10 @@
     "framework",
     "socket",
     "zmq",
-    "micro-service"
+    "micro-service",
+    "low-latency",
+    "light",
+    "ipc"
   ],
   "author": "kyle chan thim, frederic charette",
   "licenses": [
@@ -39,12 +41,9 @@
   },
   "dependencies": {
     "circuit-breaker-js": "0.0.1",
-    "cli-color": "0.3.3",
-    "memory-cache": "^0.1.4",
-    "node-ipc": "^1.2.2",
+    "ipc-light": "0.1.x",
     "portscanner": "1.0.0",
     "signals": "1.0.0",
-    "socket.io": "^1.3.6",
     "stack-trace": "0.0.9",
     "walk": "2.3.9"
   }

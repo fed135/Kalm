@@ -6,32 +6,36 @@
 
 var logo = require('./logo');
 
+/* Local variables -----------------------------------------------------------*/
+
+var _tasks = [
+	_printLogo,
+	_initRoutes,
+	_setupConnections,
+	_holdProcess
+];
+
 /* Methods -------------------------------------------------------------------*/
 
 //print logo
-//Merge config
-//Put models
+//Merge configs
 //Put routes and controllers
 //Scan ports, assign ports to protocols,
 //Start listening (tcp socket/udp socket, based on config)
 //Ready ipc*/zmq
 //Hold process
 
-//*var server = http.createServer();
-//server.listen('/var/tmp/http.sock'); 
-
+/**
+ * Entry point for boot process. Triggered once all classes are loaded
+ * @method main
+ */
 function main() {
 	var cl = K.getComponent('console');
 	var utils = K.getComponent('utils');
 
 	var _startTime = Date.now();
 
-	utils.async.all([
-		_printLogo,
-		_initRoutes,
-		_setupConnections,
-		_holdProcess
-	], function(err) {
+	utils.async.all(_tasks, function(err) {
 		if (err) {
 			cl.error('Boot failure: ');
 			cl.error(err);
@@ -42,6 +46,8 @@ function main() {
 	});
 }
 
+/*
+*/
 function _initRoutes(resolve, reject) {
 	var cl = K.getComponent('console');
 	var routes = K.getComponent('routes');
@@ -54,6 +60,8 @@ function _initRoutes(resolve, reject) {
 	});
 }
 
+/*
+*/
 function _setupConnections(resolve, reject) {
 	var cl = K.getComponent('console');
 	var connection = K.getComponent('connection');
@@ -66,9 +74,9 @@ function _setupConnections(resolve, reject) {
 	});
 }
 
-
+/*
+*/
 function _printLogo(resolve) {
-
 	var cl = K.getComponent('console');
   cl.print(logo.big());
 
@@ -76,13 +84,9 @@ function _printLogo(resolve) {
   resolve();
 }
 
-
+/*
+*/
 function _holdProcess(resolve) {
-
-
-	/*process.on('uncaughtException', function(err) {
-		cl.error(err);
-	});*/
   process.stdin.resume();
 
   resolve();

@@ -1,4 +1,15 @@
-function _getLogoBig() {
+/**
+ * Kalm logo utils
+ */
+
+/* Methods -------------------------------------------------------------------*/
+
+/**
+ * Prints the big version of the logo
+ * @method big
+ * @returns {string} The big logo as string
+ */
+function big() {
 	var cl = K.getComponent('console');
 
 	return cl.GREEN + '\n	  _\n' +
@@ -11,9 +22,12 @@ function _getLogoBig() {
 		'   / / /' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
 		'  / / /  ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
 		' / / /    ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
-		' \\/_/      ' + cl.BLUE + '\\_\\_\\' + cl.WHITE + '    Kalm v' + K.pkg.version + '\n\n';
+		' \\/_/      ' + cl.BLUE + '\\_\\_\\' + cl.WHITE + 
+		'    Kalm v' + K.pkg.version + '\n\n';
 }
 
+/* Exports -------------------------------------------------------------------*/
+
 module.exports = {
-	big: _getLogoBig 
+	big: big 
 };

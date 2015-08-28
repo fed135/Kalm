@@ -4,22 +4,32 @@
  * Looks for class files and loads them in the Framework object
  */
 
-/* Requires *******************************************************************/
+/* Requires ------------------------------------------------------------------*/
 
 var walk = require('walk');
 var path = require('path');
 var configure = require('./configure');
 
-/* Local variables ************************************************************/
+/* Local variables -----------------------------------------------------------*/
 
 var _classMarker = '.class.js';
 
-/* Methods ********************************************************************/
+/* Methods -------------------------------------------------------------------*/
 
-function main(app) {
+/**
+ * Entry point for class loader
+ * @method main
+ */
+function main() {
 	_loadComponents(configure);
 }
 
+/**
+ * Entry point for class loader
+ * @private
+ * @method _loadComponents
+ * @params {function} callback The callback method
+ */
 function _loadComponents(callback) {
 	var mod;
 	var walker = walk.walk("./src/app", {
@@ -42,6 +52,6 @@ function _loadComponents(callback) {
 	walker.on("end", callback);
 }
 
-/* Exports ********************************************************************/
+/* Exports -------------------------------------------------------------------*/
 
 module.exports = main;
