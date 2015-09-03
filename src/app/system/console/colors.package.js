@@ -15,6 +15,24 @@ var COLORS = {
 	WHITE: '\x1b[97m'
 };
 
+/* Methods -------------------------------------------------------------------*/
+
+function getList() {
+	var config = K.getComponent('config');
+
+	if (config.debug && config.debug.noColor) {
+		return {
+			GREY: '', RED: '', GREEN: '', YELLOW: '', BLUE: '', MAGENTA: '', CYAN: '',
+			WHITE: ''
+		};
+	}
+
+	return COLORS;
+}
+
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = COLORS;
+module.exports = {
+	codes: COLORS,
+	getList: getList
+};

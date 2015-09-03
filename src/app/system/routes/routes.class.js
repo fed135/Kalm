@@ -4,7 +4,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var defaultRoutes = require('./default.json');
+var defaultRoutes = require('./default');
 
 /* Methods -------------------------------------------------------------------*/
 

@@ -7,7 +7,21 @@
  * 4- return formatted result
  */
 
-function init(request, reply) {
+function init(req, reply, type) {
+	var cl = K.getComponent('console');
+
+	var reqObj = {
+		from: req.domain, //!
+		cookie: req.headers.cookie,
+		path: req.url,
+		method: req.method,
+		payload: req.body || null
+	};
+
+	cl.log('--> ' + reqObj.method + '\t' + reqObj.path);
+
+	//console.log('hmmmyello');
+	//console.log(reqObj);
 	//request.path
 	//request.tracking id
 	//request.payload
@@ -15,7 +29,7 @@ function init(request, reply) {
 	//request.handler
 	//request.meta
 	//(new socket)
-	reply('cool');
+	reply.end('cool');
 }
 
 module.exports = {

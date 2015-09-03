@@ -9,6 +9,8 @@ var logo = require('./logo');
 /* Local variables -----------------------------------------------------------*/
 
 var _tasks = [
+	_mixinConfigs,
+	_runInits,
 	_printLogo,
 	_initRoutes,
 	_setupConnections,
@@ -17,8 +19,6 @@ var _tasks = [
 
 /* Methods -------------------------------------------------------------------*/
 
-//print logo
-//Merge configs
 //Put routes and controllers
 //Scan ports, assign ports to protocols,
 //Start listening (tcp socket/udp socket, based on config)
@@ -44,6 +44,34 @@ function main() {
 			cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
 		}
 	});
+}
+
+/*
+*/
+function _runInits(resolve) {
+	var utils = K.getComponent('utils');
+	var cl = K.getComponent('console');
+
+	cl.log(' - Initializing components');
+
+	utils.async.all(K.moduleInits, function(err) {
+		if (err) cl.error(err);
+		else resolve();
+	});
+}
+
+/*
+*/
+function _mixinConfigs(resolve) {
+	var cl = K.getComponent('console');
+	var utils = K.getComponent('utils');
+	var config = K.getComponent('config');
+
+	cl.log(' - Setting configs');
+
+	utils.object.mixin(config, K.appConf);
+
+	resolve();
 }
 
 /*
@@ -87,8 +115,11 @@ function _printLogo(resolve) {
 /*
 */
 function _holdProcess(resolve) {
+	var cl = K.getComponent('console');
+
   process.stdin.resume();
 
+  cl.log('Ready!\n');
   resolve();
 }
 

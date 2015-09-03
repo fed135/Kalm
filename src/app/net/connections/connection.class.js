@@ -38,8 +38,8 @@ function main(callback) {
 
 	var listeners = [];
 
-	listeners.push(zmq.listen);
-	listeners.push(ipc.listen);
+	//listeners.push(zmq.listen);
+	//listeners.push(ipc.listen);
 
 	if (routes.has('http')) listeners.push(http.listen);
 	if (routes.has('tcp')) listeners.push(tcp.listen);

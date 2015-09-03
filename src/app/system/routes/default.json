@@ -1,7 +1,0 @@
-[
-	{
-		"action": [ "ipc", "zmq" ],
-		"path" : "/",
-		"handler" : null
-	}
-]

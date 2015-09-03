@@ -9,7 +9,7 @@ function all(list, callback) {
 		return new Promise(method);
 	}	
 
-	Promise.all(list.map(_promisify)).then(function() {
+	Promise.all(list.map(_promisify)).then(function(val) {
 		callback();
 	},
 	function(err) {

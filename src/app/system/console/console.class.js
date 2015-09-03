@@ -8,6 +8,7 @@
 
 var debug = require('debug');
 var colors = require('./colors.package');
+var stacktrace = require('./stacktrace.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -20,20 +21,24 @@ var _dError = debug('Kalm:error');
 /* Methods -------------------------------------------------------------------*/
 
 function _formatArgs() {
+	if (this.namespace.indexOf('Kalm') === -1) {
+		arguments[0] = '[' + this.namespace + '] ' + arguments[0];
+	}
+	
 	return arguments;
 }
 
-function _log(msg) {
+function log(msg) {
 	_dLog(this.CYAN + 'Info  : ' + this.WHITE + msg);
 }
 
-function _warn(msg) {
+function warn(msg) {
 	_dWarn(this.YELLOW + 'Warn  : ' + this.WHITE + msg);
 }
 
-function _error(msg) {
+function error(msg) {
 	if (msg instanceof Error) {
-		var _errInfo = stacktrace.parse(msg);
+		var _errInfo = stacktrace(msg);
 		_dError(this.RED + 'Error : ' + this.WHITE + _errInfo);
 	}
 	else {
@@ -41,19 +46,25 @@ function _error(msg) {
 	}
 }
 
-function _print(msg) {
+function print(msg) {
 	_dLog(msg);
+}
+
+function main() {
+	var utils = K.getComponent('utils');
+	var ret = utils.object.mixin(this, colors.getList());
 }
 
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
 	pkgName: 'console',
-	attributes: colors,
+	attributes: colors.codes,
 	methods: {
-		print: _print,
-		log: _log,
-		warn: _warn,
-		error: _error
+		print: print,
+		log: log,
+		warn: warn,
+		error: error,
+		_init: main
 	}
 };

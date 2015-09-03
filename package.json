@@ -1,6 +1,6 @@
 {
   "name": "kalm",
-  "version": "0.1.1",
+  "version": "0.0.1",
   "description": "A Kalm Application.",
   "main": "./index.js",
   "scripts": {
@@ -41,10 +41,9 @@
   },
   "dependencies": {
     "circuit-breaker-js": "0.0.1",
-    "ipc-light": "0.1.x",
+    "ipc-light": "0.0.x",
     "portscanner": "1.0.0",
     "signals": "1.0.0",
-    "stack-trace": "0.0.9",
     "walk": "2.3.9"
   }
 }

@@ -14,7 +14,7 @@ function listen(done, failure) {
 	
 	ipc.createServer(function(req, reply) {
 		request.init(req, reply);
-	}).listen(config.connections.ipc.path);
+	}).listen(config.connections.ipc.path, done);
 }
 
 function send(options, message, callback) {

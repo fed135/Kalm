@@ -17,6 +17,8 @@ function Kalm(pkg, config) {
 	this.appConf = config;
 	this._components = {};
 
+	//List of init methods, call at the end of the walk
+	this.moduleInits = [];
 	//Load console first
 	this.registerComponent(stdOut);
 
@@ -48,7 +50,7 @@ Kalm.prototype.registerComponent = function(pkg, path) {
 	this._components[pkg.pkgName] = p;
 
 	if (this._components[pkg.pkgName]._init) {
-		this._components[pkg.pkgName]._init();
+		this.moduleInits.push(this._components[pkg.pkgName]._init);
 	}
 };
 
