@@ -10,13 +10,18 @@ var defaultRoutes = require('./default');
 
 function load(callback) {
 	var _self = this;
+	var routing = K.getComponent('routing');
 	
 	var _confRoutes = K.appConf.routes || [];
 	var _confControllers = K.appConf.controllers || {};
 
 	_confRoutes.forEach(function(e) {
 		e.handler	= _confControllers[e.handler] || _defaultHandler;
-		_self.list.push(e);
+	});
+
+	//TODO:check for duplicates
+	this.list.forEach(function(e, i, arr) {
+		arr[i] = routing.parse(e);
 	});
 
 	if (callback) callback();
@@ -26,7 +31,7 @@ function has(connector) {
 	if (this.list.length === 0) return false;
 	
 	return this.list.every(function(e) {
-		return (e.action.indexOf(connector) !== -1);
+		return (e.connector.indexOf(connector) !== -1);
 	});
 }
 

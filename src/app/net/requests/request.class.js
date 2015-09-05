@@ -7,29 +7,21 @@
  * 4- return formatted result
  */
 
-function init(req, reply, type) {
-	var cl = K.getComponent('console');
+function init(req) {
+	var cl = K.getComponent('console');	
+	var routing = K.getComponent('routing');
 
-	var reqObj = {
-		from: req.domain, //!
-		cookie: req.headers.cookie,
-		path: req.url,
-		method: req.method,
-		payload: req.body || null
-	};
+	//Need to add an I/O tier logging level
+	cl.log('--> ' + req.method + '\t' + req.path);
 
-	cl.log('--> ' + reqObj.method + '\t' + reqObj.path);
-
-	//console.log('hmmmyello');
-	//console.log(reqObj);
-	//request.path
-	//request.tracking id
-	//request.payload
-	//request.action
-	//request.handler
-	//request.meta
-	//(new socket)
-	reply.end('cool');
+	//Look for a match in routes
+	var route = routing.match(req);
+	if (route && route.handler) {
+		route.handler(req, req.reply);
+	}
+	else {
+		req.reply('Page not found', 404);
+	}
 }
 
 module.exports = {

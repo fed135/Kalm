@@ -6,8 +6,8 @@ function print() {
 	return {
 		id: this.id,
 		name: K.pkg.name,
-		location: config.server.location,
-		port: config.server.port,
+		//location: config.server.location,
+		//port: config.server.port,
 		models: models.print(),
 		routes: routes.print(),
 		meta: {
