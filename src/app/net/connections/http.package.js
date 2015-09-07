@@ -32,6 +32,10 @@ function send(options, message, callback) {
 	req.end(message);
 }
 
+function stop(callback) {
+	if (server) server.close(callback);
+}
+
 function _reply(data, code, contentType) {
 	var config = K.getComponent('config');
 
@@ -60,5 +64,6 @@ function _parseArgs(req, res) {
 
 module.exports = {
 	listen: listen,
-	send: send
+	send: send,
+	stop: stop
 };

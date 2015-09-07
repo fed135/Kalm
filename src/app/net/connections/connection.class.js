@@ -36,16 +36,20 @@ function main(callback) {
 	var routes = K.getComponent('routes');
 	var utils = K.getComponent('utils');
 
-	var listeners = [];
+	var servers = [];
 
-	//listeners.push(zmq.listen);
-	//listeners.push(ipc.listen);
+	//this.listeners.push(zmq.listen);
+	this.listeners.push(ipc);
 
-	if (routes.has('http')) listeners.push(http.listen);
-	if (routes.has('tcp')) listeners.push(tcp.listen);
-	if (routes.has('udp')) listeners.push(udp.listen);
+	if (routes.has('http')) this.listeners.push(http);
+	if (routes.has('tcp')) this.listeners.push(tcp);
+	if (routes.has('udp')) this.listeners.push(udp);
 
-	utils.async.all(listeners, callback)
+	this.listeners.forEach(function(e) {
+		servers.push(e.listen)
+	});
+
+	utils.async.all(servers, callback)
 }
 
 function send(type, options, payload, callback) {
@@ -58,6 +62,9 @@ function send(type, options, payload, callback) {
 
 module.exports = {
 	pkgName: 'connection',
+	attributes: {
+		listeners: []
+	},
 	methods: {
 		init: main,
 		send: send

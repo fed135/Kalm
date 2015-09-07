@@ -5,6 +5,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 var logo = require('./logo');
+var terminate = require('./terminate');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -13,6 +14,7 @@ var _tasks = [
 	_runInits,
 	_printLogo,
 	_initRoutes,
+	_addListeners,
 	_setupConnections,
 	_holdProcess
 ];
@@ -86,6 +88,11 @@ function _initRoutes(resolve, reject) {
 		if (err) return reject(err);
 		resolve();
 	});
+}
+
+function _addListeners(resolve) {
+	process.on('SIGINT', terminate);
+	process.on('SIGTERM', terminate);
 }
 
 /*

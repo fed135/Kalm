@@ -10,7 +10,7 @@ module.exports = {
 				path: '/var/local/socket/kalm.socket'
 			},
 			http: {
-				port: 3000,
+				port: 3001,
 				contentType: 'text/json'
 			}
 		}

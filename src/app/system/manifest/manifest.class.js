@@ -18,12 +18,17 @@ function print() {
 	};
 }
 
+function main() {
+	process.title = K.pkg.name;
+}
+
 module.exports = {
 	pkgName: 'manifest',
 	attributes: {
 		id: process.pid	
 	},
 	methods: {
+		_init: main,
 		print: print
 	}
 };
