@@ -24,6 +24,28 @@ function init(req) {
 	}
 }
 
+function send(options, body) {
+	var connection = K.getComponent('connection');
+	var system = K.getComponent('system');
+
+	//Check if same machine to determine connection
+	//to use.
+
+	//Same machine : 
+
+		//IPC on linux
+
+		//ZMQ on windows
+
+	//Different machine (Kalm):
+
+		//ZMQ
+
+	//Different machine (Ext):
+
+		//Use specified or default to http
+}
+
 module.exports = {
 	methods: {
 		init: init
