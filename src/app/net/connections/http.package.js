@@ -38,6 +38,14 @@ function stop(callback) {
 
 function _reply(data, code, contentType) {
 	var config = K.getComponent('config');
+	var cl = K.getComponent('console');
+
+	if (this.__sent) {
+		cl.warn('    http response already send for ' + this.__path);
+		return false;
+	}
+
+	this.__sent = true;
 
 	code = code || 200;
 	contentType = contentType || config.connections.http.contentType;
@@ -49,6 +57,7 @@ function _reply(data, code, contentType) {
 }
 
 function _parseArgs(req, res) {
+	res.__path = req.url;
 	return new Request({
 		uid: req.uid,
 		connection: 'http',

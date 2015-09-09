@@ -31,6 +31,7 @@ function match(req) {
 		if (routes.list[i].connector.indexOf(req.connection) === -1) continue;
 		if (routes.list[i].method !== req.method) continue;
 		if (path === _simplifyPath(routes.list[i].path)) {
+			req.filters = routes.list[i].filters;
 			return this.resolve(req, routes.list[i]);
 		} 
 	}

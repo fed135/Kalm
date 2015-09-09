@@ -8,7 +8,14 @@ var routes = [
 		method: 'GET',
 		path: '/',
 		handler: printManifest,
-		tags: ['default']
+		tags: ['default'],
+		filters: [
+			function (req, reply, next) {
+				//interrupt test
+				reply('Unauthorized', 401);
+				next();
+			}
+		]
 	}
 ];
 

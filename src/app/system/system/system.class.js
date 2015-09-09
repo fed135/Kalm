@@ -8,7 +8,7 @@ function main() {
 	Object.keys(interfaces).forEach(function(i) {
 		interfaces[i].forEach(function(e) {
 			if (!_currAddress) {
-				if (e.family === 'IPv4' && e.internal) {
+				if (e.family === 'IPv4' && !e.internal) {
 					_currAddress = e.address;
 				}
 			}
@@ -16,7 +16,8 @@ function main() {
 	});
 
 	this.location = _currAddress || _defaultAddress;
-	console.log(this.location);
+	this.arch = os.arch();
+	this.platform = os.platform();
 }
 
 module.exports = {

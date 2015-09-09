@@ -20,9 +20,13 @@ function load(callback) {
 	});
 
 	//TODO:check for duplicates
+
 	this.list.forEach(function(e, i, arr) {
 		arr[i] = routing.parse(e);
 	});
+
+	//TODO:put filter strings to their methods
+	
 
 	if (callback) callback();
 }
