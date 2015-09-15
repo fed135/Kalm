@@ -10,6 +10,10 @@ function getKey() {
 
 }
 
+function match(req) {
+
+}
+
 module.exports = {
 	pkgName: 'services',
 	attributes: {
@@ -18,6 +22,7 @@ module.exports = {
 	methods: {
 		getKey: getKey,
 		register: register,
-		unregister: unregister
+		unregister: unregister,
+		match: match
 	}
 };

@@ -29,9 +29,9 @@ function listen(done, failure) {
 	}).listen(config.connections.http.port, done);
 }
 
-function send(options, message, callback) {
+function send(options, callback) {
 	var req = http.request(options, callback);
-	req.end(message);
+	req.end();
 }
 
 function stop(callback) {

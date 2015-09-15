@@ -31,7 +31,7 @@ function ping(req, reply) {
 		path:'/',
 		port:req.params.port,
 		method: 'GET'
-	}, null, function(err, data) {
+	}, function(err, data) {
 		if (err) return reply(err);
 		reply(data);
 	});

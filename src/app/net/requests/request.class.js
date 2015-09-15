@@ -11,8 +11,9 @@ function init(req) {
 	var cl = K.getComponent('console');	
 	var routing = K.getComponent('routing');
 	var filters = K.getComponent('filters');
+	var services = K.getComponent('services');
 
-	//Need to add an I/O tier logging level
+	//TODO: Need to add an I/O tier logging level
 	cl.log('--> ' + req.method + '\t' + req.path);
 
 	//Look for a match in routes
@@ -21,21 +22,29 @@ function init(req) {
 		filters.test(req, req.reply, route.filters, function() {
 			route.handler(req, req.reply);
 		});
-	}
+	} 
 	else {
-		req.reply('Page not found', 404);
+		var subservice = services.match(req);
+		if (subservice) {
+			send(subservice, function(err, data) {
+				if (err) return req.reply(err, err.statusCode);
+				req.reply(data);
+			});
+		}
+		else {
+			req.reply('Page not found', 404);
+		}
 	}
 }
 
-function send(options, body, callback) {
+function send(options, callback) {
 	var connection = K.getComponent('connection');
 	var system = K.getComponent('system');
 	//var services = K.getComponent('services');
 
 	var connector = 'http';
 
-	//Check if same machine to determine connection
-	//to use.
+	//Check if same machine to determine connection to use.
 	if (options.hostname === system.location ||
 		options.hostname === '127.0.0.1' ||
 		options.hostname === '0.0.0.0' || 
@@ -59,7 +68,7 @@ function send(options, body, callback) {
 		}
 	}
 
-	connection.send(connector, options, body, callback);
+	connection.send(connector, options, callback);
 }
 
 module.exports = {

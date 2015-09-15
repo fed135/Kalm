@@ -27,11 +27,9 @@ function listen(done, failure) {
 	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
 }
 
-function send(options, message, callback) {
+function send(options, callback) {
 	var cl = K.getComponent('console');
 	var config = K.getComponent('config');
-
-	options.body = message;
 
 	var socket = ipc.connect({
 		path: config.connections.ipc.path + options.port

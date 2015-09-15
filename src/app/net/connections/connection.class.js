@@ -52,10 +52,10 @@ function main(callback) {
 	utils.async.all(servers, callback)
 }
 
-function send(type, options, payload, callback) {
+function send(type, options, callback) {
 	if (!type in connectors) return callback('Unknown type "' + type + '"');
 
-	connectors[type].send(options, payload, callback);
+	connectors[type].send(options, callback);
 }
 
 /* Exports -------------------------------------------------------------------*/
