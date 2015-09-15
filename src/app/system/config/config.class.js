@@ -7,7 +7,7 @@ module.exports = {
 		connections: {
 			ipc: {
 				evt: 'message',
-				path: '/var/local/socket/kalm.socket'
+				path: '/tmp/'
 			},
 			http: {
 				port: 3001,

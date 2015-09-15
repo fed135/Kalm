@@ -27,7 +27,7 @@ function init(req) {
 	}
 }
 
-function send(options, body) {
+function send(options, body, callback) {
 	var connection = K.getComponent('connection');
 	var system = K.getComponent('system');
 	//var services = K.getComponent('services');
@@ -58,11 +58,14 @@ function send(options, body) {
 		*/
 		}
 	}
+
+	connection.send(connector, options, body, callback);
 }
 
 module.exports = {
 	methods: {
-		init: init
+		init: init,
+		send: send
 	},
 	pkgName: 'request'
 };

@@ -53,7 +53,7 @@ function main(callback) {
 }
 
 function send(type, options, payload, callback) {
-	if (!type in _connectors) return callback('Unknown type "' + type + '"');
+	if (!type in connectors) return callback('Unknown type "' + type + '"');
 
 	connectors[type].send(options, payload, callback);
 }

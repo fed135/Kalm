@@ -31,3 +31,4 @@ node_modules
 
 # Compiled api docs
 api_docs
+/log.txt

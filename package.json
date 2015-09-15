@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "circuit-breaker-js": "0.0.1",
-    "ipc-light": "0.0.x",
+    "ipc-light": "0.1.x",
     "portscanner": "1.0.0",
     "signals": "1.0.0",
     "walk": "2.3.9"

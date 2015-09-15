@@ -18,13 +18,15 @@ function listen(done, failure) {
 	var config = K.getComponent('config');
 	var request = K.getComponent('request');
 	
-	cl.log('   - Starting http server');
+	cl.log('   - Starting http server [ :' + 
+		config.connections.http.port +
+		' ]');
 
 	if (server) return done();
 
 	server = http.createServer(function(req, res) {
 		request.init(_parseArgs(req, res));
-	}).listen(config.connections.http.port,done);
+	}).listen(config.connections.http.port, done);
 }
 
 function send(options, message, callback) {

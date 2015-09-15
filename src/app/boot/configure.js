@@ -124,8 +124,6 @@ function _printLogo(resolve) {
 function _holdProcess(resolve) {
 	var cl = K.getComponent('console');
 
-  process.stdin.resume();
-
   cl.log('Ready!\n');
   resolve();
 }

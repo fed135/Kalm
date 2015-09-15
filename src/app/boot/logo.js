@@ -26,6 +26,12 @@ function big() {
 		'    Kalm v' + K.pkg.version + '\n\n';
 }
 
+function small() {
+	var cl = K.getComponent('console');
+
+	return cl.GREEN + '  K' + cl.WHITE;
+}
+
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
