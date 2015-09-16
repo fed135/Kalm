@@ -17,7 +17,6 @@ var ipc = require('./ipc.package');
 var tcp = require('./tcp.package');
 var udp = require('./udp.package');
 var zmq = require('./zmq.package');
-var socket = require('./socket.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -66,7 +65,7 @@ module.exports = {
 		listeners: []
 	},
 	methods: {
-		init: main,
+		_init: main,
 		send: send
 	}
 };

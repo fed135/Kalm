@@ -14,9 +14,21 @@ function test(req, res, filters, callback) {
 	utils.async.all(filters.map(filterify), callback);
 }
 
+function load(callback) {
+	if (K.appConf.filters) {
+		for (var i in K.appConf.filters) {
+			this.list[i] = K.appConf.filters[i];
+		}
+	}
+}
+
 module.exports = {
 	pkgName: 'filters',
+	attributes: {
+		list: {}
+	},
 	methods: {
+		_init: load,
 		test: test
 	}
 };

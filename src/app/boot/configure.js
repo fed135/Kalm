@@ -5,27 +5,17 @@
 /* Requires ------------------------------------------------------------------*/
 
 var logo = require('./logo');
-var terminate = require('./terminate');
 
 /* Local variables -----------------------------------------------------------*/
 
 var _tasks = [
 	_mixinConfigs,
-	_runInits,
 	_printLogo,
-	_initRoutes,
-	_addListeners,
-	_setupConnections,
-	_holdProcess
+	_runInits,
+	_finish
 ];
 
 /* Methods -------------------------------------------------------------------*/
-
-//Put routes and controllers
-//Scan ports, assign ports to protocols,
-//Start listening (tcp socket/udp socket, based on config)
-//Ready ipc*/zmq
-//Hold process
 
 /**
  * Entry point for boot process. Triggered once all classes are loaded
@@ -69,44 +59,9 @@ function _mixinConfigs(resolve) {
 	var utils = K.getComponent('utils');
 	var config = K.getComponent('config');
 
-	cl.log(' - Setting configs');
-
 	utils.object.mixin(config, K.appConf);
-
+	cl.init();
 	resolve();
-}
-
-/*
-*/
-function _initRoutes(resolve, reject) {
-	var cl = K.getComponent('console');
-	var routes = K.getComponent('routes');
-
-	cl.log(' - Initializing routes');	
-
-	routes.init(function(err) {
-		if (err) return reject(err);
-		resolve();
-	});
-}
-
-function _addListeners(resolve) {
-	process.on('SIGINT', terminate);
-	process.on('SIGTERM', terminate);
-}
-
-/*
-*/
-function _setupConnections(resolve, reject) {
-	var cl = K.getComponent('console');
-	var connection = K.getComponent('connection');
-
-	cl.log(' - Initializing connections');
-
-	connection.init(function(err) {
-		if (err) return reject(err);
-		resolve();
-	});
 }
 
 /*
@@ -121,7 +76,7 @@ function _printLogo(resolve) {
 
 /*
 */
-function _holdProcess(resolve) {
+function _finish(resolve) {
 	var cl = K.getComponent('console');
 
   cl.log('Ready!\n');

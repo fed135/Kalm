@@ -51,8 +51,10 @@ function print(msg) {
 }
 
 function main() {
-	var utils = K.getComponent('utils');
-	var ret = utils.object.mixin(this, colors.getList());
+	var _list = colors.getList();
+	for (var c in _list) {
+		this[c] = _list[c];
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -65,6 +67,6 @@ module.exports = {
 		log: log,
 		warn: warn,
 		error: error,
-		_init: main
+		init: main
 	}
 };

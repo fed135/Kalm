@@ -10,7 +10,7 @@ module.exports = {
 				path: '/tmp/'
 			},
 			http: {
-				port: 3001,
+				port: 3000,
 				contentType: 'text/json'
 			}
 		}

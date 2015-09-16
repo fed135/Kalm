@@ -33,6 +33,8 @@ Kalm.prototype.registerComponent = function(pkg, path) {
 		cl.error('No pkg name! ' + path);
 		return false;
 	}
+
+	if (this._components[pkg.pkgName]) return;
 	
 	p = pkg.attributes || {};
 

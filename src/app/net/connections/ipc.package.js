@@ -5,7 +5,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 var ipc = require('ipc-light');
-var Request = require('./request.package');
+var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -22,22 +22,17 @@ function listen(done, failure) {
 	cl.log('   - Starting ipc server  [ :i' + manifest.id + ' ]');
 
 	server = ipc.createServer(function(req, reply) {
-		cl.log('Received IPC request');
 		request.init(_parseArgs(req, reply));
 	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
 }
 
 function send(options, callback) {
-	var cl = K.getComponent('console');
 	var config = K.getComponent('config');
 
 	var socket = ipc.connect({
 		path: config.connections.ipc.path + options.port
 	});
 	socket.ondata.add(function(err, data) {
-		cl.log('Got response from IPC emit');
-		console.log(data);
-		console.log(callback);
 		socket.disconnect();
 		if (callback) callback(err, data)
 	}); 
@@ -45,19 +40,21 @@ function send(options, callback) {
 }
 
 function stop(callback) {
+	var cl = K.getComponent('console');
+	cl.warn('   - Stopping ipc server');
 	//TODO: delete the socket file
+	
 	if (server) server.close(callback);
 }
 
 function _parseArgs(req, res) {
-	return new Request({
+	return frame.create({
 		uid: req.uid,
 		connection: 'ipc',
 		reply: res,
-		cookie: {},
 		path: req.path,
 		method: req.method,
-		payload: req.body || null
+		payload: req.body
 	});
 }
 

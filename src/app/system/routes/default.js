@@ -23,8 +23,6 @@ var routes = [
 
 
 function ping(req, reply) {
-	console.log('pinging port' + req.params.port);
-	//reply('nice!');
 	var request = K.getComponent('request');
 	request.send({
 		hostname:'localhost',

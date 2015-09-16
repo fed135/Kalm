@@ -38,6 +38,6 @@ module.exports = {
 		register: register,
 		unregister: unregister,
 		match: match,
-		init: load
+		_init: load
 	}
 };

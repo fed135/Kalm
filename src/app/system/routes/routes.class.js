@@ -65,7 +65,7 @@ module.exports = {
 		list: defaultRoutes	//Add your custom routes here
 	},
 	methods: {
-		init: load,
+		_init: load,
 		has: has,
 		print: print
 	}

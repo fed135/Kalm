@@ -5,7 +5,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 var http = require('http');
-var Request = require('./request.package');
+var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -35,6 +35,9 @@ function send(options, callback) {
 }
 
 function stop(callback) {
+	var cl = K.getComponent('console');
+	cl.warn('   - Stopping http server');
+
 	if (server) server.close(callback);
 }
 
@@ -43,7 +46,7 @@ function _reply(data, code, contentType) {
 	var cl = K.getComponent('console');
 
 	if (this.__sent) {
-		cl.warn('    http response already send for ' + this.__path);
+		cl.warn('    http response already sent for ' + this.__path);
 		return false;
 	}
 
@@ -60,14 +63,15 @@ function _reply(data, code, contentType) {
 
 function _parseArgs(req, res) {
 	res.__path = req.url;
-	return new Request({
+	return frame.create({
 		uid: req.uid,
 		connection: 'http',
 		reply: _reply.bind(res),
-		cookie: req.headers.cookie,
+		cookies: req.headers.cookie,
 		path: req.url,
+		headers: req.headers,
 		method: req.method,
-		payload: req.body || null
+		payload: req.body
 	});
 }
 
