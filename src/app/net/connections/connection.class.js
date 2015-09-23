@@ -37,7 +37,7 @@ function main(callback) {
 
 	var servers = [];
 
-	//this.listeners.push(zmq.listen);
+	this.listeners.push(zmq);
 	this.listeners.push(ipc);
 
 	if (routes.has('http')) this.listeners.push(http);

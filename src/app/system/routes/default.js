@@ -14,7 +14,7 @@ var routes = [
 	{
 		connector: [ 'http' ],
 		method: 'GET',
-		path: '/ping/:port',
+		path: '/ping/:connector/:port',
 		tags: [ 'test' ],
 		filter: [],
 		handler: ping
@@ -25,10 +25,11 @@ var routes = [
 function ping(req, reply) {
 	var request = K.getComponent('request');
 	request.send({
-		hostname:'localhost',
+		hostname:'0.0.0.0',
 		path:'/',
 		port:req.params.port,
-		method: 'GET'
+		method: 'GET',
+		connector:req.params.connector
 	}, function(err, data) {
 		if (err) return reply(err);
 		reply(data);

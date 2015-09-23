@@ -42,7 +42,6 @@ function send(options, callback) {
 function stop(callback) {
 	var cl = K.getComponent('console');
 	cl.warn('   - Stopping ipc server');
-	//TODO: delete the socket file
 	
 	if (server) server.close(callback);
 }

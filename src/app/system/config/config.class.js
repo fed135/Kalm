@@ -10,8 +10,12 @@ module.exports = {
 				path: '/tmp/'
 			},
 			http: {
-				port: 3000,
+				port: 3001,
 				contentType: 'text/json'
+			},
+			zmq: {
+				port: 4001,
+				evt: 'KalmZMQ'
 			}
 		}
 	}

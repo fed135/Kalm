@@ -45,26 +45,26 @@ function send(options, callback) {
 	var connector = 'http';
 
 	//Check if same machine to determine connection to use.
-	if (options.hostname === system.location ||
-		options.hostname === '127.0.0.1' ||
-		options.hostname === '0.0.0.0' || 
-		options.hostname === 'localhost') {
-		//IPC on linux
-		//ZMQ on windows
-		if (system.platform === 'windows') connector = 'zmq';
-		else connector = 'ipc';
-	}
+	if (options.connector) connector = options.connector;
 	else {
-		if (options.connector) connector = options.connector;
-		else {
-		/*
-		for (var i = 0; i < services.list.length; i++) {
-			if (services.list[i].hostname === options.hostname) {
-				connector = 'zmq';
-				break;
-			}
+		if (options.hostname === system.location ||
+			options.hostname === '127.0.0.1' ||
+			options.hostname === '0.0.0.0' || 
+			options.hostname === 'localhost') {
+			//IPC on linux
+			//ZMQ on windows
+			if (system.platform === 'windows') connector = 'zmq';
+			else connector = 'ipc';
 		}
-		*/
+		else {
+			/*
+			for (var i = 0; i < services.list.length; i++) {
+				if (services.list[i].hostname === options.hostname) {
+					connector = 'zmq';
+					break;
+				}
+			}
+			*/
 		}
 	}
 
