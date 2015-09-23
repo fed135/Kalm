@@ -4,7 +4,7 @@
 
 var routes = [
 	{
-		connector: [ 'ipc', 'zmq', 'http' ],
+		connector: [ 'ipc', 'zmq', 'http', 'tcp', 'udp' ],
 		method: 'GET',
 		path: '/',
 		handler: printManifest,

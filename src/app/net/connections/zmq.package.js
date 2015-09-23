@@ -5,6 +5,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 var zmq = require('zmq');
+var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -21,19 +22,26 @@ function listen(done, failure) {
 
 	server = zmq.socket('pull');
 	server.connect('tcp://127.0.0.1:' + config.connections.zmq.port);
-	server.on('message', function(evt, body) {
+	server.on('message', function(body) {
 		console.log(body);
+		console.log(body.toString());
+		request.init(_parseArgs(JSON.parse(body.toString())));
 	});
 	done();
 }
 
 function send(options, callback) {
 	var config = K.getComponent('config');
-	console.log('zmq send');
 	var socket = zmq.socket('push');
-	socket.bindSync('tcp://' + options.hostname + ':' + options.port);
-	console.log('sending ' + 'tcp://' + options.hostname + ':' + options.port);
-	socket.send(options);
+	socket.bind('tcp://' + options.hostname + ':' + options.port, function(err) {
+		if (err) return callback(err);
+		console.log('sending');
+		socket.send(JSON.stringify(options));	
+	});
+	socket.on('message', function(body) {
+		//Need to unbind... or else it crashes
+		callback();
+	});
 }
 
 function stop(callback) {
@@ -48,7 +56,8 @@ function _parseArgs(req, res) {
 		uid: req.uid,
 		connection: 'zmq',
 		reply: function(body, code) {
-			res(null, body);
+			req.origin.body = body;	//hack
+			send(req.origin);
 		},
 		path: req.path,
 		method: req.method,

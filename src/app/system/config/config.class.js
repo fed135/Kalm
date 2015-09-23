@@ -16,6 +16,12 @@ module.exports = {
 			zmq: {
 				port: 4001,
 				evt: 'KalmZMQ'
+			},
+			tcp: {
+				port: 5001
+			},
+			udp: {
+				port: 6001
 			}
 		}
 	}

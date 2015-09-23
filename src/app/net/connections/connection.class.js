@@ -52,7 +52,17 @@ function main(callback) {
 }
 
 function send(type, options, callback) {
+	var system = K.getComponent('system');
+	var config = K.getComponent('config');
+
 	if (!type in connectors) return callback('Unknown type "' + type + '"');
+
+	if (!options.origin) {
+		options.origin = {
+			hostname: system.location,
+			port: config.connections[type].port
+		};
+	}
 
 	connectors[type].send(options, callback);
 }

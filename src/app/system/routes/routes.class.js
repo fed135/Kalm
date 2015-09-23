@@ -34,9 +34,10 @@ function load(callback) {
 function has(connector) {
 	if (this.list.length === 0) return false;
 	
-	return this.list.every(function(e) {
-		return (e.connector.indexOf(connector) !== -1);
-	});
+	for(var i = 0; i < this.list.length; i++) {
+		if (this.list[i].connector.indexOf(connector) !== -1) return true;
+	}
+	return false;
 }
 
 function print() {

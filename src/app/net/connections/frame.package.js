@@ -11,7 +11,10 @@ var _defaults = {
 	payload: null,
 	params: {},
 	_stats: {},
-	origin: null,
+	origin: {
+		hostname: null,
+		port: null
+	},
 	authKey: null
 };
 
@@ -21,6 +24,7 @@ function create(req) {
 
 	var template = utils.object.mixin({}, _defaults);
 	template.uid = manifest.id + '.' + _requestUid++;
+	
 	return utils.object.mixin(template, req);
 }
 

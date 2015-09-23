@@ -21,6 +21,8 @@ function listen(done, failure) {
 
 	cl.log('   - Starting ipc server  [ :i' + manifest.id + ' ]');
 
+	config.connections.ipc.port = 'i' + manifest.id;
+
 	server = ipc.createServer(function(req, reply) {
 		request.init(_parseArgs(req, reply));
 	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
