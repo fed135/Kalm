@@ -78,6 +78,7 @@ function _parseArgs(req, res) {
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
+	name: 'http',
 	listen: listen,
 	send: send,
 	stop: stop

@@ -4,7 +4,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var dgram = require('dgram');
+var ipc = require('ipc-light');
 var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
@@ -16,35 +16,29 @@ var server;
 function listen(done, failure) {
 	var config = K.getComponent('config');
 	var request = K.getComponent('request');
+	var manifest = K.getComponent('manifest');
 	var cl = K.getComponent('console');
 
-	cl.log('   - Starting udp server  [ :' + config.connections.udp.port + ' ]');
+	cl.log('   - Starting ipc server  [ :i' + manifest.id + ' ]');
 
-	server = net.createServer(function(req, reply) {
+	config.connections.ipc.port = 'i' + manifest.id;
+
+	server = ipc.createServer(function(req, reply) {
 		request.init(_parseArgs(req, reply));
-	}).listen(config.connections.tcp.port, done);
-	server = dgram.createSocket('udp4');
-	server.on('message', function (req, reply) {
-    request.init(_parseArgs(req, reply));
-  });
-  server.bind(config.connections.udp.port, '127.0.0.1');
+	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
 }
 
 function send(options, callback) {
+	var config = K.getComponent('config');
 
-	var client = dgram.createSocket('udp4');
-	var message = new Buffer(options);
-	client.send(message, 0, message.length, option.port, option.hostname, function(err, bytes) {
-    if (err) {
-    	client.close();
-    	callback(err);
-    }
+	var socket = ipc.connect({
+		path: config.connections.ipc.path + options.port
 	});
-
-	client.on('message', function(data){
-		callback(null, data.toString());
-    client.close();
-	});
+	socket.ondata.add(function(err, data) {
+		socket.disconnect();
+		if (callback) callback(err, data)
+	}); 
+	socket.emit(options);
 }
 
 function stop(callback) {
@@ -57,11 +51,8 @@ function stop(callback) {
 function _parseArgs(req, res) {
 	return frame.create({
 		uid: req.uid,
-		connection: 'udp',
-		reply: function(body, code) {
-			res.body = body;
-			send(res);
-		},
+		connection: 'ipc',
+		reply: res,
 		path: req.path,
 		method: req.method,
 		payload: req.body
@@ -71,6 +62,8 @@ function _parseArgs(req, res) {
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
+	name: 'ipc',
+	autoload: true,
 	listen: listen,
 	send: send,
 	stop: stop

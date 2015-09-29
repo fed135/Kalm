@@ -4,8 +4,6 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var logo = require('./logo');
-
 /* Local variables -----------------------------------------------------------*/
 
 var _tasks = [
@@ -68,7 +66,18 @@ function _mixinConfigs(resolve) {
 */
 function _printLogo(resolve) {
 	var cl = K.getComponent('console');
-  cl.print(logo.big());
+  cl.print(cl.GREEN + '\n	  _\n' +
+		'         /\\_\\\n' +
+		'        / / /  ' + cl.WHITE + '_' + cl.GREEN + '\n' +
+		'       / / /  ' + cl.WHITE + '/\\_\\' + cl.GREEN + '\n' +
+		'      / / /' + cl.WHITE + '__/ / /' + cl.GREEN + '\n' +
+		'     / /' + cl.WHITE + '\\_____/ /' + cl.GREEN + '\n' +
+		'    / /' + cl.WHITE + '\\_______/' + cl.GREEN + '\n' +
+		'   / / /' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
+		'  / / /  ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
+		' / / /    ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
+		' \\/_/      ' + cl.BLUE + '\\_\\_\\' + cl.WHITE + 
+		'    Kalm v' + K.pkg.version + '\n\n');
 
   cl.log('Starting service...');
   resolve();

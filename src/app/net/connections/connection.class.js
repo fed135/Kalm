@@ -1,70 +1,37 @@
 /**
  * Connection class
  * This is the regroupement of all the i/o adapters.
- *
- * LISTEN:
- * http/https: only gatekeeper + listed route
- * tcp: only gatekeeper + listed route
- * udp: only gatekeeper + listed route
- * zmq: everyone
- * ipc: everyone(?)
  */
 
 /* Requires ------------------------------------------------------------------*/
 
-var http = require('./http.package');
-var ipc = require('./ipc.package');
-var tcp = require('./tcp.package');
-var udp = require('./udp.package');
-var zmq = require('./zmq.package');
-
 /* Local variables -----------------------------------------------------------*/
-
-var connectors = {
-	http: http,
-	ipc: ipc,
-	tcp: tcp,
-	udp: udp,
-	zmq: zmq
-};
 
 /* Methods -------------------------------------------------------------------*/
 
-function main(callback) {
-
+/**
+ *
+ */
+function loadAdapter(adapter, path, callback) {
 	var routes = K.getComponent('routes');
+
+	this.adapters[adapter.name] = adapter;
+	if (adapter.autoload || routes.has(adapter.name)) {
+		adapter.listen(callback);
+	}
+	else callback();
+}
+
+function main(callback) {
 	var utils = K.getComponent('utils');
 
-	var servers = [];
-
-	this.listeners.push(zmq);
-	this.listeners.push(ipc);
-
-	if (routes.has('http')) this.listeners.push(http);
-	if (routes.has('tcp')) this.listeners.push(tcp);
-	if (routes.has('udp')) this.listeners.push(udp);
-
-	this.listeners.forEach(function(e) {
-		servers.push(e.listen)
-	});
-
-	utils.async.all(servers, callback)
+	utils.loader.load('./', '.adapter.js', _loadAdapter.bind(this), callback);
 }
 
 function send(type, options, callback) {
-	var system = K.getComponent('system');
-	var config = K.getComponent('config');
+	if (!type in this.adapters) return callback('Unknown type "' + type + '"');
 
-	if (!type in connectors) return callback('Unknown type "' + type + '"');
-
-	if (!options.origin) {
-		options.origin = {
-			hostname: system.location,
-			port: config.connections[type].port
-		};
-	}
-
-	connectors[type].send(options, callback);
+	this.adapters[type].send(options, callback);
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -72,10 +39,11 @@ function send(type, options, callback) {
 module.exports = {
 	pkgName: 'connection',
 	attributes: {
-		listeners: []
+		adapters: []
 	},
 	methods: {
 		_init: main,
+		load: load,
 		send: send
 	}
 };

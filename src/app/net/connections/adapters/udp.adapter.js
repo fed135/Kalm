@@ -1,10 +1,10 @@
 /**
- * ZMQ connector methods
+ * InterProcessCall connector methods
  */
 
 /* Requires ------------------------------------------------------------------*/
 
-var zmq = require('zmq');
+var dgram = require('dgram');
 var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
@@ -18,35 +18,38 @@ function listen(done, failure) {
 	var request = K.getComponent('request');
 	var cl = K.getComponent('console');
 
-	cl.log('   - Starting zmq server  [ :' + config.connections.zmq.port + ' ]');
+	cl.log('   - Starting udp server  [ :' + config.connections.udp.port + ' ]');
 
-	server = zmq.socket('pull');
-	server.connect('tcp://127.0.0.1:' + config.connections.zmq.port);
-	server.on('message', function(body) {
-		console.log(body);
-		console.log(body.toString());
-		request.init(_parseArgs(JSON.parse(body.toString())));
-	});
-	done();
+	server = net.createServer(function(req, reply) {
+		request.init(_parseArgs(req, reply));
+	}).listen(config.connections.tcp.port, done);
+	server = dgram.createSocket('udp4');
+	server.on('message', function (req, reply) {
+    request.init(_parseArgs(req, reply));
+  });
+  server.bind(config.connections.udp.port, '127.0.0.1');
 }
 
 function send(options, callback) {
-	var config = K.getComponent('config');
-	var socket = zmq.socket('push');
-	socket.bind('tcp://' + options.hostname + ':' + options.port, function(err) {
-		if (err) return callback(err);
-		console.log('sending');
-		socket.send(JSON.stringify(options));	
+
+	var client = dgram.createSocket('udp4');
+	var message = new Buffer(options);
+	client.send(message, 0, message.length, option.port, option.hostname, function(err, bytes) {
+    if (err) {
+    	client.close();
+    	callback(err);
+    }
 	});
-	socket.on('message', function(body) {
-		//Need to unbind... or else it crashes
-		callback();
+
+	client.on('message', function(data){
+		callback(null, data.toString());
+    client.close();
 	});
 }
 
 function stop(callback) {
 	var cl = K.getComponent('console');
-	cl.warn('   - Stopping zmq server');
+	cl.warn('   - Stopping ipc server');
 	
 	if (server) server.close(callback);
 }
@@ -54,10 +57,10 @@ function stop(callback) {
 function _parseArgs(req, res) {
 	return frame.create({
 		uid: req.uid,
-		connection: 'zmq',
+		connection: 'udp',
 		reply: function(body, code) {
-			req.origin.body = body;	//hack
-			send(req.origin);
+			res.body = body;
+			send(res);
 		},
 		path: req.path,
 		method: req.method,
@@ -68,6 +71,7 @@ function _parseArgs(req, res) {
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
+	name: 'udp',
 	listen: listen,
 	send: send,
 	stop: stop

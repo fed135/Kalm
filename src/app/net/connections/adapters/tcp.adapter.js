@@ -4,7 +4,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var ipc = require('ipc-light');
+var net = require('net');
 var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
@@ -16,29 +16,27 @@ var server;
 function listen(done, failure) {
 	var config = K.getComponent('config');
 	var request = K.getComponent('request');
-	var manifest = K.getComponent('manifest');
 	var cl = K.getComponent('console');
 
-	cl.log('   - Starting ipc server  [ :i' + manifest.id + ' ]');
+	cl.log('   - Starting tcp server  [ :' + config.connections.tcp.port + ' ]');
 
-	config.connections.ipc.port = 'i' + manifest.id;
-
-	server = ipc.createServer(function(req, reply) {
+	server = net.createServer(function(req, reply) {
 		request.init(_parseArgs(req, reply));
-	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
+	}).listen(config.connections.tcp.port, done);
 }
 
 function send(options, callback) {
-	var config = K.getComponent('config');
 
-	var socket = ipc.connect({
-		path: config.connections.ipc.path + options.port
-	});
-	socket.ondata.add(function(err, data) {
+	var socket = net.connect(options);
+	socket.on('data', function(data) {
 		socket.disconnect();
-		if (callback) callback(err, data)
-	}); 
-	socket.emit(options);
+		if (callback) callback(null, data);
+	});
+	socket.on('error', function(err) {
+		socket.disconnect();
+		if (callback) callback(err);
+	});
+	socket.write(options);
 }
 
 function stop(callback) {
@@ -51,7 +49,7 @@ function stop(callback) {
 function _parseArgs(req, res) {
 	return frame.create({
 		uid: req.uid,
-		connection: 'ipc',
+		connection: 'tcp',
 		reply: res,
 		path: req.path,
 		method: req.method,
@@ -62,6 +60,7 @@ function _parseArgs(req, res) {
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
+	name: 'tcp',
 	listen: listen,
 	send: send,
 	stop: stop

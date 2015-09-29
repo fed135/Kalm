@@ -8,7 +8,7 @@ var Signal = require('signals');
 
 /* Local variables -----------------------------------------------------------*/
 
-/* Class ---------------------------------------------------------------------*/
+/* Classes -------------------------------------------------------------------*/
 
 /**
  * Request class
@@ -26,7 +26,7 @@ function Request() {
 	this.connector = null;
 	this.headers = {};
 	this.authKey = null;
-	this.id;
+	this.id = null;
 	this.status = 0;
 
 	this.__events = {};
