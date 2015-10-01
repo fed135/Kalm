@@ -28,19 +28,20 @@ function Kalm(pkg, config) {
 
 	var utils = this.getComponent('utils');
 
-	utils.loader.load('./app', '.class.js', this.registerComponent, configure);
+	utils.loader.load('src/app', '.class.js', this.registerComponent.bind(this), configure);
 }
 
 Kalm.prototype.registerComponent = function(pkg, path, callback) {
-	var cl = this.getComponent('console');
 	var p;
 
 	if (!pkg.pkgName) {
-		cl.error('No pkg name! ' + path);
+		console.error('No pkg name! ' + path);
 		return false;
 	}
 
-	if (this._components[pkg.pkgName]) return;
+	if (this._components[pkg.pkgName]) {
+		if (callback) return callback();
+	}
 	
 	p = pkg.attributes || {};
 
@@ -50,7 +51,7 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 				p[e] = pkg.methods[e].bind(p);
 			}
 			else {
-				cl.warn(e + 'is not a method in ' + pkg.pkgName)
+				console.warn(e + 'is not a method in ' + pkg.pkgName)
 			}
 		});
 	}

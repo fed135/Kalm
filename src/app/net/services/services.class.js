@@ -21,6 +21,10 @@ function match(req) {
 }
 
 function load(callback) {
+	var cl = K.getComponent('console');
+
+	cl.log(' - Initializing services class');
+	
 	if (K.appConf.services && K.appConf.services.length) {
 		K.appConf.services.forEach(this.register);
 	}

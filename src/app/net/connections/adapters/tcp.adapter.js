@@ -5,7 +5,6 @@
 /* Requires ------------------------------------------------------------------*/
 
 var net = require('net');
-var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -41,7 +40,7 @@ function send(options, callback) {
 
 function stop(callback) {
 	var cl = K.getComponent('console');
-	cl.warn('   - Stopping ipc server');
+	cl.warn('   - Stopping tcp server');
 	
 	if (server) server.close(callback);
 }

@@ -15,6 +15,9 @@ function test(req, res, filters, callback) {
 }
 
 function load(callback) {
+	var cl = K.getComponent('console');
+
+	cl.log(' - Initializing filter class');
 	if (K.appConf.filters) {
 		for (var i in K.appConf.filters) {
 			this.list[i] = K.appConf.filters[i];

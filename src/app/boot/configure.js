@@ -38,14 +38,14 @@ function main() {
 
 /*
 */
-function _runInits(resolve) {
+function _runInits(resolve, failure) {
 	var utils = K.getComponent('utils');
 	var cl = K.getComponent('console');
 
 	cl.log(' - Initializing components');
 
 	utils.async.all(K.moduleInits, function(err) {
-		if (err) cl.error(err);
+		if (err) failure(err);
 		else resolve();
 	});
 }

@@ -19,6 +19,10 @@ function print() {
 }
 
 function main() {
+	var cl = K.getComponent('console');
+
+	cl.log(' - Initializing manifest class');
+
 	process.title = K.pkg.name;
 }
 

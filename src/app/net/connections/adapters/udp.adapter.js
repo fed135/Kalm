@@ -5,7 +5,6 @@
 /* Requires ------------------------------------------------------------------*/
 
 var dgram = require('dgram');
-var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -20,9 +19,6 @@ function listen(done, failure) {
 
 	cl.log('   - Starting udp server  [ :' + config.connections.udp.port + ' ]');
 
-	server = net.createServer(function(req, reply) {
-		request.init(_parseArgs(req, reply));
-	}).listen(config.connections.tcp.port, done);
 	server = dgram.createSocket('udp4');
 	server.on('message', function (req, reply) {
     request.init(_parseArgs(req, reply));
@@ -49,7 +45,7 @@ function send(options, callback) {
 
 function stop(callback) {
 	var cl = K.getComponent('console');
-	cl.warn('   - Stopping ipc server');
+	cl.warn('   - Stopping udp server');
 	
 	if (server) server.close(callback);
 }

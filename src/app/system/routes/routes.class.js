@@ -10,8 +10,11 @@ var defaultRoutes = require('./default');
 
 function load(callback) {
 	var _self = this;
+	var cl = K.getComponent('console');
 	var routing = K.getComponent('routing');
 	
+	cl.log(' - Initializing routes class');
+
 	var _confRoutes = K.appConf.routes || [];
 	var _confControllers = K.appConf.controllers || {};
 

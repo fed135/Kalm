@@ -24,8 +24,12 @@ function loadAdapter(adapter, path, callback) {
 
 function main(callback) {
 	var utils = K.getComponent('utils');
+	var cl = K.getComponent('console');
 
-	utils.loader.load('./', '.adapter.js', _loadAdapter.bind(this), callback);
+	cl.log(' - Initializing connections class');
+	utils.loader.load('./', '.adapter.js', loadAdapter.bind(this), function() {
+		//TODO: add listen here(?)
+	});
 }
 
 function send(type, options, callback) {
@@ -43,7 +47,7 @@ module.exports = {
 	},
 	methods: {
 		_init: main,
-		load: load,
+		load: loadAdapter,
 		send: send
 	}
 };

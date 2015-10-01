@@ -9,6 +9,10 @@ function register(model) {
 }
 
 function load(callback) {
+	var cl = K.getComponent('console');
+
+	cl.log(' - Initializing models class');
+
 	if (K.appConf.models && K.appConf.models.length) {
 		K.appConf.models.forEach(this.register);
 	}

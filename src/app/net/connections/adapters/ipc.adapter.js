@@ -5,7 +5,6 @@
 /* Requires ------------------------------------------------------------------*/
 
 var ipc = require('ipc-light');
-var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
 

@@ -5,7 +5,6 @@
 /* Requires ------------------------------------------------------------------*/
 
 var zmq = require('zmq');
-var frame = require('./frame.package');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -23,8 +22,6 @@ function listen(done, failure) {
 	server = zmq.socket('pull');
 	server.connect('tcp://127.0.0.1:' + config.connections.zmq.port);
 	server.on('message', function(body) {
-		console.log(body);
-		console.log(body.toString());
 		request.init(_parseArgs(JSON.parse(body.toString())));
 	});
 	done();
