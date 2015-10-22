@@ -23,13 +23,16 @@ var routes = [
 
 
 function ping(req, reply) {
+	var friends = K.getComponent('friends');
 	var request = K.getComponent('request');
-	request.send({
-		hostname:'0.0.0.0',
-		path:'/',
-		port:req.params.port,
-		method: 'GET',
-		connector:req.params.connector
+
+	//DESIGN TEST
+	friends.getOrCreate('local-'+req.params.connector, {
+		port: req.params.port,
+		adapter: req.params.connector,
+		circle: 'test'
+	}).send({
+		path:'/'
 	}, function(err, data) {
 		if (err) return reply(err);
 		reply(data);

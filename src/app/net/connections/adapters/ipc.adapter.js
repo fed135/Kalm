@@ -1,5 +1,7 @@
 /**
  * InterProcessCall connector methods
+ * @adapter ipc
+ * @exports {object}
  */
 
 /* Requires ------------------------------------------------------------------*/
@@ -8,10 +10,18 @@ var ipc = require('ipc-light');
 
 /* Local variables -----------------------------------------------------------*/
 
-var server;
+var server; /** {ipc.Server|null} The ipc server for this process
 
 /* Methods -------------------------------------------------------------------*/
 
+/**
+ * Listens for ipc connections on the selected port.
+ * socket connections are created with a friend (which is created if not 
+ * already present)
+ * @method listen
+ * @param {function} done The success callback for the operation
+ * @param {function} failure The error callback for the operation
+ */
 function listen(done, failure) {
 	var config = K.getComponent('config');
 	var request = K.getComponent('request');
@@ -23,21 +33,42 @@ function listen(done, failure) {
 	config.connections.ipc.port = 'i' + manifest.id;
 
 	server = ipc.createServer(function(req, reply) {
-		request.init(_parseArgs(req, reply));
+		request.init(null, _parseArgs(req, reply));
 	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
 }
 
-function send(options, callback) {
+/**
+ * Re-uses or creates a socket client to communicate with another service
+ * @method send
+ * @param {Friend} friend The friend service to send to
+ * @param {object} options The details of the request
+ * @param {ipc.Client|null} socket The socket to use
+ * @param {function|null} callback The callback method
+ */
+function send(friend, options, socket, callback) {
 	var config = K.getComponent('config');
 
-	var socket = ipc.connect({
-		path: config.connections.ipc.path + options.port
-	});
-	socket.ondata.add(function(err, data) {
-		socket.disconnect();
-		if (callback) callback(err, data)
-	}); 
+	if (socket === null) {
+		socket = ipc.connect({
+			path: config.connections.ipc.path + friend.port
+		});
+		socket.ondisconnect.add(function() {
+			var i = friend.__pool.indexOf(socket);
+			if (i !== -1) friend.__pool.splice(i, 1);
+		});
+	}
+
 	socket.emit(options);
+
+	if (friend.poolSize > friend.__pool.length) {
+		friend.__pool.push(socket);
+
+		socket.ondata.add(function (err, data) {
+			request.init(socket, _parseArgs(data, null));
+		});
+	}
+	else socket.disconnect();
+	if (callback) callback();
 }
 
 function stop(callback) {

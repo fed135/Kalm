@@ -21,6 +21,8 @@ function terminate(callback) {
   cl.print('\r  ');
 	cl.warn('Shutting down...');
 
+	K.onBeforeShutdown.dispatch();
+
 	utils.async.all(
 		Object.keys(connection.adapters).map(function(e){
 			return connection.adapters[e].stop;
@@ -29,7 +31,7 @@ function terminate(callback) {
 	);
 
 	//Just in case something goes bad
-	setTimeout(_kill, 1000);
+	setTimeout(_kill, 1500);
 }
 
 function _kill() {
@@ -38,7 +40,8 @@ function _kill() {
 
 module.exports = {
 	methods: {
-		_init: main
+		_init: main,
+		terminate: terminate
 	},
 	pkgName: 'events'
 };

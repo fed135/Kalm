@@ -1,6 +1,10 @@
 /**
  * ZMQ connector methods
+ * @adapter zmq
+ * @exports {object}
  */
+
+'use strict'
 
 /* Requires ------------------------------------------------------------------*/
 

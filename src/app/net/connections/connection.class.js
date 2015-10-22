@@ -32,10 +32,10 @@ function main(callback) {
 	});
 }
 
-function send(type, options, callback) {
-	if (!type in this.adapters) return callback('Unknown type "' + type + '"');
+function send(friend, options, socket, callback) {
+	if (!friend.adapter in this.adapters) return callback('Unknown type "' + type + '"');
 
-	this.adapters[type].send(options, callback);
+	this.adapters[type].send(friend, options, socket, callback);
 }
 
 /* Exports -------------------------------------------------------------------*/
