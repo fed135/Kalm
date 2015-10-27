@@ -7,6 +7,19 @@
 
 /* Local variables -----------------------------------------------------------*/
 
+var callWrapper = {
+	origin: {
+		id: '',
+		hostname: '0.0.0.0',
+		port: 80,
+		name: ''
+	},
+	metadata: {
+		serviceId: '',
+		keepAlive: true
+	}
+};
+
 /* Methods -------------------------------------------------------------------*/
 
 /**
@@ -25,17 +38,40 @@ function loadAdapter(adapter, path, callback) {
 function main(callback) {
 	var utils = K.getComponent('utils');
 	var cl = K.getComponent('console');
+	var manifest = K.getComponent('manifest');
 
 	cl.log(' - Initializing connections class');
-	utils.loader.load('./', '.adapter.js', loadAdapter.bind(this), function() {
-		//TODO: add listen here(?)
-	});
+	utils.loader.load('./', '.adapter.js', loadAdapter.bind(this), callback);
+
+	callWrapper.origin.id = manifest.id;
+	callWrapper.origin.name = K.pkg.name;
 }
 
-function send(friend, options, socket, callback) {
-	if (!friend.adapter in this.adapters) return callback('Unknown type "' + type + '"');
+function createClient(service) {
+	if (!service.adapter in this.adapters) {
+		return callback('Unknown type "' + service.adapter + '"');
+	}
 
-	this.adapters[type].send(friend, options, socket, callback);
+	return this.adapters[service.adapter].createClient(service);
+}
+
+function send(service, payload, socket, callback) {
+	var config = K.getComponent('config');
+	var system = K.getComponent('system');
+
+	if (!service.adapter in this.adapters) {
+		return callback('Unknown type "' + service.adapter + '"');
+	}
+
+	callWrapper.origin.hostname = system.location;
+	callWrapper.origin.port = config.connections[service.adapter].port;
+	callWrapper.metadata.serviceId = service.label;
+	callWrapper.metadata.keepAlive = service.keepAlive;
+	callWrapper.payload = payload;
+
+	console.log(callWrapper);
+
+	this.adapters[service.adapter].send(service, callWrapper, socket, callback);
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -48,6 +84,7 @@ module.exports = {
 	methods: {
 		_init: main,
 		load: loadAdapter,
+		createClient: createClient,
 		send: send
 	}
 };

@@ -9,6 +9,10 @@
 
 var Circle = require('./circle.package');
 
+/* Local variables -----------------------------------------------------------*/
+
+var _list = {};
+
 /* Methods -------------------------------------------------------------------*/
 
 /**
@@ -25,7 +29,7 @@ function create(name, options) {
 	options = options || Object.create(null);
 	options.label = name || utils.crypto.uid();
 	c = new Circle(options);
-	this.list[c.label] = c;
+	_list[c.label] = c;
 	return c;
 }
 
@@ -37,9 +41,7 @@ function create(name, options) {
  * @returns {Circle} The requested circle
  */
 function find(name, options) {
-	if (name in this.list) return this.list[name];
-
-	if (!options) return null;
+	if (name in _list) return _list[name];
 
 	this.create(name, options);
 	return find(name);

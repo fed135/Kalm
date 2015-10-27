@@ -128,3 +128,11 @@ kalm delete service <name>
 "" ... to cômmunicate with a service
 
 kalm message <name> <json>
+
+
+
+-------------------------------
+
+Need to split creation of clients and connect
+Need to abstract adapter events 
+

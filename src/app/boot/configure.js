@@ -89,6 +89,7 @@ function _finish(resolve) {
 	var cl = K.getComponent('console');
 
   cl.log('Ready!\n');
+  K.onReady.dispatch();
   resolve();
 }
 

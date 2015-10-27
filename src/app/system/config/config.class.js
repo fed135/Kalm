@@ -4,6 +4,7 @@ module.exports = {
 		debug: {
 			//noColor: true
 		},
+		poolSize: 2,
 		connections: {
 			ipc: {
 				evt: 'message',

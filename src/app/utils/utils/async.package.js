@@ -10,11 +10,11 @@ function all(list, callback) {
 	}	
 
 	Promise.all(list.map(_promisify)).then(function(val) {
+		console.log('finishged list');
 		callback();
 	},
 	function(err) {
 		callback(err || 'unhandled_error');
-		cl.error('Boot failure: ');
 		cl.error(err);
 	});
 }

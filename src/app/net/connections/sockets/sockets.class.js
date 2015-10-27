@@ -14,8 +14,9 @@ var Socket = require('./socket.package');
 /* Methods -------------------------------------------------------------------*/
 
 function create(name, options) {
+	var utils = K.getComponent('utils');
 	options = options || {};
-	options.label = name;
+	options.label = name || utils.crypto.generate();
 	return new Socket(options);
 }
 

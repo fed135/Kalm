@@ -21,6 +21,18 @@ function main() {
 	this.location = _currAddress || _defaultAddress;
 	this.arch = os.arch();
 	this.platform = os.platform();
+
+	K.onReady.add(function(){
+
+		setTimeout(function() {
+			var services = K.getComponent('services');
+
+			//call friend
+			services.create('friend', {
+				port:'i16177'
+			}).socket().send('hello');
+		}, 1000);
+	});
 }
 
 module.exports = {

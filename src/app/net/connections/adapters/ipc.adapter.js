@@ -10,7 +10,7 @@ var ipc = require('ipc-light');
 
 /* Local variables -----------------------------------------------------------*/
 
-var server; /** {ipc.Server|null} The ipc server for this process
+var server;
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -33,60 +33,68 @@ function listen(done, failure) {
 	config.connections.ipc.port = 'i' + manifest.id;
 
 	server = ipc.createServer(function(req, reply) {
-		request.init(null, _parseArgs(req, reply));
+		console.log('GOT SOMETHING!');
+		console.log(req);
+		//request.init(null, null, null, req, reply);
 	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
 }
 
 /**
- * Re-uses or creates a socket client to communicate with another service
+ * Sends a message with a socket client, then pushes it back to its service
  * @method send
- * @param {Friend} friend The friend service to send to
+ * @param {Service} service The service to send to
  * @param {object} options The details of the request
- * @param {ipc.Client|null} socket The socket to use
+ * @param {ipc.Client} socket The socket to use
  * @param {function|null} callback The callback method
  */
-function send(friend, options, socket, callback) {
-	var config = K.getComponent('config');
-
-	if (socket === null) {
-		socket = ipc.connect({
-			path: config.connections.ipc.path + friend.port
-		});
-		socket.ondisconnect.add(function() {
-			var i = friend.__pool.indexOf(socket);
-			if (i !== -1) friend.__pool.splice(i, 1);
-		});
-	}
-
+function send(service, options, socket, callback) {
 	socket.emit(options);
 
-	if (friend.poolSize > friend.__pool.length) {
-		friend.__pool.push(socket);
-
-		socket.ondata.add(function (err, data) {
-			request.init(socket, _parseArgs(data, null));
-		});
+	if (!service._pushSocket(socket)) {
+		socket.disconnect();
 	}
-	else socket.disconnect();
+
 	if (callback) callback();
 }
 
+/**
+ * Creates a client and adds the listeners to it
+ * @method createClient
+ * @param {Service} service The service to create the socket for
+ * @returns {ipc.Client} The created ipc client
+ */
+function createClient(service) {
+	var config = K.getComponent('config');
+
+	var socket = ipc.connect({
+		path: config.connections.ipc.path + service.port
+	});
+
+
+	//TODO: check if this closure isn't gonna leak at some point
+	socket.ondata.add(function (err, data) {
+		request.init(service, socket, err, data);
+	});
+
+	socket.ondisconnect.add(function() {
+		service._removeSocket(socket);
+	});
+
+	
+
+	return socket;
+}
+
+/**
+ * Stops listening for ipc connections and closes the server
+ * @method stop
+ * @param {function|null} callback The callback method
+ */ 
 function stop(callback) {
 	var cl = K.getComponent('console');
 	cl.warn('   - Stopping ipc server');
 	
 	if (server) server.close(callback);
-}
-
-function _parseArgs(req, res) {
-	return frame.create({
-		uid: req.uid,
-		connection: 'ipc',
-		reply: res,
-		path: req.path,
-		method: req.method,
-		payload: req.body
-	});
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -95,6 +103,7 @@ module.exports = {
 	name: 'ipc',
 	autoload: true,
 	listen: listen,
+	createClient: createClient,
 	send: send,
 	stop: stop
 };

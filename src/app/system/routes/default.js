@@ -4,20 +4,12 @@
 
 var routes = [
 	{
-		connector: [ 'ipc', 'zmq', 'http', 'tcp', 'udp' ],
+		connector: [ 'ipc' ],
 		method: 'GET',
 		path: '/',
 		handler: printManifest,
 		tags: ['default'],
 		filters: []
-	},
-	{
-		connector: [ 'http' ],
-		method: 'GET',
-		path: '/ping/:connector/:port',
-		tags: [ 'test' ],
-		filter: [],
-		handler: ping
 	}
 ];
 

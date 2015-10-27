@@ -70,7 +70,6 @@ function _parseArgs(req, res) {
 
 module.exports = {
 	name: 'zmq',
-	autoload: true,
 	listen: listen,
 	send: send,
 	stop: stop

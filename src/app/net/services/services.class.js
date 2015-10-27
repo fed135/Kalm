@@ -33,7 +33,7 @@ function load(callback) {
 }
 
 module.exports = {
-	pkgName: 'services',
+	pkgName: 'submodules',
 	attributes: {
 		list: []
 	},

@@ -7,9 +7,6 @@ function main(callback) {
 	
 	process.on('SIGINT', terminate);
 	process.on('SIGTERM', terminate);
-
-	K.onRequest = new Signal();
-	K.onBeforeShutdown = new Signal();
 }
 
 //TODO: Look for app-state patterns - move this there
@@ -21,7 +18,7 @@ function terminate(callback) {
   cl.print('\r  ');
 	cl.warn('Shutting down...');
 
-	K.onBeforeShutdown.dispatch();
+	K.onShutdown.dispatch();
 
 	utils.async.all(
 		Object.keys(connection.adapters).map(function(e){

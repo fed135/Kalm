@@ -10,6 +10,7 @@
 var stdUtils = require('./app/utils/utils/utils.class');
 var stdOut = require('./app/system/console/console.class');
 var configure = require('./app/boot/configure');
+var Signal = require('signals');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -25,6 +26,9 @@ function Kalm(pkg, config) {
 	//Init already loaded modules - unclean
 	this.registerComponent(stdOut);
 	this.registerComponent(stdUtils);
+
+	this.onReady = new Signal();
+	this.onShutdown = new Signal();
 
 	var utils = this.getComponent('utils');
 

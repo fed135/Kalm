@@ -17,7 +17,7 @@ function Service(options) {
 
 	this.label = options.label;
 	this.hostname = options.hostname || '0.0.0.0';
-	this.adapter = options.adapter;
+	this.adapter = options.adapter || 'ipc';
 	this.port = options.port || 80;
 	this.poolSize = (options.poolSize !== undefined)?options.poolSize:config.poolSize;
 	this.keepAlive = (options.keepAlive !== undefined)?options.keepAlive:true;
@@ -32,9 +32,8 @@ Service.prototype.socket = function(name, options) {
 	var utils = K.getComponent('utils');
 	var i = 0;
 
-	if (options) {
-		options.serviceId = this.label;
-	}
+	options = options || Object.create(null);
+	options.service = this;
 
 	//Unnamed sockets - use pooling system
 	if (!name) {
@@ -46,10 +45,35 @@ Service.prototype.socket = function(name, options) {
 			return this._namedSockets[name];
 		}
 
-		if (!options) return null;
-
 		this._namedSockets[name] = sockets.create(name, options);
 		return this._namedSockets[name];
+	}
+};
+
+Service.prototype._pushSocket = function(socket) {
+
+	//Named sockets dont get moved.
+	if (!(socket.label in this._namedSockets)) {
+		if (this.poolSize > this._pool.length) {
+			this._pool.push(socket);
+			return true;
+		}
+		return false;
+	}
+	return true;
+};
+
+Service.prototype._removeSocket = function(socket) {
+	var i;
+
+	if (socket.label in this._namedSockets) delete this._namedSockets[socket.label];
+	else {
+		for (i = this._pool.length - 1; i >= 0; i--) {
+			if (this._pool[i].label === socket.label) {
+				this._pool.splice(i,1);
+				return;
+			}
+		}
 	}
 };
 

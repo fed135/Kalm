@@ -11,43 +11,32 @@ var Service = require('./service.package');
 
 /* Local variables -----------------------------------------------------------*/
 
-var _list = {};					//Remote hosts or services
-
 /* Methods -------------------------------------------------------------------*/
 
-function get(name, options) {
+function create(name, options) {
+	name || utils.crypto.generate();
+	options = options || Object.create(null);
+
 	var cl = K.getComponent('console');
 	var utils = K.getComponent('utils');
 	var connection = K.getComponent('connection');
-	var adapter = connection.adapters[options.adapter];
+	var circles = K.getComponent('circles');
+	var adapter = connection.adapters[options.adapter || 'ipc'];
 	var cl = K.getComponent('console');
+
 	var f;
+	var cList;
 
-	//TODO: check what to do with uniqueness
-	if (_list[name]) {
-		return _list[name];
-	}
-
-	//TODO: check if we should force tcp
-	if (!adapter) {
-		cl.error('Unable to create service with adapter ' + options.adapter);
-	}
-
+	if (options.circles === undefined) options.circles = [];
 	if (options.poolSize === undefined) options.poolSize = adapter.poolSize;
-	if (!options.circles) options.circles = [];
-	options.circles.push(utils.crypto.generate());
-	//TODO: add to circles - make them live in circles, not in _list!
+	options.label = name;
 
 	f = new Service(options);
-	_list[name] = f;
+	cList = options.circles.concat([utils.crypto.generate()]);
+	cList.forEach(function(c) {
+		circles.find(c).add(f);
+	});
 	return f;
-}
-
-function remove(name) {
-	var f = _list[name];
-	
-	//TODO: remove from circles
-	delete _list[name];
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -55,7 +44,6 @@ function remove(name) {
 module.exports = {
 	pkgName: 'services',
 	methods: {
-		remove: remove,
-		get: get
+		create: create
 	}
 };

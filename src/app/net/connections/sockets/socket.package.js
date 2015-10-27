@@ -1,88 +1,82 @@
 /**
- * Generic request class.
- */ 
+ * Socket class
+ * @class Socket
+ * @exports {Socket}
+ */
+
+'use strict'
 
 /* Requires ------------------------------------------------------------------*/
 
 var Signal = require('signals');
 
-/* Local variables -----------------------------------------------------------*/
-
-/* Classes -------------------------------------------------------------------*/
-
-/**
- * Request class
- * Used as a prototype for all outgoing requests.
- * @class Request
- * @constructor
- */
-function Request() {
-	this.hostname = '0.0.0.0';
-	this.port = null;
-	this.method = 'GET';
-	this.path = '/';
-	this.params = {};
-	this.payload = null;
-	this.connector = null;
-	this.headers = {};
-	this.authKey = null;
-	this.id = null;
-	this.status = 0;
-
-	this.__events = {};
-}
-
-/**
- * Default behavior for sending a request
- * @memberof Request
- * @method send
- * @param {function} callback The method to call after the request
- */
-Request.prototype.send = function(callback) {
-	var cl = K.getComponent('console');
-	cl.warn('No method defined for sending request');
-	cl.warn(this);
-	if (callback) callback();
-};
-
-/**
- * Default behavior when listnening for events
- * @memberof Request
- * @method on
- * @param {string} eventName The name of the event to listen for
- * @param {function} callback The method to call
- */
-Request.prototype.on = function(eventName, method) {
-	if (!this.__events[eventName]) this.__events[eventName] = new Signal();
-	this.__events[eventName].add(method);
-};
-
-/**
- * Default behavior for handling events
- * @memberof Request
- * @method __handleEvent
- * @private
- * @param {string} eventName The name of the event to listen for
- * @param {*} data Optionnal data to pass to the methods
- */
-Request.prototype.__handleEvent = function(eventName, data) {
-	if (this.__events[eventName]) this.__events[eventName].dispatch(data);
-};
-
 /* Methods -------------------------------------------------------------------*/
 
 /**
- * Creates the request object
- * @method create
- * @param {object} options The settings for the request
+ * Socket constructor
+ * @constructor
+ * @param {object} options The configuration options for the socket
  */
-function create(options) {
-	var utils = K.getComponent('utils');
-	return utils.object.mixin(Object.create(Request), options);
+function Socket(options) {
+	var connection = K.getComponent('connection');
+
+	this.label = options.label;
+	this.service = options.service;
+
+	this.client = connection.createClient(options.service);
+	this.status = 'connected';
+
+	this.client.onconnect.add((function() {
+		this.status = 'connected';
+		this._renderQueue();
+	}).bind(this));
+
+	this._outbox = [];
 }
+
+/**
+ * Renders the queue, once connected or reconnected
+ * @private
+ * @method _renderQueue
+ * @memberof Socket
+ */
+Socket.prototype._renderQueue = function() {
+	this._outbox.filter(function(e) {
+		this.send.apply(this, e);
+		return false;
+	}, this);
+};
+
+/**
+ * Sends a request with the socket
+ * @method send
+ * @memberof Socket
+ * @param {*} payload The payload to send
+ * @param {function} callback The callback method
+ */
+Socket.prototype.send = function(payload, callback) {
+	var connection = K.getComponent('connection');
+
+	if (this.status !== 'connected') {
+		this._outbox.push([payload, callback]);
+		return this;
+	}
+
+	connection.send(this.service, payload, this.client, callback);
+
+	return this;
+};
+
+/**
+ * Destroys the socket instance - async
+ * @method destroy
+ * @memberof Socket
+ */
+Socket.prototype.destroy = function() {
+	//TODO: make sure that all clients implement disconnect
+	this.client.disconnect();
+};
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	create: create
-};
+module.exports = Socket;

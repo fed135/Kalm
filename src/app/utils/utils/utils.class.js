@@ -7,6 +7,7 @@
 var object = require('./object.package');
 var async = require('./async.package');
 var loader = require('./loader.package');
+var crypto = require('./crypto.package');
 
 /* Exports -------------------------------------------------------------------*/
 
@@ -15,6 +16,7 @@ module.exports = {
 	attributes: {
 		loader: loader,
 		object: object,
-		async: async
+		async: async,
+		crypto: crypto
 	}
 };
