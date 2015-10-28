@@ -32,7 +32,7 @@ function create(name, options) {
 	options.label = name;
 
 	f = new Service(options);
-	cList = options.circles.concat([utils.crypto.generate()]);
+	cList = options.circles.concat(['global']);
 	cList.forEach(function(c) {
 		circles.find(c).add(f);
 	});

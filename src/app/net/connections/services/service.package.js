@@ -25,6 +25,9 @@ function Service(options) {
 
 	this._pool = [];
 	this._namedSockets = {};
+	this.filters = [];
+
+	this.onRequest = new Signal();
 }
 
 Service.prototype.socket = function(name, options) {

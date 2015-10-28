@@ -28,11 +28,19 @@ function main() {
 			var services = K.getComponent('services');
 
 			//call friend
-			services.create('friend', {
-				port:'i16177'
-			}).socket().send('hello');
+			var friend = services.create('friend', {
+				port:'i17360'
+			});
+			friend.onRequest.add(function(response) {
+				console.log(response);
+			});
+			friend.socket().send('hello');
 		}, 1000);
 	});
+
+	//Look for serviceId, maybe it has filters
+	//Filters can also attach to methods, should be the end of it.
+	//Devs using Kalm only setup services and their filters
 }
 
 module.exports = {

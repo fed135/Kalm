@@ -23,6 +23,8 @@ function Circle(options) {
 
 	this.onAdding = new Signal();
 	this.onRemoving = new Signal();
+
+	console.log('new circle ' + this.label);
 }
 
 /**
@@ -33,10 +35,19 @@ function Circle(options) {
  * @param {object} options The configuration in case of creation
  * @return {Service} The desired service
  */
-Circle.prototype.service = function(name, options) {
+Circle.prototype.service = function(name, options, update) {
 	var services = K.getComponent('services');
+	var service = this.list[name];
 
-	if (name in this.list) return this.list[name];
+	//Perhaps update?
+	if (service) {
+		if (update) {
+			//TODO: no hardcoding, perhaps add origin to services properties
+			service.hostname = options.hostname;
+			service.port = options.port;
+		}
+		return service;
+	}
 
 	if (!options) return null;
 
@@ -52,6 +63,8 @@ Circle.prototype.service = function(name, options) {
  * @return {Circle} Self reference
  */
 Circle.prototype.add = function(service) {
+	console.log('adding');
+	console.log(service);
 	this.list[service.label] = service;
 	this.onAdding.dispatch(service);
 	return this;

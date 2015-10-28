@@ -9,14 +9,14 @@
 
 var callWrapper = {
 	origin: {
-		id: '',
 		hostname: '0.0.0.0',
 		port: 80,
-		name: ''
+		keepAlive: true
 	},
 	metadata: {
 		serviceId: '',
-		keepAlive: true
+		name: '',
+		id: ''
 	}
 };
 
@@ -43,8 +43,8 @@ function main(callback) {
 	cl.log(' - Initializing connections class');
 	utils.loader.load('./', '.adapter.js', loadAdapter.bind(this), callback);
 
-	callWrapper.origin.id = manifest.id;
-	callWrapper.origin.name = K.pkg.name;
+	callWrapper.metadata.id = manifest.id;
+	callWrapper.metadata.name = K.pkg.name;
 }
 
 function createClient(service) {
@@ -65,13 +65,21 @@ function send(service, payload, socket, callback) {
 
 	callWrapper.origin.hostname = system.location;
 	callWrapper.origin.port = config.connections[service.adapter].port;
+	callWrapper.origin.keepAlive = service.keepAlive;
 	callWrapper.metadata.serviceId = service.label;
-	callWrapper.metadata.keepAlive = service.keepAlive;
 	callWrapper.payload = payload;
 
 	console.log(callWrapper);
 
 	this.adapters[service.adapter].send(service, callWrapper, socket, callback);
+}
+
+function handleRequest(req) {
+	console.log('got request from service ' + req.metadata.serviceId);
+	var circles = K.getComponent('circles');
+	circles.find('global')
+		.service(req.metadata.serviceId, req.origin, true)
+		.onRequest.dispatch(req);
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -85,6 +93,7 @@ module.exports = {
 		_init: main,
 		load: loadAdapter,
 		createClient: createClient,
+		handleRequest: handleRequest,
 		send: send
 	}
 };

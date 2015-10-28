@@ -27,15 +27,15 @@ function listen(done, failure) {
 	var request = K.getComponent('request');
 	var manifest = K.getComponent('manifest');
 	var cl = K.getComponent('console');
+	var connection = K.getComponent('connection');
 
 	cl.log('   - Starting ipc server  [ :i' + manifest.id + ' ]');
 
 	config.connections.ipc.port = 'i' + manifest.id;
 
-	server = ipc.createServer(function(req, reply) {
-		console.log('GOT SOMETHING!');
-		console.log(req);
-		//request.init(null, null, null, req, reply);
+	server = ipc.createServer(function(req) {
+		req.origin.adapter = 'ipc';
+		connection.handleRequest(req);
 	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
 }
 
