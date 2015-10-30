@@ -18,12 +18,13 @@ function print() {
 	};
 }
 
-function main() {
+function main(callback) {
 	var cl = K.getComponent('console');
 
 	cl.log(' - Initializing manifest class');
 
 	process.title = K.pkg.name;
+	callback();
 }
 
 module.exports = {

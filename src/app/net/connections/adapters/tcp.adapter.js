@@ -24,18 +24,22 @@ function listen(done, failure) {
 	}).listen(config.connections.tcp.port, done);
 }
 
-function send(options, callback) {
-
-	var socket = net.connect(options);
-	socket.on('data', function(data) {
-		socket.disconnect();
-		if (callback) callback(null, data);
-	});
-	socket.on('error', function(err) {
-		socket.disconnect();
-		if (callback) callback(err);
-	});
+/**
+ * Sends a message with a socket client, then pushes it back to its service
+ * @method send
+ * @param {Service} service The service to send to
+ * @param {object} options The details of the request
+ * @param {ipc.Client} socket The socket to use
+ * @param {function|null} callback The callback method
+ */
+function send(service, options, socket, callback) {
 	socket.write(options);
+
+	if (!service._pushSocket(socket)) {
+		socket.client.disconnect();
+	}
+
+	if (callback) callback();
 }
 
 function stop(callback) {
@@ -43,17 +47,24 @@ function stop(callback) {
 	cl.warn('   - Stopping tcp server');
 	
 	if (server) server.close(callback);
+	else callback();
 }
 
-function _parseArgs(req, res) {
-	return frame.create({
-		uid: req.uid,
-		connection: 'tcp',
-		reply: res,
-		path: req.path,
-		method: req.method,
-		payload: req.body
+function createClient(service) {
+	var socket = net.connect(options);
+
+	socket.on('error', function(err) {
+		socket.disconnect();
+		service._removeSocket(socket);
 	});
+	return socket;
+}
+
+function isConnected(socket) {
+	//TODO
+	console.log('checking connected status for');
+	console.log(socket);
+	return (socket.client.socket);
 }
 
 /* Exports -------------------------------------------------------------------*/

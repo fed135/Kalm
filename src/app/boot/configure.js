@@ -6,12 +6,7 @@
 
 /* Local variables -----------------------------------------------------------*/
 
-var _tasks = [
-	_mixinConfigs,
-	_printLogo,
-	_runInits,
-	_finish
-];
+var _startTime;
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -20,25 +15,13 @@ var _tasks = [
  * @method main
  */
 function main() {
-	var cl = K.getComponent('console');
-	var utils = K.getComponent('utils');
-
-	var _startTime = Date.now();
-
-	utils.async.all(_tasks, function(err) {
-		if (err) {
-			cl.error('Boot failure: ');
-			cl.error(err);
-		}
-		else {
-			cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
-		}
-	});
+	_startTime = Date.now();
+	_mixinConfigs();
 }
 
 /*
 */
-function _runInits(resolve, failure) {
+function _runInits() {
 	var utils = K.getComponent('utils');
 	var cl = K.getComponent('console');
 
@@ -46,25 +29,25 @@ function _runInits(resolve, failure) {
 
 	utils.async.all(K.moduleInits, function(err) {
 		if (err) failure(err);
-		else resolve();
+		else _finish();
 	});
 }
 
 /*
 */
-function _mixinConfigs(resolve) {
+function _mixinConfigs() {
 	var cl = K.getComponent('console');
 	var utils = K.getComponent('utils');
 	var config = K.getComponent('config');
 
 	utils.object.mixin(config, K.appConf);
 	cl.init();
-	resolve();
+	_printLogo();
 }
 
 /*
 */
-function _printLogo(resolve) {
+function _printLogo() {
 	var cl = K.getComponent('console');
   cl.print(cl.GREEN + '\n	  _\n' +
 		'         /\\_\\\n' +
@@ -80,17 +63,16 @@ function _printLogo(resolve) {
 		'    Kalm v' + K.pkg.version + '\n\n');
 
   cl.log('Starting service...');
-  resolve();
+  _runInits();
 }
 
 /*
 */
-function _finish(resolve) {
+function _finish() {
 	var cl = K.getComponent('console');
 
-  cl.log('Ready!\n');
+  cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
   K.onReady.dispatch();
-  resolve();
 }
 
 /* Exports -------------------------------------------------------------------*/

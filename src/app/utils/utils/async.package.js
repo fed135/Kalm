@@ -4,18 +4,16 @@
 
 /* Methods ------------------------------------------------------------------*/
 
+//Cheap-and dirty (but lightweight) async manager
 function all(list, callback) {
-	function _promisify(method) {
-		return new Promise(method);
-	}	
+	//Callback-based
+	var done = 0;
 
-	Promise.all(list.map(_promisify)).then(function(val) {
-		console.log('finishged list');
-		callback();
-	},
-	function(err) {
-		callback(err || 'unhandled_error');
-		cl.error(err);
+	list.forEach(function(e, i) {
+		e(function() { 
+			done++;
+			if (done === list.length) callback(); 
+		});
 	});
 }
 

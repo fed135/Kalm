@@ -6,7 +6,8 @@
 
 var object = require('./object.package');
 var async = require('./async.package');
-var loader = require('./loader.package');
+//TODO: find a better require query
+var loader = require('../../boot/loader');
 var crypto = require('./crypto.package');
 
 /* Exports -------------------------------------------------------------------*/

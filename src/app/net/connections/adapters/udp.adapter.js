@@ -48,6 +48,7 @@ function stop(callback) {
 	cl.warn('   - Stopping udp server');
 	
 	if (server) server.close(callback);
+	else callback();
 }
 
 function _parseArgs(req, res) {

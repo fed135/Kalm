@@ -33,13 +33,20 @@ function Service(options) {
 Service.prototype.socket = function(name, options) {
 	var sockets = K.getComponent('sockets');
 	var utils = K.getComponent('utils');
+	var connection = K.getComponent('connection');
 	var i = 0;
+	var self = this;
 
 	options = options || Object.create(null);
 	options.service = this;
 
 	//Unnamed sockets - use pooling system
 	if (!name) {
+		//Make sure pooled sockets are still connected
+		this._pool = this._pool.filter(function(socket) {
+			return connection.isConnected(self, socket);
+		});
+
 		if (this._pool.length > 0) return this._pool.shift();
 		else return sockets.create(null, options);
 	}
@@ -54,7 +61,6 @@ Service.prototype.socket = function(name, options) {
 };
 
 Service.prototype._pushSocket = function(socket) {
-
 	//Named sockets dont get moved.
 	if (!(socket.label in this._namedSockets)) {
 		if (this.poolSize > this._pool.length) {

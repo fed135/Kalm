@@ -48,13 +48,17 @@ function listen(done, failure) {
  * @param {function|null} callback The callback method
  */
 function send(service, options, socket, callback) {
-	socket.emit(options);
+	socket.client.emit(options);
 
 	if (!service._pushSocket(socket)) {
-		socket.disconnect();
+		socket.client.disconnect();
 	}
 
 	if (callback) callback();
+}
+
+function isConnected(socket) {
+	return (socket.client.socket);
 }
 
 /**
@@ -70,17 +74,14 @@ function createClient(service) {
 		path: config.connections.ipc.path + service.port
 	});
 
-
-	//TODO: check if this closure isn't gonna leak at some point
-	socket.ondata.add(function (err, data) {
-		request.init(service, socket, err, data);
-	});
-
 	socket.ondisconnect.add(function() {
 		service._removeSocket(socket);
 	});
 
-	
+	socket.onerror.add(function() {
+		console.log('error caught');
+		service._removeSocket(socket);
+	});
 
 	return socket;
 }
@@ -95,6 +96,7 @@ function stop(callback) {
 	cl.warn('   - Stopping ipc server');
 	
 	if (server) server.close(callback);
+	else callback();
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -104,6 +106,7 @@ module.exports = {
 	autoload: true,
 	listen: listen,
 	createClient: createClient,
+	isConnected: isConnected,
 	send: send,
 	stop: stop
 };

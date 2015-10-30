@@ -6,9 +6,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-//Hack to get access to some modules before the class initialization
-var stdUtils = require('./app/utils/utils/utils.class');
-var stdOut = require('./app/system/console/console.class');
+var loader = require('./app/boot/loader');
 var configure = require('./app/boot/configure');
 var Signal = require('signals');
 
@@ -22,24 +20,23 @@ function Kalm(pkg, config) {
 
 	//List of init methods, call at the end of the walk
 	this.moduleInits = [];
-	
-	//Init already loaded modules - unclean
-	this.registerComponent(stdOut);
-	this.registerComponent(stdUtils);
 
 	this.onReady = new Signal();
 	this.onShutdown = new Signal();
 
-	var utils = this.getComponent('utils');
-
-	utils.loader.load('src/app', '.class.js', this.registerComponent.bind(this), configure);
+	loader.load(
+		'./src/app', 
+		'.class.js', 
+		this.registerComponent.bind(this), 
+		configure
+	);
 }
 
 Kalm.prototype.registerComponent = function(pkg, path, callback) {
 	var p;
 
 	if (!pkg.pkgName) {
-		console.error('No pkg name! ' + path);
+		process.stdErr('No pkg name! ' + path);
 		return false;
 	}
 
@@ -55,7 +52,7 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 				p[e] = pkg.methods[e].bind(p);
 			}
 			else {
-				console.warn(e + 'is not a method in ' + pkg.pkgName)
+				process.stdErr(e + 'is not a method in ' + pkg.pkgName)
 			}
 		});
 	}

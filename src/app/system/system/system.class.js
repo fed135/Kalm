@@ -1,6 +1,6 @@
 var os = require('os');
 
-function main() {
+function main(resolve) {
 	var _defaultAddress = '127.0.0.1';
 	var _currAddress = null;
 	var interfaces = os.networkInterfaces();
@@ -23,24 +23,27 @@ function main() {
 	this.platform = os.platform();
 
 	K.onReady.add(function(){
-
-		setTimeout(function() {
 			var services = K.getComponent('services');
 
 			//call friend
 			var friend = services.create('friend', {
-				port:'i17360'
+				port:'3001',
+				adapter: 'tcp'
 			});
 			friend.onRequest.add(function(response) {
-				console.log(response);
+				console.log('pong');
+				setTimeout(function() {
+					friend.socket().send('hello')
+				}, 2000);
 			});
 			friend.socket().send('hello');
-		}, 1000);
 	});
 
 	//Look for serviceId, maybe it has filters
 	//Filters can also attach to methods, should be the end of it.
 	//Devs using Kalm only setup services and their filters
+
+	resolve();
 }
 
 module.exports = {

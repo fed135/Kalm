@@ -26,10 +26,9 @@ var callWrapper = {
  *
  */
 function loadAdapter(adapter, path, callback) {
-	var routes = K.getComponent('routes');
-
 	this.adapters[adapter.name] = adapter;
-	if (adapter.autoload || routes.has(adapter.name)) {
+	//TODO: services.has instead of routes
+	if (adapter.autoload/* || routes.has(adapter.name)*/) {
 		adapter.listen(callback);
 	}
 	else callback();
@@ -41,8 +40,7 @@ function main(callback) {
 	var manifest = K.getComponent('manifest');
 
 	cl.log(' - Initializing connections class');
-	utils.loader.load('./', '.adapter.js', loadAdapter.bind(this), callback);
-
+	utils.loader.load('./src/app/net/connections/adapters', '.adapter.js', loadAdapter.bind(this), callback);
 	callWrapper.metadata.id = manifest.id;
 	callWrapper.metadata.name = K.pkg.name;
 }
@@ -53,6 +51,15 @@ function createClient(service) {
 	}
 
 	return this.adapters[service.adapter].createClient(service);
+}
+
+function isConnected(service, socket) {
+	if (!service.adapter in this.adapters) {
+		cl.warn('Unknown type "' + service.adapter + '"');
+		return false;
+	}
+
+	return this.adapters[service.adapter].isConnected(socket);
 }
 
 function send(service, payload, socket, callback) {
@@ -69,13 +76,10 @@ function send(service, payload, socket, callback) {
 	callWrapper.metadata.serviceId = service.label;
 	callWrapper.payload = payload;
 
-	console.log(callWrapper);
-
 	this.adapters[service.adapter].send(service, callWrapper, socket, callback);
 }
 
 function handleRequest(req) {
-	console.log('got request from service ' + req.metadata.serviceId);
 	var circles = K.getComponent('circles');
 	circles.find('global')
 		.service(req.metadata.serviceId, req.origin, true)
@@ -94,6 +98,7 @@ module.exports = {
 		load: loadAdapter,
 		createClient: createClient,
 		handleRequest: handleRequest,
-		send: send
+		send: send,
+		isConnected: isConnected
 	}
 };

@@ -36,7 +36,6 @@ function send(options, callback) {
 	var socket = zmq.socket('push');
 	socket.bind('tcp://' + options.hostname + ':' + options.port, function(err) {
 		if (err) return callback(err);
-		console.log('sending');
 		socket.send(JSON.stringify(options));	
 	});
 	socket.on('message', function(body) {
@@ -50,6 +49,7 @@ function stop(callback) {
 	cl.warn('   - Stopping zmq server');
 	
 	if (server) server.close(callback);
+	else callback();
 }
 
 function _parseArgs(req, res) {

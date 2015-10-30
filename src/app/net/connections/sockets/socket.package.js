@@ -62,7 +62,7 @@ Socket.prototype.send = function(payload, callback) {
 		return this;
 	}
 
-	connection.send(this.service, payload, this.client, callback);
+	connection.send(this.service, payload, this, callback);
 
 	return this;
 };

@@ -7,6 +7,8 @@ function main(callback) {
 	
 	process.on('SIGINT', terminate);
 	process.on('SIGTERM', terminate);
+
+	callback();
 }
 
 //TODO: Look for app-state patterns - move this there
@@ -21,7 +23,7 @@ function terminate(callback) {
 	K.onShutdown.dispatch();
 
 	utils.async.all(
-		Object.keys(connection.adapters).map(function(e){
+		Object.keys(connection.adapters).map(function(e, i){
 			return connection.adapters[e].stop;
 		}),
 		_kill

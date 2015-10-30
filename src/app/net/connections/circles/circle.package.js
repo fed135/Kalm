@@ -23,8 +23,6 @@ function Circle(options) {
 
 	this.onAdding = new Signal();
 	this.onRemoving = new Signal();
-
-	console.log('new circle ' + this.label);
 }
 
 /**
@@ -63,8 +61,6 @@ Circle.prototype.service = function(name, options, update) {
  * @return {Circle} Self reference
  */
 Circle.prototype.add = function(service) {
-	console.log('adding');
-	console.log(service);
 	this.list[service.label] = service;
 	this.onAdding.dispatch(service);
 	return this;
