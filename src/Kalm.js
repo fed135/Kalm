@@ -2,17 +2,26 @@
  * Kalm App singleton
  * Reference to this class will be available accross the project
  * under the global property K
+ * @exports {Kalm}
+ * @class Kalm
  */
+
+'use strict'
 
 /* Requires ------------------------------------------------------------------*/
 
-//Hack to get access to some modules before the class initialization
-var stdUtils = require('./app/utils/utils/utils.class');
-var stdOut = require('./app/system/console/console.class');
+var loader = require('./app/boot/loader');
 var configure = require('./app/boot/configure');
+var Signal = require('signals');
 
 /* Methods -------------------------------------------------------------------*/
 
+/**
+ * Kalm framework constructor
+ * @constructor
+ * @param {object} pkg The package file for the Kalm distribution
+ * @param {object} config The app config of the Kalm project
+ */
 function Kalm(pkg, config) {
 
 	this.pkg = pkg;
@@ -21,21 +30,32 @@ function Kalm(pkg, config) {
 
 	//List of init methods, call at the end of the walk
 	this.moduleInits = [];
-	
-	//Init already loaded modules - unclean
-	this.registerComponent(stdOut);
-	this.registerComponent(stdUtils);
 
-	var utils = this.getComponent('utils');
+	this.onReady = new Signal();
+	this.onShutdown = new Signal();
 
-	utils.loader.load('src/app', '.class.js', this.registerComponent.bind(this), configure);
+	loader.load(
+		'./src/app', 
+		'.class.js', 
+		this.registerComponent.bind(this), 
+		configure
+	);
 }
 
+/**
+ * Registers a component with Kalm
+ * This makes it available accross the project
+ * @method registerComponent
+ * @memberof Kalm
+ * @param {object} pkg The component package to register (component definition)
+ * @param {string|null} path The path where the package was found (debug)
+ * @param {function} callback The callback method
+ */
 Kalm.prototype.registerComponent = function(pkg, path, callback) {
 	var p;
 
 	if (!pkg.pkgName) {
-		console.error('No pkg name! ' + path);
+		process.stdErr('No pkg name! ' + path);
 		return false;
 	}
 
@@ -51,7 +71,7 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 				p[e] = pkg.methods[e].bind(p);
 			}
 			else {
-				console.warn(e + 'is not a method in ' + pkg.pkgName)
+				process.stdErr(e + 'is not a method in ' + pkg.pkgName)
 			}
 		});
 	}
@@ -65,6 +85,13 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 	if (callback) callback();
 };
 
+/**
+ * Retreives a registered component
+ * @method getComponent
+ * @memberof Kalm
+ * @param {string} pkgName The name of the package to retreive
+ * @returns {object} The requested component
+ */
 Kalm.prototype.getComponent = function(pkgName) {
 	return this._components[pkgName];
 };

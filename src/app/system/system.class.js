@@ -1,6 +1,22 @@
+/**
+ * System info package
+ * @exports {component(system)}
+ */
+
+'use_strict'
+
+/* Requires ------------------------------------------------------------------*/
+
 var os = require('os');
 
-function main() {
+/* Methods -------------------------------------------------------------------*/
+
+/**
+ * The entry point for the systems analysis package
+ * @method main
+ * @param {function} callback The callback method
+ */
+function main(callback) {
 	var _defaultAddress = '127.0.0.1';
 	var _currAddress = null;
 	var interfaces = os.networkInterfaces();
@@ -21,7 +37,11 @@ function main() {
 	this.location = _currAddress || _defaultAddress;
 	this.arch = os.arch();
 	this.platform = os.platform();
+
+	callback();
 }
+
+/* Exports -------------------------------------------------------------------*/
 
 module.exports = {
 	pkgName: 'system',

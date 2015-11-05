@@ -112,12 +112,7 @@ Use the industry-wide branching conventions.
 
 Needs to be reviewed by a commity of contributors before integrating
 
-1. Help wanted
-
-People with low-level networking skills are more than welcommed.
-
 1. Using Kalm
 
 If you or your company use Kalm, or are planning to do so; please let
-me know and I will do my best to provide support. Only remember that 
-I have a job and family that take priority over releasing updates.
+me know and I will do my best to provide support.

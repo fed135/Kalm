@@ -1,21 +1,23 @@
+/**
+ * Default configuration options
+ * @exports {component(config)}
+ */
+
+'use strict'
+
+/* Exports -------------------------------------------------------------------*/
+
 module.exports = {
 	pkgName: 'config',
 	attributes: {
 		debug: {
-			//noColor: true
+			noColor: false
 		},
 		connections: {
+			poolSize: 2,
 			ipc: {
 				evt: 'message',
 				path: '/tmp/'
-			},
-			http: {
-				port: 3001,
-				contentType: 'text/json'
-			},
-			zmq: {
-				port: 4001,
-				evt: 'KalmZMQ'
 			},
 			tcp: {
 				port: 5001

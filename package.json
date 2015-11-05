@@ -1,6 +1,6 @@
 {
   "name": "kalm",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A Kalm Application.",
   "main": "./index.js",
   "scripts": {
@@ -11,19 +11,17 @@
     "type": "git",
     "url": "git+https://github.com/fed135/Kalm.git"
   },
-  "bin": {
-    "kalm": "./bin/kalm.js"
-  },
   "keywords": [
     "framework",
     "socket",
-    "zmq",
+    "tcp",
+    "udp",
     "micro-service",
     "low-latency",
     "light",
     "ipc"
   ],
-  "author": "kyle chan thim, frederic charette",
+  "author": "frederic charette",
   "licenses": [
     {
       "type": "GNU GPL V2",
@@ -35,16 +33,13 @@
   },
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
-    "chai": "^2.3.0",
-    "debug": "^2.2.0",
+    "chai": "2.3.0",
     "mocha": "2.2.4"
   },
   "dependencies": {
-    "circuit-breaker-js": "0.0.1",
-    "ipc-light": "0.1.x",
-    "portscanner": "1.0.0",
+    "debug": "2.2.0",
+    "ipc-light": "1.0.3",
     "signals": "1.0.0",
-    "walk": "2.3.9",
-    "zmq": "^2.13.0"
+    "walk": "2.3.9"
   }
 }

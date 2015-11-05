@@ -3,28 +3,7 @@
 ^ [Back to home](../README.md)
 
 
-## v.0.1.0
-
-- Functionnal connectors (http, tcp socket, udp socket)
-  With interface class and universal handler
-
-- Config properly populates the routes list
-  Need to figure out a pretty syntax
-
-- ZMQ and unix sockets (ipc)
-  Note: ZMQ is going to be tricky: node client has binaries deps
-
-- Print stats, manifest, healthcheck
-  {status:'ok', details:{service1: 'ok', ...}}
-
-- Handle server up, server down and error recovery
-  Add signals or w/e
-
-- Circuit breaking
-  For forwarding methods
-
-- Port-scanning
-  For connectors that use the network card
+## v.0.1.1
 
 - Environments
   Add in config
@@ -38,10 +17,7 @@
 - Logging destination
   Provided by debug > file.log (pipe)
 
-- Routing (connector-agnostic)
-  Create event-based routing
-
-- Handle redirection (gatekeeper)
+- Handle redirection (gatekeeper) - or need of
 	Keep track of request.
 
 ## Backlog
@@ -55,6 +31,18 @@
 
 - Code coverage tests
 
-- Load-balancing
+- Proper load-balancing strategy for pooled sockets
 
 - Mock mode (needs definition)
+
+## TODOs
+
+- Better handling of service/socket update on request
+
+- Manage unwrapped requests
+
+- Make sure socket clients all implement closing behaviour (disconnect)
+
+- Review app shutdown to eliminate all existing connections and hanging resources
+
+- Add proper uid generation

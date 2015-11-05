@@ -1,9 +1,13 @@
 /**
  * The list of codes for colors in the console
+ * @exports {object}
  */
+
+'use strict'
 
 /* Local variables -----------------------------------------------------------*/
 
+/** The list of color codes */
 var COLORS = {
 	GREY: '\x1b[90m',
 	RED: '\x1b[91m',
@@ -17,6 +21,11 @@ var COLORS = {
 
 /* Methods -------------------------------------------------------------------*/
 
+/**
+ * Returns the list of colors codes or empties if no-color config is true
+ * @method getList
+ * @returns {object} The collection of colors
+ */
 function getList() {
 	var config = K.getComponent('config');
 
