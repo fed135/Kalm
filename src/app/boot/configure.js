@@ -1,11 +1,13 @@
 /**
  * Initializes modules once they are loaded
+ * @exports {function} main
  */
 
-/* Requires ------------------------------------------------------------------*/
+'use strict'
 
 /* Local variables -----------------------------------------------------------*/
 
+/** Stores the start time of the node app to calculate boot time */
 var _startTime;
 
 /* Methods -------------------------------------------------------------------*/
@@ -19,8 +21,11 @@ function main() {
 	_mixinConfigs();
 }
 
-/*
-*/
+/**
+ * Runs the initialization methods (_init) of packages
+ * @private
+ * @method _runInits
+ */
 function _runInits() {
 	var utils = K.getComponent('utils');
 	var cl = K.getComponent('console');
@@ -33,8 +38,11 @@ function _runInits() {
 	});
 }
 
-/*
-*/
+/**
+ * Applies application config to the base template
+ * @private
+ * @method _mixinConfigs
+ */
 function _mixinConfigs() {
 	var cl = K.getComponent('console');
 	var utils = K.getComponent('utils');
@@ -45,8 +53,11 @@ function _mixinConfigs() {
 	_printLogo();
 }
 
-/*
-*/
+/**
+ * Prints the Kalm logo
+ * @private
+ * @method _printLogo
+ */
 function _printLogo() {
 	var cl = K.getComponent('console');
   cl.print(cl.GREEN + '\n	  _\n' +
@@ -66,12 +77,16 @@ function _printLogo() {
   _runInits();
 }
 
-/*
-*/
+/**
+ * Completes the booting process
+ * @private
+ * @method _finish
+ */
 function _finish() {
 	var cl = K.getComponent('console');
 
   cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
+  _startTime = null;
   K.onReady.dispatch();
 }
 

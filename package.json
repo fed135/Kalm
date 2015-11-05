@@ -14,7 +14,8 @@
   "keywords": [
     "framework",
     "socket",
-    "zmq",
+    "tcp",
+    "udp",
     "micro-service",
     "low-latency",
     "light",
@@ -32,15 +33,13 @@
   },
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
-    "chai": "^2.3.0",
+    "chai": "2.3.0",
     "mocha": "2.2.4"
   },
   "dependencies": {
-    "debug": "^2.2.0",
-    "circuit-breaker-js": "0.0.1",
+    "debug": "2.2.0",
     "ipc-light": "1.0.3",
     "signals": "1.0.0",
-    "walk": "2.3.9",
-    "zmq": "^2.13.0"
+    "walk": "2.3.9"
   }
 }

@@ -2,7 +2,11 @@
  * Kalm App singleton
  * Reference to this class will be available accross the project
  * under the global property K
+ * @exports {Kalm}
+ * @class Kalm
  */
+
+'use strict'
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -12,6 +16,12 @@ var Signal = require('signals');
 
 /* Methods -------------------------------------------------------------------*/
 
+/**
+ * Kalm framework constructor
+ * @constructor
+ * @param {object} pkg The package file for the Kalm distribution
+ * @param {object} config The app config of the Kalm project
+ */
 function Kalm(pkg, config) {
 
 	this.pkg = pkg;
@@ -32,6 +42,15 @@ function Kalm(pkg, config) {
 	);
 }
 
+/**
+ * Registers a component with Kalm
+ * This makes it available accross the project
+ * @method registerComponent
+ * @memberof Kalm
+ * @param {object} pkg The component package to register (component definition)
+ * @param {string|null} path The path where the package was found (debug)
+ * @param {function} callback The callback method
+ */
 Kalm.prototype.registerComponent = function(pkg, path, callback) {
 	var p;
 
@@ -66,6 +85,13 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 	if (callback) callback();
 };
 
+/**
+ * Retreives a registered component
+ * @method getComponent
+ * @memberof Kalm
+ * @param {string} pkgName The name of the package to retreive
+ * @returns {object} The requested component
+ */
 Kalm.prototype.getComponent = function(pkgName) {
 	return this._components[pkgName];
 };

@@ -1,6 +1,9 @@
 /**
  * A utility method to get the file and line number from an error stack
+ * @exports {function} prettyPrintStack
  */
+
+'use strict'
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -8,6 +11,12 @@ var colors = require('./colors.package');
 
 /* Methods -------------------------------------------------------------------*/
 
+/**
+ * Creates a readable format for an error stack
+ * @method prettyPrintStack
+ * @param {Error} error The error to print
+ * @returns {string} The stringified, pretty stack
+ */
 function prettyPrintStack(error) {
 	var ret;
 	var stack;
