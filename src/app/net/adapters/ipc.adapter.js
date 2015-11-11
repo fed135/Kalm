@@ -8,7 +8,9 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var ipc = require('ipc-light');
+var ipc;
+if (process.env.IPC_HOME) ipc = require(process.env.IPC_HOME);
+else ipc = require('ipc-light');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -28,14 +30,19 @@ function listen(done) {
 	var cl = K.getComponent('console');
 	var connection = K.getComponent('connection');
 
-	cl.log('   - Starting ipc server  [ :i' + manifest.id + ' ]');
-
-	config.connections.ipc.port = 'i' + manifest.id;
+	cl.log('   - Starting ipc server  [ :' + config.connections.ipc.port + ' ]');
 
 	server = ipc.createServer(function(req) {
 		req.origin.adapter = 'ipc';
-		connection.handleRequest(req);
-	}).listen(config.connections.ipc.path + 'i' + manifest.id, done);
+		connection.handleRequest(req, function(payload, callback) {
+			var circles = K.getComponent('circles');
+			var service = circles.find('global')
+				.service(req.metadata.serviceId);
+			// Service existing or created during handleRequest
+			var socket = service.socket();
+			connection.send(service, payload, socket, callback);
+		});
+	}).listen(config.connections.ipc.path + config.connections.ipc.port, done);
 }
 
 /**
@@ -85,6 +92,12 @@ function createClient(service) {
 
 	socket.onconnect.add(function() {
 		service._updateSocketStatus(socket);
+	});
+
+	socket.ondata.add(function(e) {
+		service.onRequest.dispatch(e, function(payload, callback) {
+			send(service, payload, socket, callback);
+		});
 	});
 
 	socket.onerror.add(function() {

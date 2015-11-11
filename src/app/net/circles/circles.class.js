@@ -29,6 +29,10 @@ function create(name, options) {
 
 	options = options || Object.create(null);
 	options.label = name || utils.crypto.uid();
+	
+	//Prevent accidental override
+	if (_list[options.label]) return _list[options.label];
+
 	c = new Circle(options);
 	_list[c.label] = c;
 	return c;
@@ -48,6 +52,16 @@ function find(name, options) {
 	return find(name);
 }
 
+/**
+ * Entry point for circles class. Instantiates the global circle.
+ * @method main
+ * @param {function} callback The callback method
+ */
+function main(callback) {
+	create('global');
+	callback();
+}
+
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
@@ -56,6 +70,7 @@ module.exports = {
 		list: {}
 	},
 	methods: {
+		_init: main,
 		find: find,
 		create: create
 	}

@@ -35,7 +35,7 @@ function Kalm(pkg, config) {
 	this.onShutdown = new Signal();
 
 	loader.load(
-		'./src/app', 
+		__dirname, 
 		'.class.js', 
 		this.registerComponent.bind(this), 
 		configure

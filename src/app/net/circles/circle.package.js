@@ -81,6 +81,18 @@ Circle.prototype.remove = function(service) {
 	return this;
 };
 
+/**
+ * Returns an array with all the services
+ * @method all
+ * memberof Circle
+ * @returns {array} An array with all the circle's services
+ */
+Circle.prototype.all = function() {
+	return Object.keys(this.list).map(function(e) {
+		return this.list[e];
+	}, this);
+};
+
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = Circle;

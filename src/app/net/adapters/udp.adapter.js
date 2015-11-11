@@ -33,7 +33,15 @@ function listen(done) {
 	server.on('message', function (req, reply) {
 		req = JSON.parse(req.toString());
     req.origin.adapter = 'udp';
-		connection.handleRequest(req);
+		connection.handleRequest(req, function(payload, callback) {
+			//Generally a bad idea to rely on a udp reply, but for consistency...
+			var circles = K.getComponent('circles');
+			var service = circles.find('global')
+				.service(req.metadata.serviceId);
+			// Service existing or created during handleRequest
+			var socket = service.socket();
+			connection.send(service, payload, socket, callback);
+		});
   });
   server.bind(config.connections.udp.port, '127.0.0.1');
   done();
@@ -59,6 +67,12 @@ function createClient(service) {
 	var socket = dgram.createSocket('udp4');
 	socket.__active = true;
 	service._updateSocketStatus(socket);
+
+	socket.on('message', function(e) {
+		service.onRequest.dispatch(e, function(payload, callback) {
+			send(service, payload, socket, callback);
+		});
+	});
 	return socket;
 }
 
@@ -72,25 +86,34 @@ function createClient(service) {
  */
 function send(service, options, socket, callback) {
 	var message = new Buffer(JSON.stringify(options));
-	socket.client.send(
-		message, 
-		0, 
-		message.length, 
-		service.port, 
-		service.hostname, 
-		function(err, bytes) {
-    	if (err) {
-    		console.log(err);
-    		socket.client.close();
-    		socket.client.__active = false;
-    	}
-			if (callback) callback(err);
-   	}
-	);
+	var cl = K.getComponent('console');
+	//Sometimes, we get unhandled errors...
+	try {
+		socket.client.send(
+			message, 
+			0, 
+			message.length, 
+			service.port, 
+			service.hostname, 
+			function(err, bytes) {
+	    	if (err) {
+	    		cl.error(err);
+	    		socket.client.close();
+	    		socket.client.__active = false;
+	    	}
+				if (callback) callback(err);
+	   	}
+		);
+	}
+	catch(err) {
+		cl.error(err);
+		socket.client.close();
+	  socket.client.__active = false;
+	}
 }
 
 /**
- * Stops listening for ipc connections and closes the server
+ * Stops listening for udp connections and closes the server
  * @method stop
  * @param {function|null} callback The callback method
  */ 

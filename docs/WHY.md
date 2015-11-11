@@ -9,9 +9,9 @@ latency inter-service calls, vertical and horizontal scaling
 solutions as well as modern client communication protocols that are not 
 limited to web. 
 
-Kalm aims at being the reference in terms of micro-service framework and 
+Kalm aims at being the reference in terms of micro-service frameworks and 
 modern back-end technology for apps and games.
 
 Merge requests are more than welcommed. I will try to keep the
-contributors circle small, but make sure that every requests gets
+contributor circle small, but I will make sure that every requests gets
 addressed as soon as possible. 

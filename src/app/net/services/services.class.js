@@ -44,11 +44,29 @@ function create(name, options) {
 	return f;
 }
 
+/**
+ * Entry point for services class. Instantiates services listed in the config.
+ * @method main
+ * @param {function} callback The callback method
+ */
+function main(callback) {
+	var config = K.getComponent('config');
+
+	if (config.services) {
+		Object.keys(config.services).forEach(function(e){
+			create(e, config.services[e]);
+		});
+	}
+
+	callback();
+}
+
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
 	pkgName: 'services',
 	methods: {
-		create: create
+		create: create,
+		_init: main
 	}
 };

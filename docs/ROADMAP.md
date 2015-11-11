@@ -3,46 +3,55 @@
 ^ [Back to home](../README.md)
 
 
-## v.0.1.1
+## v.1.0.2
 
-- Environments
+- [x] Environments
   Add in config
 
-- API docs
+- [ ] Handle redirection (gatekeeper) - or need of
+  Keep track of request.
+
+- [x] IPC adapter binds to a specified and static location (and remove 'i')
+
+- [x] Create services from config on load
+
+- [ ] Add reply interface (uses same socket) to handlers 
+
+- [ ] Better handling of service/socket update on request
+
+- [ ] Manage unwrapped requests
+
+- [ ] Make sure socket clients all implement closing behaviour (disconnect)
+
+- [ ] Allow 'unlimited' pool size
+
+- [ ] Implement optionnal socket timeout
+
+- [ ] Resolve parallel ipc and udp connection problems
+
+- [x] Review app shutdown to eliminate all existing connections and hanging resources
+
+## v.1.0.3
+
+- [ ] API docs
   Generated from docblocks
 
-- Internal map
+- [ ] Internal map
   Generated from class-loader
 
-- Logging destination
+- [ ] Logging destination
   Provided by debug > file.log (pipe)
 
-- Handle redirection (gatekeeper) - or need of
-	Keep track of request.
+- [ ] Unit tests
 
-## Backlog
+- [ ] Smoke tests
 
-- Handle filtering middleware
-  Check Sails for implementation example
+- [ ] Code coverage tests
 
-- Unit tests
+- [ ] Proper load-balancing strategy for pooled sockets
 
-- Smoke tests
+- [ ] Mock mode (needs definition)
 
-- Code coverage tests
+- [ ] Add scheduler
 
-- Proper load-balancing strategy for pooled sockets
-
-- Mock mode (needs definition)
-
-## TODOs
-
-- Better handling of service/socket update on request
-
-- Manage unwrapped requests
-
-- Make sure socket clients all implement closing behaviour (disconnect)
-
-- Review app shutdown to eliminate all existing connections and hanging resources
-
-- Add proper uid generation
+- [ ] Add proper uid generation

@@ -26,6 +26,8 @@ function Socket(options) {
 	this.client = connection.createClient(options.service);
 	this.status = 'connected';
 
+	this.timeout = options.timeout || -1;
+
 	this._outbox = [];
 }
 

@@ -124,14 +124,15 @@ function send(service, payload, socket, callback) {
  * Global capture method for incomming requests.
  * Redirects to the appropriate service's handling method 
  * @method handleRequest
- * @param {Service} service The incomming request payload
+ * @param {object} req The incomming request payload
+ * @param {function} reply The reply interface
  */
-function handleRequest(req) {
+function handleRequest(req, reply) {
 	//TODO: what to do in the case of an unwrapped request
 	var circles = K.getComponent('circles');
 	circles.find('global')
 		.service(req.metadata.serviceId, req.origin, true)
-		.onRequest.dispatch(req);
+		.onRequest.dispatch(req, reply);
 }
 
 /* Exports -------------------------------------------------------------------*/

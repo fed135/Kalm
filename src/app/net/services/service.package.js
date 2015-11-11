@@ -24,7 +24,10 @@ function Service(options) {
 	this.hostname = options.hostname || '0.0.0.0';
 	this.adapter = options.adapter || 'ipc';
 	this.port = options.port || 80;
-	this.poolSize = (options.poolSize !== undefined)?options.poolSize:config.poolSize;
+	this.poolSize = (options.poolSize !== undefined)?options.poolSize:config.connections.poolSize;
+	if (this.adapter === 'ipc') this.poolSize = 1; //Bug in the implementation
+	this.socketTimeout = options.socketTimeout || -1;
+
 	this.keepAlive = (options.keepAlive !== undefined)?options.keepAlive:true;
 	this.wrap = (options.wrap !== undefined)?options.wrap:true;
 
@@ -49,6 +52,7 @@ Service.prototype.socket = function(name, options) {
 	var connection = K.getComponent('connection');
 	var i = 0;
 	var self = this;
+	var s;
 
 	options = options || Object.create(null);
 	options.service = this;
@@ -60,8 +64,16 @@ Service.prototype.socket = function(name, options) {
 			return connection.isConnected(self, socket);
 		});
 
-		if (this._pool.length > 0) return this._pool.shift();
-		else return sockets.create(null, options);
+		if (this._pool.length > 0) s = this._pool.shift();
+		else s = sockets.create(null, options);
+
+		if (this.socketTimeout !== -1) {
+			s.__timeout = setTimeout(function() {
+				s.__dead = true;
+			}, this.socketTimeout);
+		}
+
+		return s;
 	}
 	else {
 		if (name in this._namedSockets) {
@@ -84,7 +96,11 @@ Service.prototype.socket = function(name, options) {
 Service.prototype._pushSocket = function(socket) {
 	//Named sockets dont get moved.
 	if (!(socket.label in this._namedSockets)) {
-		if (this.poolSize > this._pool.length) {
+		if (this.poolSize > this._pool.length || this.poolSize === -1) {
+			if (this.socketTimeout !== -1) {
+				if (socket.__dead) return false;
+				else clearTimeout(socket.__timeout);
+			}
 			this._pool.push(socket);
 			return true;
 		}

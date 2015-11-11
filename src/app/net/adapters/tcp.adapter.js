@@ -29,12 +29,19 @@ function listen(done) {
 
 	cl.log('   - Starting tcp server  [ :' + config.connections.tcp.port + ' ]');
 
-	server = net.createServer(function(req, res) {
+	server = net.createServer(function(req) {
 		req.on('data', function(data) {
 			var data = JSON.parse(data.toString());
 			req.on('end', function() {
 				data.origin.adapter = 'tcp';
-				connection.handleRequest(data);
+				connection.handleRequest(data,  function(payload, callback) {
+					var circles = K.getComponent('circles');
+					var service = circles.find('global')
+						.service(data.metadata.serviceId);
+					// Service existing or created during handleRequest
+					var socket = service.socket();
+					connection.send(service, payload, socket, callback);
+				});
 			});
 		});
 		
@@ -53,7 +60,7 @@ function send(service, options, socket, callback) {
 	socket.client.end(JSON.stringify(options));
 
 	if (!service._pushSocket(socket)) {
-		socket.client.disconnect();
+		socket.client.destroy();
 	}
 
 	if (callback) callback();
@@ -87,6 +94,12 @@ function createClient(service) {
 
 	socket.on('disconnect', function() {
 		service._removeSocket(socket);
+	});
+
+	socket.on('data', function(socket) {
+		service.onRequest.dispatch(e, function(payload, callback) {
+			send(service, payload, socket, callback);
+		});
 	});
 
 	socket.on('error', function(err) {

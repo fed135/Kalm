@@ -28,7 +28,7 @@ function load(rootDir, marker, method, callback) {
 
 	walker.on('file', function (root, fileStats, next) {
 		if (fileStats.name.indexOf(marker) !== -1) {
-			mod = require(path.join(process.cwd(), root, fileStats.name));
+			mod = require(path.join(root, fileStats.name));
 			method(mod, fileStats.name, next);
 		}
 		else next();

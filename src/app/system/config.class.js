@@ -10,6 +10,7 @@
 module.exports = {
 	pkgName: 'config',
 	attributes: {
+		environment: 'dev',
 		debug: {
 			noColor: false
 		},
