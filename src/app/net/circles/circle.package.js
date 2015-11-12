@@ -37,13 +37,12 @@ Circle.prototype.service = function(name, options, update) {
 	var services = K.getComponent('services');
 	var service = this.list[name];
 
-	//Perhaps update?
 	if (service) {
-		if (update) {
-			//TODO: no hardcoding, perhaps add origin to services properties
-			service.hostname = options.hostname;
-			service.port = options.port;
-		}
+		//TODO: Do we want this to be updatable, like discovery mode ?
+		/*if (update) {
+			service.hostname = options.h;
+			service.port = options.p;
+		}*/
 		return service;
 	}
 

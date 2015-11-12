@@ -33,11 +33,13 @@ function listen(done) {
 	cl.log('   - Starting ipc server  [ :' + config.connections.ipc.port + ' ]');
 
 	server = ipc.createServer(function(req) {
+		if (!req.payload) req = { payload: req };
+		if (!req.origin) req.origin = {};
 		req.origin.adapter = 'ipc';
 		connection.handleRequest(req, function(payload, callback) {
 			var circles = K.getComponent('circles');
 			var service = circles.find('global')
-				.service(req.metadata.serviceId);
+				.service(req.meta.sId);
 			// Service existing or created during handleRequest
 			var socket = service.socket();
 			connection.send(service, payload, socket, callback);
@@ -54,13 +56,13 @@ function listen(done) {
  * @param {function|null} callback The callback method
  */
 function send(service, options, socket, callback) {
-	socket.client.emit(options);
+	socket.client.emit(options, function() {
+		if (!service._pushSocket(socket)) {
+			socket.client.disconnect();
+		}
 
-	if (!service._pushSocket(socket)) {
-		socket.client.disconnect();
-	}
-
-	if (callback) callback();
+		if (callback) callback();
+	});
 }
 
 /**

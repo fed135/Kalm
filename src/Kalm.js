@@ -33,6 +33,7 @@ function Kalm(pkg, config) {
 
 	this.onReady = new Signal();
 	this.onShutdown = new Signal();
+	this.onRequest = new Signal();	//Catches unwrapped requests
 
 	loader.load(
 		__dirname, 

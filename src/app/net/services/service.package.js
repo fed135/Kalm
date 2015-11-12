@@ -25,15 +25,12 @@ function Service(options) {
 	this.adapter = options.adapter || 'ipc';
 	this.port = options.port || 80;
 	this.poolSize = (options.poolSize !== undefined)?options.poolSize:config.connections.poolSize;
-	if (this.adapter === 'ipc') this.poolSize = 1; //Bug in the implementation
 	this.socketTimeout = options.socketTimeout || -1;
 
-	this.keepAlive = (options.keepAlive !== undefined)?options.keepAlive:true;
 	this.wrap = (options.wrap !== undefined)?options.wrap:true;
 
 	this._pool = [];
 	this._namedSockets = {};
-	this.filters = [];
 
 	this.onRequest = new Signal();
 }

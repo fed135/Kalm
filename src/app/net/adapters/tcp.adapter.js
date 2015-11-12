@@ -31,17 +31,17 @@ function listen(done) {
 
 	server = net.createServer(function(req) {
 		req.on('data', function(data) {
-			var data = JSON.parse(data.toString());
-			req.on('end', function() {
-				data.origin.adapter = 'tcp';
-				connection.handleRequest(data,  function(payload, callback) {
-					var circles = K.getComponent('circles');
-					var service = circles.find('global')
-						.service(data.metadata.serviceId);
-					// Service existing or created during handleRequest
-					var socket = service.socket();
-					connection.send(service, payload, socket, callback);
-				});
+			data = JSON.parse(data.toString());
+			if (!req.payload) req = { payload: req };
+			if (!req.origin) req.origin = {};
+			data.origin.adapter = 'tcp';
+			connection.handleRequest(data,  function(payload, callback) {
+				var circles = K.getComponent('circles');
+				var service = circles.find('global')
+					.service(data.meta.sId);
+				// Service existing or created during handleRequest
+				var socket = service.socket();
+				connection.send(service, payload, socket, callback);
 			});
 		});
 		
@@ -57,13 +57,13 @@ function listen(done) {
  * @param {function|null} callback The callback method
  */
 function send(service, options, socket, callback) {
-	socket.client.end(JSON.stringify(options));
+	socket.client.write(JSON.stringify(options), function() {
+		if (!service._pushSocket(socket)) {
+			socket.client.destroy();
+		}
 
-	if (!service._pushSocket(socket)) {
-		socket.client.destroy();
-	}
-
-	if (callback) callback();
+		if (callback) callback();
+	});
 }
 
 /**

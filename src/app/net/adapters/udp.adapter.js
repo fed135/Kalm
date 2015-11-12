@@ -32,12 +32,13 @@ function listen(done) {
 	server = dgram.createSocket('udp4');
 	server.on('message', function (req, reply) {
 		req = JSON.parse(req.toString());
+    if (!req.payload) req = { payload: req };
+		if (!req.origin) req.origin = {};
     req.origin.adapter = 'udp';
 		connection.handleRequest(req, function(payload, callback) {
-			//Generally a bad idea to rely on a udp reply, but for consistency...
 			var circles = K.getComponent('circles');
 			var service = circles.find('global')
-				.service(req.metadata.serviceId);
+				.service(req.meta.sId);
 			// Service existing or created during handleRequest
 			var socket = service.socket();
 			connection.send(service, payload, socket, callback);
@@ -87,29 +88,28 @@ function createClient(service) {
 function send(service, options, socket, callback) {
 	var message = new Buffer(JSON.stringify(options));
 	var cl = K.getComponent('console');
-	//Sometimes, we get unhandled errors...
-	try {
-		socket.client.send(
-			message, 
-			0, 
-			message.length, 
-			service.port, 
-			service.hostname, 
-			function(err, bytes) {
-	    	if (err) {
-	    		cl.error(err);
-	    		socket.client.close();
-	    		socket.client.__active = false;
-	    	}
-				if (callback) callback(err);
+	socket.client.send(
+		message, 
+		0, 
+		message.length, 
+		service.port, 
+		service.hostname, 
+		function(err, bytes) {
+	   	if (err !== 0 || bytes !== message.length) {
+	   		cl.error(err);
+	   		socket.client.close();
+	   		socket.client.__active = false;
 	   	}
-		);
-	}
-	catch(err) {
-		cl.error(err);
-		socket.client.close();
-	  socket.client.__active = false;
-	}
+	   	else {
+	   		if (!service._pushSocket(socket)) {
+					socket.client.close();
+					socket.client.__active = false;
+				}
+    	}
+
+			if (callback) callback();
+   	}
+	);
 }
 
 /**

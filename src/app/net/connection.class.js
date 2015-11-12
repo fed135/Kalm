@@ -15,13 +15,11 @@ var udp = require('./adapters/udp.adapter.js');
 /** Wrapper for the payloads */
 var callWrapper = {
 	origin: {
-		hostname: '0.0.0.0',
-		port: 80,
-		keepAlive: true
+		h: '0.0.0.0',
+		p: 80
 	},
-	metadata: {
-		serviceId: '',
-		name: '',
+	meta: {
+		sId: '',
 		id: ''
 	}
 };
@@ -61,8 +59,7 @@ function main(callback) {
 		};
 	}), callback);
 
-	callWrapper.metadata.id = manifest.id;
-	callWrapper.metadata.name = K.pkg.name;
+	callWrapper.meta.id = K.pkg.name + '#' + manifest.id;
 }
 
 /**
@@ -111,10 +108,9 @@ function send(service, payload, socket, callback) {
 		return callback('Unknown type "' + service.adapter + '"');
 	}
 
-	callWrapper.origin.hostname = system.location;
-	callWrapper.origin.port = config.connections[service.adapter].port;
-	callWrapper.origin.keepAlive = service.keepAlive;
-	callWrapper.metadata.serviceId = service.label;
+	callWrapper.origin.h = system.location;
+	callWrapper.origin.p = config.connections[service.adapter].port;
+	callWrapper.meta.sId = service.label;
 	callWrapper.payload = payload;
 
 	this.adapters[service.adapter].send(service, callWrapper, socket, callback);
@@ -129,9 +125,14 @@ function send(service, payload, socket, callback) {
  */
 function handleRequest(req, reply) {
 	//TODO: what to do in the case of an unwrapped request
+	if (!req.meta) {
+		K.onRequest.dispatch(req);
+		return;
+	}
+
 	var circles = K.getComponent('circles');
 	circles.find('global')
-		.service(req.metadata.serviceId, req.origin, true)
+		.service(req.meta.sId, req.origin, true)
 		.onRequest.dispatch(req, reply);
 }
 

@@ -6,28 +6,32 @@
 ## v.1.0.2
 
 - [x] Environments
-  Add in config
-
-- [ ] Handle redirection (gatekeeper) - or need of
-  Keep track of request.
 
 - [x] IPC adapter binds to a specified and static location (and remove 'i')
 
 - [x] Create services from config on load
 
-- [ ] Add reply interface (uses same socket) to handlers 
+- [x] Add reply interface (uses same socket) to handlers 
 
-- [ ] Better handling of service/socket update on request
+- [x] Better handling of service/socket update on request
 
-- [ ] Manage unwrapped requests
+- [x] Manage unwrapped requests
 
-- [ ] Make sure socket clients all implement closing behaviour (disconnect)
+- [x] Handle uncaughtExceptions to prevent process from crashing
 
-- [ ] Allow 'unlimited' pool size
+- [x] Make sure socket clients all implement closing behaviour (disconnect)
 
-- [ ] Implement optionnal socket timeout
+- [x] Allow 'unlimited' pool size 
 
-- [ ] Resolve parallel ipc and udp connection problems
+- [x] Implement optionnal socket timeout
+
+- [x] Resolve parallel ipc connections
+
+- [x] Fix udp reply problem
+
+- [x] Optimize tcp receiver
+
+- [x] Minify wrapper
 
 - [x] Review app shutdown to eliminate all existing connections and hanging resources
 
@@ -39,8 +43,7 @@
 - [ ] Internal map
   Generated from class-loader
 
-- [ ] Logging destination
-  Provided by debug > file.log (pipe)
+- [x] Logging destination
 
 - [ ] Unit tests
 

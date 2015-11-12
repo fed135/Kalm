@@ -24,6 +24,8 @@ function main(callback) {
 	process.on('SIGINT', terminate);
 	process.on('SIGTERM', terminate);
 
+	process.on('uncaughtException', cl.error.bind(cl));
+
 	callback();
 }
 
