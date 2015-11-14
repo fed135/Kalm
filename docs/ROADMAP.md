@@ -47,6 +47,8 @@
 
 - [ ] Unit tests
 
+- [ ] Snippets in Readme
+
 - [ ] Smoke tests
 
 - [ ] Code coverage tests
