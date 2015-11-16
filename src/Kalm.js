@@ -3,7 +3,6 @@
  * Reference to this class will be available accross the project
  * under the global property K
  * @exports {Kalm}
- * @class Kalm
  */
 
 'use strict'

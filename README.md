@@ -15,7 +15,7 @@ It's perfect for network-intensive applications and games.
 ## Documentation
 
 1. [Why](./docs/WHY.md)
-1. [API Docs](./docs/API_DOCS.md)
+1. [API Docs](https://github.com/fed135/Kalm-docs/README.md)
 1. [Roadmap](./docs/ROADMAP.md)
 1. [Kalm coding rules](./docs/RULES.md)
 
