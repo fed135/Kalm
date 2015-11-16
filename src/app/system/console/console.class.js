@@ -28,8 +28,8 @@ var _dError = debug('Kalm:error');
  * Formats debug output for Kalm applications. Overrides arguments.
  * @private
  * @method _formatArgs
- * @param {...}
- * @returns {...}
+ * @param {*}
+ * @returns {*}
  */
 function _formatArgs() {
 	if (this.namespace.indexOf('Kalm') === -1) {
