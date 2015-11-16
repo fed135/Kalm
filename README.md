@@ -2,9 +2,9 @@
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 
-[![IPC Score](https://img.shields.io/badge/ipc_score-138537_rpm-green.svg)](https://github.com/fed135/Kalm-template)
-[![TCP Score](https://img.shields.io/badge/tcp_score-104578_rpm-green.svg)](https://github.com/fed135/Kalm-template)
-[![UDP Score](https://img.shields.io/badge/udp_score-291259_rpm-green.svg)](https://github.com/fed135/Kalm-template)
+[![IPC Score](https://img.shields.io/badge/ipc_score-138537_rpm-green.svg)](./docs/PONG_TEST.md)
+[![TCP Score](https://img.shields.io/badge/tcp_score-104578_rpm-green.svg)](./docs/PONG_TEST.md)
+[![UDP Score](https://img.shields.io/badge/udp_score-291259_rpm-green.svg)](./docs/PONG_TEST.md)
 
 NodeJS Framework specifically designed for micro-service architectures and minimal network overhead.
 
