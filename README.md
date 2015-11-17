@@ -2,7 +2,6 @@
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
-[![Coverage Status](https://coveralls.io/repos/fed135/Kalm/badge.svg?branch=master&service=github)](https://coveralls.io/github/fed135/Kalm?branch=master)
 
 [![IPC Score](https://img.shields.io/badge/ipc_score-138537_rpm-green.svg)](./docs/PONG_TEST.md)
 [![TCP Score](https://img.shields.io/badge/tcp_score-104578_rpm-green.svg)](./docs/PONG_TEST.md)
