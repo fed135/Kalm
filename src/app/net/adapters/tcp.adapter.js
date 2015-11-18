@@ -35,14 +35,7 @@ function listen(done) {
 			if (!req.payload) req = { payload: req };
 			if (!req.origin) req.origin = {};
 			data.origin.adapter = 'tcp';
-			connection.handleRequest(data,  function(payload, callback) {
-				var circles = K.getComponent('circles');
-				var service = circles.find('global')
-					.service(data.meta.sId);
-				// Service existing or created during handleRequest
-				var socket = service.socket();
-				connection.send(service, payload, socket, callback);
-			});
+			connection.handleRequest(data);
 		});
 		
 	}).listen(config.connections.tcp.port, done);

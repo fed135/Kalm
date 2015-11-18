@@ -125,11 +125,12 @@ function send(service, payload, socket, callback) {
  * @param {object} req The incomming request payload
  * @param {function} reply The reply interface
  */
-function handleRequest(req, reply) {
+function handleRequest(req) {
 	var circles = K.getComponent('circles');
 	var system = K.getComponent('system');
 	var config = K.getComponent('config');
 	var service;
+	var reply;
 
 	if (!req.meta) {
 		_defaultHandler(req);
@@ -148,6 +149,14 @@ function handleRequest(req, reply) {
 	}
 
 	service = circles.find('global').service(req.meta.sId, req.origin, true);
+
+	reply = function(payload, callback) {
+		var circles = K.getComponent('circles');
+		var service = circles.find('global').service(req.meta.sId);
+		// Service existing or created during handleRequest
+		var socket = service.socket();
+		send(service, payload, socket, callback);
+	}
 
 	if (service.onRequest.getNumListeners() > 0) {
 		service.onRequest.dispatch(req, reply);

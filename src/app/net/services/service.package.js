@@ -24,17 +24,13 @@ function Service(options) {
 	this.hostname = options.hostname || '0.0.0.0';
 	this.adapter = options.adapter || 'ipc';
 	this.port = options.port || 80;
-	this.poolSize = options.poolSize;
+	this.poolSize = options.poolSize || -1;
 	this.socketTimeout = options.socketTimeout || -1;
-
-	this.wrap = (options.wrap !== undefined)?options.wrap:true;
 
 	this._pool = [];
 	this._namedSockets = {};
 
 	this.onRequest = new Signal();
-
-	if (this.poolSize === undefined) this.poolSize = config.connections.poolSize;
 }
 
 /**

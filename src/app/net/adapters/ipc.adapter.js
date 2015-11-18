@@ -35,14 +35,7 @@ function listen(done) {
 		if (!req.payload) req = { payload: req };
 		if (!req.origin) req.origin = {};
 		req.origin.adapter = 'ipc';
-		connection.handleRequest(req, function(payload, callback) {
-			var circles = K.getComponent('circles');
-			var service = circles.find('global')
-				.service(req.meta.sId);
-			// Service existing or created during handleRequest
-			var socket = service.socket();
-			connection.send(service, payload, socket, callback);
-		});
+		connection.handleRequest(req);
 	}).listen(config.connections.ipc.path + config.connections.ipc.port, done);
 }
 

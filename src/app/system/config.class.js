@@ -16,7 +16,6 @@ module.exports = {
 			noColor: false
 		},
 		connections: {
-			poolSize: -1,
 			ipc: {
 				evt: 'message',
 				path: '/tmp/'
