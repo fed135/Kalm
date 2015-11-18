@@ -17,8 +17,9 @@ module.exports = {
 		},
 		connections: {
 			ipc: {
+				port: 4001,
 				evt: 'message',
-				path: '/tmp/'
+				path: '/tmp/socket-'
 			},
 			tcp: {
 				port: 5001

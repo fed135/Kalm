@@ -15,6 +15,8 @@
  * @returns {object} The target object with the mixed data
  */
 function mixin(target, source) {
+	// Non-reccursive broken thing
+	/*
 	Object.getOwnPropertyNames(source).forEach(function(key) {
 		Object.defineProperty(
 			target, 
@@ -22,6 +24,16 @@ function mixin(target, source) {
 			Object.getOwnPropertyDescriptor(source, key)
 		); 
 	});
+	*/
+	// Reccursive ugly thing
+	for(var i in source) {
+		if (typeof target[i] === 'object') {
+			target[i] = mixin(target[i], source[i]);
+		}
+		else {
+			target[i] = source[i];
+		}
+	}
 
 	return target;
 }
