@@ -4,7 +4,7 @@
  * @exports {component(console)}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 

@@ -3,7 +3,7 @@
  * @exports {component(circles)}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 

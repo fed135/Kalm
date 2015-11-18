@@ -4,7 +4,7 @@
  * @exports {object}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -30,11 +30,11 @@ function listen(done) {
 	cl.log('   - Starting udp server  [ :' + config.connections.udp.port + ' ]');
 
 	server = dgram.createSocket('udp4');
-	server.on('message', function (req, reply) {
+	server.on('message', function (req) {
 		req = JSON.parse(req.toString());
-    if (!req.payload) req = { payload: req };
+		if (!req.payload) req = { payload: req };
 		if (!req.origin) req.origin = {};
-    req.origin.adapter = 'udp';
+		req.origin.adapter = 'udp';
 		connection.handleRequest(req, function(payload, callback) {
 			var circles = K.getComponent('circles');
 			var service = circles.find('global')
@@ -43,9 +43,9 @@ function listen(done) {
 			var socket = service.socket();
 			connection.send(service, payload, socket, callback);
 		});
-  });
-  server.bind(config.connections.udp.port, '127.0.0.1');
-  done();
+	});
+	server.bind(config.connections.udp.port, '127.0.0.1');
+	done();
 }
 
 /**
@@ -69,11 +69,6 @@ function createClient(service) {
 	socket.__active = true;
 	service._updateSocketStatus(socket);
 
-	socket.on('message', function(e) {
-		service.onRequest.dispatch(e, function(payload, callback) {
-			send(service, payload, socket, callback);
-		});
-	});
 	return socket;
 }
 
@@ -95,20 +90,20 @@ function send(service, options, socket, callback) {
 		service.port, 
 		service.hostname, 
 		function(err, bytes) {
-	   	if (err !== 0 || bytes !== message.length) {
-	   		cl.error(err);
-	   		socket.client.close();
-	   		socket.client.__active = false;
-	   	}
-	   	else {
-	   		if (!service._pushSocket(socket)) {
+			if (err !== 0 || bytes !== message.length) {
+				cl.error(err);
+				socket.client.close();
+				socket.client.__active = false;
+			}
+			else {
+				if (!service._pushSocket(socket)) {
 					socket.client.close();
 					socket.client.__active = false;
 				}
-    	}
+			}
 
 			if (callback) callback();
-   	}
+		}
 	);
 }
 

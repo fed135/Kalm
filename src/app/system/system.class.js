@@ -3,7 +3,7 @@
  * @exports {component(system)}
  */
 
-'use_strict'
+'use_strict';
 
 /* Requires ------------------------------------------------------------------*/
 

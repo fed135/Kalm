@@ -3,9 +3,9 @@
  * @exports {component(utils)}
  */
 
-'use strict'
+'use strict';
 
-/* Requires ------------------------------------------------------------------*/  
+/* Requires ------------------------------------------------------------------*/
 
 var object = require('./object.package');
 var async = require('./async.package');

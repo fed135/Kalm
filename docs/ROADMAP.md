@@ -59,6 +59,4 @@
 
 - [ ] Smoke tests
 
-- [ ] Add scheduler
-
-- [ ] Recover from fatal crash - resolve already bound addresses
+- [ ] Bug: Recover from fatal crash - resolve already bound addresses

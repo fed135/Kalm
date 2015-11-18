@@ -4,11 +4,7 @@
  * @exports {Socket}
  */
 
-'use strict'
-
-/* Requires ------------------------------------------------------------------*/
-
-var Signal = require('signals');
+'use strict';
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -37,7 +33,7 @@ function Socket(options) {
  * @memberof Socket
  * @param {string} status The connected status
  */
-Socket.prototype.updateStatus = function(status) {
+Socket.prototype.updateStatus = function() {
 	this.status = 'connected';
 	this._renderQueue();
 };

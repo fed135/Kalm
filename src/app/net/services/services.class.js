@@ -3,7 +3,7 @@
  * @exports {component(services)}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -23,16 +23,14 @@ var _handlers = null;
  * @return {Service} The created service
  */
 function create(name, options) {
-	name || utils.crypto.generate();
-	options = options || Object.create(null);
-
-	var cl = K.getComponent('console');
 	var utils = K.getComponent('utils');
 	var connection = K.getComponent('connection');
 	var circles = K.getComponent('circles');
-	var adapter = connection.adapters[options.adapter || 'ipc'];
-	var cl = K.getComponent('console');
 
+	name = name || utils.crypto.generate();
+	options = options || Object.create(null);
+
+	var adapter = connection.adapters[options.adapter || 'ipc'];
 	var f;
 	var cList;
 
@@ -50,18 +48,6 @@ function create(name, options) {
 }
 
 /**
- * Adds a collection of handlers to bind to new and existing services
- * @method bindHandlers
- * @param {object} handlers The collection of handlers for the app
- */
-function bindHandlers(handlers) {
-	_handlers = handlers;
-
-	var circles = K.getComponent('circles');
-	circles.find('global').all().forEach(_bindServiceHandler);
-}
-
-/**
  * Tries to bind a service to a handler
  * @private
  * @method _bindServiceHandler
@@ -73,6 +59,18 @@ function _bindServiceHandler(service) {
 			service.onRequest.add(_handlers[service.label]);
 		}
 	}
+}
+
+/**
+ * Adds a collection of handlers to bind to new and existing services
+ * @method bindHandlers
+ * @param {object} handlers The collection of handlers for the app
+ */
+function bindHandlers(handlers) {
+	_handlers = handlers;
+
+	var circles = K.getComponent('circles');
+	circles.find('global').all().forEach(_bindServiceHandler);
 }
 
 /**

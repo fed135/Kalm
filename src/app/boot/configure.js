@@ -3,7 +3,7 @@
  * @exports {function} main
  */
 
-'use strict'
+'use strict';
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -13,12 +13,16 @@ var _startTime;
 /* Methods -------------------------------------------------------------------*/
 
 /**
- * Entry point for boot process. Triggered once all classes are loaded
- * @method main
+ * Completes the booting process
+ * @private
+ * @method _finish
  */
-function main() {
-	_startTime = Date.now();
-	_mixinConfigs();
+function _finish() {
+	var cl = K.getComponent('console');
+
+	cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
+	_startTime = null;
+	K.onReady.dispatch();
 }
 
 /**
@@ -33,9 +37,33 @@ function _runInits() {
 	cl.log(' - Initializing components');
 
 	utils.async.all(K.moduleInits, function(err) {
-		if (err) failure(err);
+		if (err) cl.error(err);
 		else _finish();
 	});
+}
+
+/**
+ * Prints the Kalm logo
+ * @private
+ * @method _printLogo
+ */
+function _printLogo() {
+	var cl = K.getComponent('console');
+	cl.print(cl.GREEN + '\n	  _\n' +
+		'         /\\_\\\n' +
+		'        / / /  ' + cl.WHITE + '_' + cl.GREEN + '\n' +
+		'       / / /  ' + cl.WHITE + '/\\_\\' + cl.GREEN + '\n' +
+		'      / / /' + cl.WHITE + '__/ / /' + cl.GREEN + '\n' +
+		'     / /' + cl.WHITE + '\\_____/ /' + cl.GREEN + '\n' +
+		'    / /' + cl.WHITE + '\\_______/' + cl.GREEN + '\n' +
+		'   / / /' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
+		'  / / /  ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
+		' / / /    ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
+		' \\/_/      ' + cl.BLUE + '\\_\\_\\' + cl.WHITE + 
+		'    Kalm v' + K.pkg.version + '\n\n');
+
+	cl.log('Starting service...');
+	_runInits();
 }
 
 /**
@@ -54,40 +82,12 @@ function _mixinConfigs() {
 }
 
 /**
- * Prints the Kalm logo
- * @private
- * @method _printLogo
+ * Entry point for boot process. Triggered once all classes are loaded
+ * @method main
  */
-function _printLogo() {
-	var cl = K.getComponent('console');
-  cl.print(cl.GREEN + '\n	  _\n' +
-		'         /\\_\\\n' +
-		'        / / /  ' + cl.WHITE + '_' + cl.GREEN + '\n' +
-		'       / / /  ' + cl.WHITE + '/\\_\\' + cl.GREEN + '\n' +
-		'      / / /' + cl.WHITE + '__/ / /' + cl.GREEN + '\n' +
-		'     / /' + cl.WHITE + '\\_____/ /' + cl.GREEN + '\n' +
-		'    / /' + cl.WHITE + '\\_______/' + cl.GREEN + '\n' +
-		'   / / /' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
-		'  / / /  ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
-		' / / /    ' + cl.BLUE + '\\ \\ \\' + cl.GREEN + '\n' +
-		' \\/_/      ' + cl.BLUE + '\\_\\_\\' + cl.WHITE + 
-		'    Kalm v' + K.pkg.version + '\n\n');
-
-  cl.log('Starting service...');
-  _runInits();
-}
-
-/**
- * Completes the booting process
- * @private
- * @method _finish
- */
-function _finish() {
-	var cl = K.getComponent('console');
-
-  cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
-  _startTime = null;
-  K.onReady.dispatch();
+function main() {
+	_startTime = Date.now();
+	_mixinConfigs();
 }
 
 /* Exports -------------------------------------------------------------------*/

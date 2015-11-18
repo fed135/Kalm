@@ -4,7 +4,7 @@
  * @exports {object}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -26,7 +26,6 @@ var server = null;
  */
 function listen(done) {
 	var config = K.getComponent('config');
-	var manifest = K.getComponent('manifest');
 	var cl = K.getComponent('console');
 	var connection = K.getComponent('connection');
 
@@ -90,16 +89,6 @@ function createClient(service) {
 
 	socket.ondisconnect.add(function() {
 		service._removeSocket(socket);
-	});
-
-	socket.onconnect.add(function() {
-		service._updateSocketStatus(socket);
-	});
-
-	socket.ondata.add(function(e) {
-		service.onRequest.dispatch(e, function(payload, callback) {
-			send(service, payload, socket, callback);
-		});
 	});
 
 	socket.onerror.add(function() {

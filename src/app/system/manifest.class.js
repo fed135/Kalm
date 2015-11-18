@@ -3,7 +3,7 @@
  * @exports {component(manifest)}
  */
 
-'use strict'
+'use strict';
 
 /* Methods -------------------------------------------------------------------*/
 

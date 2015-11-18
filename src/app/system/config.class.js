@@ -3,7 +3,7 @@
  * @exports {component(config)}
  */
 
-'use strict'
+'use strict';
 
 /* Exports -------------------------------------------------------------------*/
 

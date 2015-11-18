@@ -4,11 +4,7 @@
  * @exports {component(connection)}
  */
 
-/* Requires ------------------------------------------------------------------*/
-
-var ipc = require('./adapters/ipc.adapter.js');
-var tcp = require('./adapters/tcp.adapter.js');
-var udp = require('./adapters/udp.adapter.js');
+'use strict';
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -80,9 +76,7 @@ function main(callback) {
  * @returns {object|null} The created client or null on error
  */
 function createClient(service) {
-	if (!service.adapter in this.adapters) {
-		return callback('Unknown type "' + service.adapter + '"');
-	}
+	if (!(service.adapter in this.adapters)) return null;
 
 	return this.adapters[service.adapter].createClient(service);
 }
@@ -95,10 +89,7 @@ function createClient(service) {
  * @returns {boolean} Wether the socket is valid or not
  */
 function isConnected(service, socket) {
-	if (!service.adapter in this.adapters) {
-		cl.warn('Unknown type "' + service.adapter + '"');
-		return false;
-	}
+	if (!(service.adapter in this.adapters)) return false;
 
 	return this.adapters[service.adapter].isConnected(socket);
 }
@@ -115,7 +106,7 @@ function send(service, payload, socket, callback) {
 	var config = K.getComponent('config');
 	var system = K.getComponent('system');
 
-	if (!service.adapter in this.adapters) {
+	if (!(service.adapter in this.adapters)) {
 		return callback('Unknown type "' + service.adapter + '"');
 	}
 

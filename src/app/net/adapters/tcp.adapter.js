@@ -4,7 +4,7 @@
  * @exports {object}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -88,21 +88,11 @@ function stop(callback) {
 function createClient(service) {
 	var socket = net.connect(service);
 
-	socket.on('connect', function() {
-		service._updateSocketStatus(socket);
-	});
-
 	socket.on('disconnect', function() {
 		service._removeSocket(socket);
 	});
 
-	socket.on('data', function(socket) {
-		service.onRequest.dispatch(e, function(payload, callback) {
-			send(service, payload, socket, callback);
-		});
-	});
-
-	socket.on('error', function(err) {
+	socket.on('error', function() {
 		if (socket && socket.disconnect) {
 			socket.disconnect();
 		}

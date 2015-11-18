@@ -3,7 +3,7 @@
  * @exports {object}
  */
 
-'use strict'
+'use strict';
 
 /* Methods ------------------------------------------------------------------*/
 
@@ -16,7 +16,7 @@ function all(list, callback) {
 	//Callback-based
 	var done = 0;
 
-	list.forEach(function(e, i) {
+	list.forEach(function(e) {
 		e(function() { 
 			done++;
 			if (done === list.length) {

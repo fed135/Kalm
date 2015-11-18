@@ -3,7 +3,7 @@
  * @exports {function} prettyPrintStack
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 

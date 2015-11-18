@@ -3,7 +3,7 @@
  * @exports {object}
  */
 
-'use strict'
+'use strict';
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -16,14 +16,14 @@
  */
 function mixin(target, source) {
 	Object.getOwnPropertyNames(source).forEach(function(key) {
-    Object.defineProperty(
-    	target, 
-    	key, 
-    	Object.getOwnPropertyDescriptor(source, key)
-    ); 
-  });
+		Object.defineProperty(
+			target, 
+			key, 
+			Object.getOwnPropertyDescriptor(source, key)
+		); 
+	});
 
-  return target;
+	return target;
 }
 
 /* Exports -------------------------------------------------------------------*/

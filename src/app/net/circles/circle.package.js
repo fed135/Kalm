@@ -4,7 +4,7 @@
  * @exports {Circle}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -33,18 +33,11 @@ function Circle(options) {
  * @param {object} options The configuration in case of creation
  * @return {Service} The desired service
  */
-Circle.prototype.service = function(name, options, update) {
+Circle.prototype.service = function(name, options) {
 	var services = K.getComponent('services');
 	var service = this.list[name];
 
-	if (service) {
-		//TODO: Do we want this to be updatable, like discovery mode ?
-		/*if (update) {
-			service.hostname = options.h;
-			service.port = options.p;
-		}*/
-		return service;
-	}
+	if (service) return service;
 
 	if (!options) return null;
 

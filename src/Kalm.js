@@ -5,7 +5,7 @@
  * @exports {Kalm}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -70,7 +70,7 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 				p[e] = pkg.methods[e].bind(p);
 			}
 			else {
-				process.stdErr(e + 'is not a method in ' + pkg.pkgName)
+				process.stdErr(e + 'is not a method in ' + pkg.pkgName);
 			}
 		});
 	}

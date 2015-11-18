@@ -4,7 +4,7 @@
  * @exports {Service}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
@@ -24,7 +24,7 @@ function Service(options) {
 	this.hostname = options.hostname || '0.0.0.0';
 	this.adapter = options.adapter || 'ipc';
 	this.port = options.port || 80;
-	this.poolSize = (options.poolSize !== undefined)?options.poolSize:config.connections.poolSize;
+	this.poolSize = options.poolSize;
 	this.socketTimeout = options.socketTimeout || -1;
 
 	this.wrap = (options.wrap !== undefined)?options.wrap:true;
@@ -33,6 +33,8 @@ function Service(options) {
 	this._namedSockets = {};
 
 	this.onRequest = new Signal();
+
+	if (this.poolSize === undefined) this.poolSize = config.connections.poolSize;
 }
 
 /**
@@ -45,9 +47,7 @@ function Service(options) {
  */
 Service.prototype.socket = function(name, options) {
 	var sockets = K.getComponent('sockets');
-	var utils = K.getComponent('utils');
 	var connection = K.getComponent('connection');
-	var i = 0;
 	var self = this;
 	var s;
 
@@ -107,17 +107,6 @@ Service.prototype._pushSocket = function(socket) {
 };
 
 /**
- * Updates the connected status of a socket
- * @system-reserved
- * @method _updateSocketStatus
- * @memberof Service
- * @param {Socket} socket The socket to update
- */
-Service.prototype._updateSocketStatus = function(socket) {
-	//TODO:
-};
-
-/**
  * Removes the socket from the pool
  * @system-reserved
  * @method _removeSocket
@@ -127,7 +116,9 @@ Service.prototype._updateSocketStatus = function(socket) {
 Service.prototype._removeSocket = function(socket) {
 	var i;
 
-	if (socket.label in this._namedSockets) delete this._namedSockets[socket.label];
+	if (socket.label in this._namedSockets) {
+		delete this._namedSockets[socket.label];
+	}
 	else {
 		for (i = this._pool.length - 1; i >= 0; i--) {
 			if (this._pool[i].label === socket.label) {

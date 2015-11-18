@@ -3,7 +3,7 @@
  * @exports {object}
  */
 
-'use strict'
+'use strict';
 
 /* Local variables -----------------------------------------------------------*/
 

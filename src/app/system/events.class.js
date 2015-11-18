@@ -3,11 +3,7 @@
  * @exports {component(events)}
  */
 
-'use strict'
-
-/* Requires ------------------------------------------------------------------*/
-
-var Signal = require('signals');
+'use strict';
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -34,19 +30,18 @@ function main(callback) {
  * @method terminate
  * @param {function} callback The callback method
  */
-function terminate(callback) {
-	//TODO: Look for app-state patterns - move this there
+function terminate() {
 	var connection = K.getComponent('connection');
 	var cl = K.getComponent('console');
 	var utils = K.getComponent('utils');
 
-  cl.print('\r  ');
+	cl.print('\r  ');
 	cl.warn('Shutting down...');
 
 	K.onShutdown.dispatch();
 
 	utils.async.all(
-		Object.keys(connection.adapters).map(function(e, i){
+		Object.keys(connection.adapters).map(function(e){
 			return connection.adapters[e].stop;
 		}),
 		_kill

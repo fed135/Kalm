@@ -3,7 +3,7 @@
  * @exports {component(sockets)}
  */
 
-'use strict'
+'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
