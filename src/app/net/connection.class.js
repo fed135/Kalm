@@ -24,6 +24,8 @@ var callWrapper = {
 	}
 };
 
+var _defaultHandler = function(){};
+
 /* Methods -------------------------------------------------------------------*/
 
 /**
@@ -36,6 +38,15 @@ function loadAdapter(adapter, callback) {
 	this.adapters[adapter.name] = adapter;
 	adapter.listen(callback);
 }
+
+/**
+ * Sets the default controller for routes
+ * @method setDefaultHandler
+ * @param {function} handler The function to call on routes
+ */
+function setDefaultHandler(handler) {
+	_defaultHandler = handler;
+}  
 
 /**
  * Entry point for the configuration of adapter connections
@@ -124,16 +135,35 @@ function send(service, payload, socket, callback) {
  * @param {function} reply The reply interface
  */
 function handleRequest(req, reply) {
-	//TODO: what to do in the case of an unwrapped request
+	var circles = K.getComponent('circles');
+	var system = K.getComponent('system');
+	var config = K.getComponent('config');
+	var service;
+
 	if (!req.meta) {
-		K.onRequest.dispatch(req);
+		_defaultHandler(req);
 		return;
 	}
 
-	var circles = K.getComponent('circles');
-	circles.find('global')
-		.service(req.meta.sId, req.origin, true)
-		.onRequest.dispatch(req, reply);
+	//Check if it's the same service that sent the request
+	if (req.origin) {
+		if (
+			req.origin.p === config.connections[req.origin.adapter].port &&
+			req.origin.h === system.location
+		) { 
+			//It's from me
+			return;
+		}
+	}
+
+	service = circles.find('global').service(req.meta.sId, req.origin, true);
+
+	if (service.onRequest.getNumListeners() > 0) {
+		service.onRequest.dispatch(req, reply);
+	}
+	else {
+		_defaultHandler(req, reply);
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/
@@ -148,6 +178,7 @@ module.exports = {
 		load: loadAdapter,
 		createClient: createClient,
 		handleRequest: handleRequest,
+		setDefaultHandler: setDefaultHandler,
 		send: send,
 		isConnected: isConnected
 	}

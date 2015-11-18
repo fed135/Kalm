@@ -11,6 +11,7 @@ module.exports = {
 	pkgName: 'config',
 	attributes: {
 		environment: 'dev',
+		mock: false,
 		debug: {
 			noColor: false
 		},

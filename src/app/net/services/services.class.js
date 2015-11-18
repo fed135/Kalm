@@ -9,6 +9,10 @@
 
 var Service = require('./service.package');
 
+/* Local variables -----------------------------------------------------------*/
+
+var _handlers = null;
+
 /* Methods -------------------------------------------------------------------*/
 
 /**
@@ -41,7 +45,34 @@ function create(name, options) {
 	cList.forEach(function(c) {
 		circles.find(c).add(f);
 	});
+	_bindServiceHandler(f);
 	return f;
+}
+
+/**
+ * Adds a collection of handlers to bind to new and existing services
+ * @method bindHandlers
+ * @param {object} handlers The collection of handlers for the app
+ */
+function bindHandlers(handlers) {
+	_handlers = handlers;
+
+	var circles = K.getComponent('circles');
+	circles.find('global').all().forEach(_bindServiceHandler);
+}
+
+/**
+ * Tries to bind a service to a handler
+ * @private
+ * @method _bindServiceHandler
+ * @param {Service} service The service to bind a handler to
+ */
+function _bindServiceHandler(service) {
+	if (_handlers !== null) {
+		if (service.label in _handlers) {
+			service.onRequest.add(_handlers[service.label]);
+		}
+	}
 }
 
 /**
@@ -67,6 +98,7 @@ module.exports = {
 	pkgName: 'services',
 	methods: {
 		create: create,
+		bindHandlers: bindHandlers,
 		_init: main
 	}
 };

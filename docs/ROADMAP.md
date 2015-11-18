@@ -37,26 +37,28 @@
 
 ## v.1.0.3
 
-- [ ] API docs
-  Generated from docblocks
-
-- [ ] Internal map
-  Generated from class-loader
+- [x] API docs
 
 - [x] Logging destination
 
-- [ ] Unit tests
+- [x] Proper load-balancing strategy for pooled sockets
 
-- [ ] Snippets in Readme
+- [x] Add proper uid generation
+
+- [x] Bug: ipc will notify sender with onRequest
+
+- [x] Mock mode config
+
+- [x] Feature: need to be able to add a default handler + dynamic bind to handler
+
+## v.1.0.4
+
+- [ ] Internal map
+
+- [ ] Unit tests
 
 - [ ] Smoke tests
 
-- [ ] Code coverage tests
-
-- [ ] Proper load-balancing strategy for pooled sockets
-
-- [ ] Mock mode (needs definition)
-
 - [ ] Add scheduler
 
-- [ ] Add proper uid generation
+- [ ] Recover from fatal crash - resolve already bound addresses
