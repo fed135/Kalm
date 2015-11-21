@@ -18,8 +18,6 @@ var Signal = require('signals');
  * @param {object} options The configuration options for the service
  */
 function Service(options) {
-	var config = K.getComponent('config');
-
 	this.label = options.label;
 	this.hostname = options.hostname || '0.0.0.0';
 	this.adapter = options.adapter || 'ipc';
@@ -42,8 +40,8 @@ function Service(options) {
  * @returns {Socket} The recovered or created socket
  */
 Service.prototype.socket = function(name, options) {
-	var sockets = K.getComponent('sockets');
-	var connection = K.getComponent('connection');
+	var sockets = this.getComponent('sockets');
+	var connection = this.getComponent('connection');
 	var self = this;
 	var s;
 

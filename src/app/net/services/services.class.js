@@ -23,9 +23,9 @@ var _handlers = null;
  * @return {Service} The created service
  */
 function create(name, options) {
-	var utils = K.getComponent('utils');
-	var connection = K.getComponent('connection');
-	var circles = K.getComponent('circles');
+	var utils = this.getComponent('utils');
+	var connection = this.getComponent('connection');
+	var circles = this.getComponent('circles');
 
 	name = name || utils.crypto.generate();
 	options = options || Object.create(null);
@@ -69,7 +69,7 @@ function _bindServiceHandler(service) {
 function bindHandlers(handlers) {
 	_handlers = handlers;
 
-	var circles = K.getComponent('circles');
+	var circles = this.getComponent('circles');
 	circles.find('global').all().forEach(_bindServiceHandler);
 }
 
@@ -79,12 +79,12 @@ function bindHandlers(handlers) {
  * @param {function} callback The callback method
  */
 function main(callback) {
-	var config = K.getComponent('config');
+	var config = this.getComponent('config');
 
 	if (config.services) {
 		Object.keys(config.services).forEach(function(e){
-			create(e, config.services[e]);
-		});
+			create.call(this, e, config.services[e]);
+		}, this);
 	}
 
 	callback();

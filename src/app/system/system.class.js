@@ -20,7 +20,7 @@ function main(callback) {
 	var _defaultAddress = '127.0.0.1';
 	var _currAddress = null;
 	var interfaces = os.networkInterfaces();
-	var cl = K.getComponent('console');
+	var cl = this.getComponent('console');
 
 	cl.log(' - Initializing system class');
 

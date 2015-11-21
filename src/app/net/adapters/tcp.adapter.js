@@ -12,7 +12,6 @@ var net = require('net');
 
 /* Local variables -----------------------------------------------------------*/
 
-/** Stores the ipc server object */
 var server = null;
 
 /* Methods -------------------------------------------------------------------*/
@@ -20,25 +19,21 @@ var server = null;
 /**
  * Listens for tcp connections on the selected port.
  * @method listen
- * @param {function} done The success callback for the operation
+ * @param {object} options The config object for that adapter
+ * @param {function} handler The central handling method for requests
+ * @param {function} callback The success callback for the operation
  */
-function listen(done) {
-	var config = K.getComponent('config');
-	var connection = K.getComponent('connection');
-	var cl = K.getComponent('console');
-
-	cl.log('   - Starting tcp server  [ :' + config.connections.tcp.port + ' ]');
-
+function listen(options, handler, callback) {
 	server = net.createServer(function(req) {
 		req.on('data', function(data) {
 			data = JSON.parse(data.toString());
 			if (!req.payload) req = { payload: req };
 			if (!req.origin) req.origin = {};
 			data.origin.adapter = 'tcp';
-			connection.handleRequest(data);
+			handler(data);
 		});
 		
-	}).listen(config.connections.tcp.port, done);
+	}).listen(options.port, callback);
 }
 
 /**
@@ -65,9 +60,6 @@ function send(service, options, socket, callback) {
  * @param {function|null} callback The callback method
  */ 
 function stop(callback) {
-	var cl = K.getComponent('console');
-	cl.warn('   - Stopping tcp server');
-	
 	if (server) server.close(callback);
 	else callback();
 }
@@ -75,10 +67,11 @@ function stop(callback) {
 /**
  * Creates a client and adds the listeners to it
  * @method createClient
+ * @param {object} options The config object for that adapter
  * @param {Service} service The service to create the socket for
- * @returns {ipc.Client} The created ipc client
+ * @returns {Socket} The created tcp client
  */
-function createClient(service) {
+function createClient(options, service) {
 	var socket = net.connect(service);
 
 	socket.on('disconnect', function() {

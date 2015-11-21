@@ -34,7 +34,7 @@ function Circle(options) {
  * @return {Service} The desired service
  */
 Circle.prototype.service = function(name, options) {
-	var services = K.getComponent('services');
+	var services = this.getComponent('services');
 	var service = this.list[name];
 
 	if (service) return service;

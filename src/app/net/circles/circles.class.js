@@ -24,7 +24,7 @@ var _list = {};
  * @returns {Circle} The newly created circle
  */
 function create(name, options) {
-	var utils = K.getComponent('utils');
+	var utils = this.getComponent('utils');
 	var c;
 
 	options = options || Object.create(null);
@@ -58,7 +58,7 @@ function find(name, options) {
  * @param {function} callback The callback method
  */
 function main(callback) {
-	create('global');
+	this.create('global');
 	callback();
 }
 

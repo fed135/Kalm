@@ -12,7 +12,6 @@ var dgram = require('dgram');
 
 /* Local variables -----------------------------------------------------------*/
 
-/** Stores the ipc server object */
 var server = null;
 
 /* Methods -------------------------------------------------------------------*/
@@ -20,25 +19,21 @@ var server = null;
 /**
  * Listens for udp connections on the selected port.
  * @method listen
- * @param {function} done The success callback for the operation
+ * @param {object} options The config object for that adapter
+ * @param {function} handler The central handling method for requests
+ * @param {function} callback The success callback for the operation
  */
-function listen(done) {
-	var config = K.getComponent('config');
-	var connection = K.getComponent('connection');
-	var cl = K.getComponent('console');
-
-	cl.log('   - Starting udp server  [ :' + config.connections.udp.port + ' ]');
-
+function listen(options, handler, callback) {
 	server = dgram.createSocket('udp4');
 	server.on('message', function (req) {
 		req = JSON.parse(req.toString());
 		if (!req.payload) req = { payload: req };
 		if (!req.origin) req.origin = {};
 		req.origin.adapter = 'udp';
-		connection.handleRequest(req);
+		handler(req);
 	});
-	server.bind(config.connections.udp.port, '127.0.0.1');
-	done();
+	server.bind(options.port, '127.0.0.1');
+	callback();
 }
 
 /**
@@ -54,10 +49,11 @@ function isConnected(socket) {
 /**
  * Creates a client and adds the listeners to it
  * @method createClient
+ * @param {object} options The config object for that adapter
  * @param {Service} service The service to create the socket for
- * @returns {ipc.Client} The created ipc client
+ * @returns {dgram.Socket} The created udp client
  */
-function createClient(service) {
+function createClient(options, service) {
 	var socket = dgram.createSocket('udp4');
 	socket.__active = true;
 	service._updateSocketStatus(socket);
@@ -75,7 +71,6 @@ function createClient(service) {
  */
 function send(service, options, socket, callback) {
 	var message = new Buffer(JSON.stringify(options));
-	var cl = K.getComponent('console');
 	socket.client.send(
 		message, 
 		0, 
@@ -84,7 +79,6 @@ function send(service, options, socket, callback) {
 		service.hostname, 
 		function(err, bytes) {
 			if (err !== 0 || bytes !== message.length) {
-				cl.error(err);
 				socket.client.close();
 				socket.client.__active = false;
 			}
@@ -106,9 +100,6 @@ function send(service, options, socket, callback) {
  * @param {function|null} callback The callback method
  */ 
 function stop(callback) {
-	var cl = K.getComponent('console');
-	cl.warn('   - Stopping udp server');
-	
 	if (server) server.close(callback);
 	else callback();
 }

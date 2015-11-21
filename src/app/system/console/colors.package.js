@@ -27,7 +27,7 @@ var COLORS = {
  * @returns {object} The collection of colors
  */
 function getList() {
-	var config = K.getComponent('config');
+	var config = this.getComponent('config');
 
 	if (config.debug && config.debug.noColor) {
 		return {

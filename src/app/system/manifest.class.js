@@ -13,9 +13,9 @@
  * @returns {object} The manifest info
  */
 function print() {
-	var system = K.getComponent('system');
-	var connection = K.getComponent('connection');
-	var config = K.getComponent('config');
+	var system = this.getComponent('system');
+	var connection = this.getComponent('connection');
+	var config = this.getComponent('config');
 
 	var adapters = Object.keys(connection.adapters).map(function(e) {
 		return config.connections[e];
@@ -23,13 +23,13 @@ function print() {
 
 	return {
 		id: this.id,
-		name: K.pkg.name,
+		name: config.pkg.name,
 		location: system.location,
 		adapters: adapters,
 		meta: {
-			version: K.pkg.version ,
-			description: K.pkg.description || 'A Kalm service.',
-			contact: K.pkg.contact || ''
+			version: config.pkg.version ,
+			description: config.pkg.description || 'A Kalm service.',
+			contact: config.pkg.contact || ''
 		}
 	};
 }
@@ -40,11 +40,12 @@ function print() {
  * @param {function} callback The callback method
  */
 function main(callback) {
-	var cl = K.getComponent('console');
+	var cl = this.getComponent('console');
+	var config = this.getComponent('config');
 
 	cl.log(' - Initializing manifest class');
 
-	process.title = K.pkg.name;
+	process.title = config.pkg.name;
 	callback();
 }
 

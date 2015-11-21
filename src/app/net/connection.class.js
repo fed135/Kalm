@@ -31,8 +31,21 @@ var _defaultHandler = function(){};
  * @param {function} callback The callback method
  */
 function loadAdapter(adapter, callback) {
+	var config = this.getComponent('config');
+	var cl = this.getComponent('console');
+	var connection = this.getComponent('connection');
+
+	cl.log(
+		'   - Starting ' + adapter.name + ' server' + 
+		' [ :' + config.connections[adapter.name].port + ' ]'
+	);
+
 	this.adapters[adapter.name] = adapter;
-	adapter.listen(callback);
+	adapter.listen(
+		config.connections[adapter.name], 
+		handleRequest.bind(this), 
+		callback
+	);
 }
 
 /**
@@ -50,9 +63,10 @@ function setDefaultHandler(handler) {
  * @param {function} callback The callback method
  */
 function main(callback) {
-	var utils = K.getComponent('utils');
-	var cl = K.getComponent('console');
-	var manifest = K.getComponent('manifest');
+	var utils = this.getComponent('utils');
+	var cl = this.getComponent('console');
+	var manifest = this.getComponent('manifest');
+	var config = this.getComponent('config');
 
 	var self = this;
 	var baseAdapters = ['ipc', 'tcp', 'udp'];
@@ -66,7 +80,7 @@ function main(callback) {
 		};
 	}), callback);
 
-	callWrapper.meta.id = K.pkg.name + '#' + manifest.id;
+	callWrapper.meta.id = config.pkg.name + '#' + manifest.id;
 }
 
 /**
@@ -76,9 +90,14 @@ function main(callback) {
  * @returns {object|null} The created client or null on error
  */
 function createClient(service) {
+	var config = this.getComponent('config');
+
 	if (!(service.adapter in this.adapters)) return null;
 
-	return this.adapters[service.adapter].createClient(service);
+	return this.adapters[service.adapter].createClient(
+		config.connections[service.adapter], 
+		service
+	);
 }
 
 /**
@@ -103,8 +122,8 @@ function isConnected(service, socket) {
  * @param {function} callback The callback method 
  */
 function send(service, payload, socket, callback) {
-	var config = K.getComponent('config');
-	var system = K.getComponent('system');
+	var config = this.getComponent('config');
+	var system = this.getComponent('system');
 
 	if (!(service.adapter in this.adapters)) {
 		return callback('Unknown type "' + service.adapter + '"');
@@ -126,9 +145,9 @@ function send(service, payload, socket, callback) {
  * @param {function} reply The reply interface
  */
 function handleRequest(req) {
-	var circles = K.getComponent('circles');
-	var system = K.getComponent('system');
-	var config = K.getComponent('config');
+	var circles = this.getComponent('circles');
+	var system = this.getComponent('system');
+	var config = this.getComponent('config');
 	var service;
 	var reply;
 
@@ -151,7 +170,7 @@ function handleRequest(req) {
 	service = circles.find('global').service(req.meta.sId, req.origin, true);
 
 	reply = function(payload, callback) {
-		var circles = K.getComponent('circles');
+		var circles = this.getComponent('circles');
 		var service = circles.find('global').service(req.meta.sId);
 		// Service existing or created during handleRequest
 		var socket = service.socket();

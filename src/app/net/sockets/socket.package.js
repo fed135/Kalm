@@ -14,7 +14,7 @@
  * @param {object} options The configuration options for the socket
  */
 function Socket(options) {
-	var connection = K.getComponent('connection');
+	var connection = this.getComponent('connection');
 
 	this.label = options.label;
 	this.service = options.service;
@@ -59,7 +59,7 @@ Socket.prototype._renderQueue = function() {
  * @param {function} callback The callback method
  */
 Socket.prototype.send = function(payload, callback) {
-	var connection = K.getComponent('connection');
+	var connection = this.getComponent('connection');
 
 	if (this.status !== 'connected') {
 		this._outbox.push([payload, callback]);

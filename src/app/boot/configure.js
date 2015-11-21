@@ -17,7 +17,7 @@ var _startTime;
  * @private
  * @method _finish
  */
-function _finish() {
+function _finish(K) {
 	var cl = K.getComponent('console');
 
 	cl.log('Server started in ' + (Date.now() - _startTime) + 'ms');
@@ -29,8 +29,9 @@ function _finish() {
  * Runs the initialization methods (_init) of packages
  * @private
  * @method _runInits
+ * @param {Kalm} K The Kalm instance reference
  */
-function _runInits() {
+function _runInits(K) {
 	var utils = K.getComponent('utils');
 	var cl = K.getComponent('console');
 
@@ -38,7 +39,7 @@ function _runInits() {
 
 	utils.async.all(K.moduleInits, function(err) {
 		if (err) cl.error(err);
-		else _finish();
+		else _finish(K);
 	});
 }
 
@@ -46,8 +47,9 @@ function _runInits() {
  * Prints the Kalm logo
  * @private
  * @method _printLogo
+ * @param {Kalm} K The Kalm instance reference
  */
-function _printLogo() {
+function _printLogo(K) {
 	var cl = K.getComponent('console');
 	cl.print(cl.GREEN + '\n	  _\n' +
 		'         /\\_\\\n' +
@@ -63,31 +65,34 @@ function _printLogo() {
 		'    Kalm v' + K.pkg.version + '\n\n');
 
 	cl.log('Starting service...');
-	_runInits();
+	_runInits(K);
 }
 
 /**
  * Applies application config to the base template
  * @private
  * @method _mixinConfigs
+ * @param {Kalm} K The Kalm instance reference
  */
-function _mixinConfigs() {
+function _mixinConfigs(K) {
 	var cl = K.getComponent('console');
 	var utils = K.getComponent('utils');
 	var config = K.getComponent('config');
 
 	utils.object.mixin(config, K.appConf);
+	config.pkg = K.pkg;
 	cl.init();
-	_printLogo();
+	_printLogo(K);
 }
 
 /**
  * Entry point for boot process. Triggered once all classes are loaded
  * @method main
+ * @param {Kalm} K The Kalm instance reference
  */
-function main() {
+function main(K) {
 	_startTime = Date.now();
-	_mixinConfigs();
+	_mixinConfigs(K);
 }
 
 /* Exports -------------------------------------------------------------------*/

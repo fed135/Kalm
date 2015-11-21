@@ -21,7 +21,7 @@ function prettyPrintStack(error) {
 	var ret;
 	var stack;
 	var cwd = process.cwd();
-	var cList = colors.getList();
+	var cList = colors.getList.call(this);
 
 	stack = (error.stack.split('\n')).splice(0,4);
 	ret = stack[0].substring(stack[0].indexOf(': ') + 2) + '\n';

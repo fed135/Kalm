@@ -1,7 +1,7 @@
 /**
  * Kalm App singleton
- * Reference to this class will be available accross the project
- * under the global property K
+ * Reference to this class will be available accross the components as 
+ * this.parent
  * @exports {Kalm}
  */
 
@@ -22,6 +22,7 @@ var Signal = require('signals');
  * @param {object} config The app config of the Kalm project
  */
 function Kalm(pkg, config) {
+	var _self = this;
 
 	this.pkg = pkg;
 	this.appConf = config;
@@ -37,7 +38,9 @@ function Kalm(pkg, config) {
 		__dirname, 
 		'.class.js', 
 		this.registerComponent.bind(this), 
-		configure
+		function boot() {
+			configure.call(_self, _self);
+		}
 	);
 }
 
@@ -63,6 +66,9 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 	}
 	
 	p = pkg.attributes || {};
+
+	p.getComponent = this.getComponent.bind(this);
+	p.__offSwitch = this.onShutdown;
 
 	if (pkg.methods) {
 		Object.keys(pkg.methods).forEach(function(e) {

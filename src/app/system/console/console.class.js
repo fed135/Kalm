@@ -64,7 +64,7 @@ function warn(msg) {
  */
 function error(msg) {
 	if (msg instanceof Error) {
-		var _errInfo = stacktrace(msg);
+		var _errInfo = stacktrace.call(this, msg);
 		_dError(this.RED + 'Error : ' + this.WHITE + _errInfo);
 	}
 	else {
@@ -86,7 +86,7 @@ function print(msg) {
  * @method main
  */
 function main() {
-	var _list = colors.getList();
+	var _list = colors.getList.call(this);
 	for (var c in _list) {
 		this[c] = _list[c];
 	}

@@ -13,12 +13,12 @@
  * @param {function} callback The callback method
  */
 function main(callback) {
-	var cl = K.getComponent('console');
+	var cl = this.getComponent('console');
 
 	cl.log(' - Initializing events class');
 	
-	process.on('SIGINT', terminate);
-	process.on('SIGTERM', terminate);
+	process.on('SIGINT', terminate.bind(this));
+	process.on('SIGTERM', terminate.bind(this));
 
 	process.on('uncaughtException', cl.error.bind(cl));
 
@@ -31,14 +31,14 @@ function main(callback) {
  * @param {function} callback The callback method
  */
 function terminate() {
-	var connection = K.getComponent('connection');
-	var cl = K.getComponent('console');
-	var utils = K.getComponent('utils');
+	var connection = this.getComponent('connection');
+	var cl = this.getComponent('console');
+	var utils = this.getComponent('utils');
 
 	cl.print('\r  ');
 	cl.warn('Shutting down...');
 
-	K.onShutdown.dispatch();
+	this.__offSwitch.dispatch();
 
 	utils.async.all(
 		Object.keys(connection.adapters).map(function(e){

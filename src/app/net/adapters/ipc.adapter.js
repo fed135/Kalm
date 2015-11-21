@@ -8,13 +8,10 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var ipc;
-if (process.env.IPC_HOME) ipc = require(process.env.IPC_HOME);
-else ipc = require('ipc-light');
+var ipc = require('ipc-light');
 
 /* Local variables -----------------------------------------------------------*/
 
-/** Stores the ipc server object */ 
 var server = null;
 
 /* Methods -------------------------------------------------------------------*/
@@ -22,21 +19,17 @@ var server = null;
 /**
  * Listens for ipc connections on the selected port.
  * @method listen
- * @param {function} done The success callback for the operation
+ * @param {object} options The config object for that adapter
+ * @param {function} handler The central handling method for requests
+ * @param {function} callback The success callback for the operation
  */
-function listen(done) {
-	var config = K.getComponent('config');
-	var cl = K.getComponent('console');
-	var connection = K.getComponent('connection');
-
-	cl.log('   - Starting ipc server  [ :' + config.connections.ipc.port + ' ]');
-
+function listen(options, handler, callback) {
 	server = ipc.createServer(function(req) {
 		if (!req.payload) req = { payload: req };
 		if (!req.origin) req.origin = {};
 		req.origin.adapter = 'ipc';
-		connection.handleRequest(req);
-	}).listen(config.connections.ipc.path + config.connections.ipc.port, done);
+		handler(req);
+	}).listen(options.path + options.port, callback);
 }
 
 /**
@@ -70,14 +63,13 @@ function isConnected(socket) {
 /**
  * Creates a client and adds the listeners to it
  * @method createClient
+ * @param {object} options The config object for that adapter
  * @param {Service} service The service to create the socket for
  * @returns {ipc.Client} The created ipc client
  */
-function createClient(service) {
-	var config = K.getComponent('config');
-
+function createClient(options, service) {
 	var socket = ipc.connect({
-		path: config.connections.ipc.path + service.port
+		path: options.path + service.port
 	});
 
 	socket.ondisconnect.add(function() {
@@ -97,9 +89,6 @@ function createClient(service) {
  * @param {function|null} callback The callback method
  */ 
 function stop(callback) {
-	var cl = K.getComponent('console');
-	cl.warn('   - Stopping ipc server');
-	
 	if (server) server.close(callback);
 	else callback();
 }

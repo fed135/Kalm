@@ -19,7 +19,7 @@ var Socket = require('./socket.package');
  * @returns {Socket} The created socket
  */
 function create(name, options) {
-	var utils = K.getComponent('utils');
+	var utils = this.getComponent('utils');
 	options = options || {};
 	options.label = name || utils.crypto.generate();
 	return new Socket(options);
