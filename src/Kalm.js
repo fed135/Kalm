@@ -26,13 +26,27 @@ function Kalm(pkg, config) {
 
 	this.pkg = pkg;
 	this.appConf = config;
-	this._components = {};
-
-	//List of init methods, call at the end of the walk
-	this.moduleInits = [];
+	this.config = {
+		environment: 'dev',
+		mock: false,
+		debug: { noColor: false },
+		connections: {
+			ipc: {
+				port: 4001,
+				evt: 'message',
+				path: '/tmp/socket-'
+			}
+		}
+	};
+	this.components = {};
 
 	this.onReady = new Signal();
 	this.onShutdown = new Signal();
+
+	process.on('SIGINT', this.terminate.bind(this));
+	process.on('SIGTERM', this.terminate.bind(this));
+
+	process.on('uncaughtException', cl.error.bind(cl));
 
 	loader.load(
 		__dirname, 
@@ -91,15 +105,39 @@ Kalm.prototype.registerComponent = function(pkg, path, callback) {
 };
 
 /**
- * Retreives a registered component
- * @method getComponent
- * @memberof Kalm
- * @param {string} pkgName The name of the package to retreive
- * @returns {object} The requested component
+ * Handles app termination
+ * @method terminate
+ * @param {function} callback The callback method
  */
-Kalm.prototype.getComponent = function(pkgName) {
-	return this._components[pkgName];
-};
+function terminate() {
+	var connection = this.getComponent('connection');
+	var cl = this.getComponent('console');
+	var utils = this.getComponent('utils');
+
+	cl.print('\r  ');
+	cl.warn('Shutting down...');
+
+	this.__offSwitch.dispatch();
+
+	utils.async.all(
+		Object.keys(connection.adapters).map(function(e){
+			return connection.adapters[e].stop;
+		}),
+		_kill
+	);
+
+	//Just in case something goes bad
+	setTimeout(_kill, 1500);
+}
+
+/**
+ * Force-kills the process
+ * @private
+ * @method _kill
+ */ 
+function _kill() {
+	process.exit();
+}
 
 /* Exports -------------------------------------------------------------------*/
 

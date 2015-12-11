@@ -14,42 +14,15 @@
  * @param {object} options The configuration options for the socket
  */
 function Socket(options) {
-	var connection = this.getComponent('connection');
+	var net = this.p.components.net;
 
 	this.label = options.label;
 	this.service = options.service;
 
-	this.client = connection.createClient(options.service);
-	this.status = 'connected';
+	this.client = net.createClient(options.service);
 
 	this.timeout = options.timeout || -1;
-
-	this._outbox = [];
 }
-
-/**
- * Updates the connected status of the socket
- * @method updateStatus
- * @memberof Socket
- * @param {string} status The connected status
- */
-Socket.prototype.updateStatus = function() {
-	this.status = 'connected';
-	this._renderQueue();
-};
-
-/**
- * Renders the queue, once connected or reconnected
- * @private
- * @method _renderQueue
- * @memberof Socket
- */
-Socket.prototype._renderQueue = function() {
-	this._outbox.filter(function(e) {
-		this.send.apply(this, e);
-		return false;
-	}, this);
-};
 
 /**
  * Sends a request with the socket
@@ -59,15 +32,9 @@ Socket.prototype._renderQueue = function() {
  * @param {function} callback The callback method
  */
 Socket.prototype.send = function(payload, callback) {
-	var connection = this.getComponent('connection');
-
-	if (this.status !== 'connected') {
-		this._outbox.push([payload, callback]);
-		return this;
-	}
+	var net = this.p.components.net;
 
 	connection.send(this.service, payload, this, callback);
-
 	return this;
 };
 

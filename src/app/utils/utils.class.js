@@ -1,6 +1,6 @@
 /**
  * Utility packages
- * @exports {component(utils)}
+ * @exports {Utils}
  */
 
 'use strict';
@@ -11,13 +11,24 @@ var object = require('./object.package');
 var async = require('./async.package');
 var crypto = require('./crypto.package');
 
+/* Methods  ------------------------------------------------------------------*/
+
+/**
+ * Utils class
+ * @constructor
+ * @param {Kalm} K Kalm reference
+ * @param {function} callback The callback method
+ */
+function Utils(K, callback) {
+	this.p = K;
+
+	this.object = object;
+	this.async = async;
+	this.crypto = crypto;
+
+	if (callback) callback();
+}
+
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	pkgName: 'utils',
-	attributes: {
-		object: object,
-		async: async,
-		crypto: crypto
-	}
-};
+module.exports = Utils;

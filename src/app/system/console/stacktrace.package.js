@@ -21,7 +21,6 @@ function prettyPrintStack(error) {
 	var ret;
 	var stack;
 	var cwd = process.cwd();
-	var cList = colors.getList.call(this);
 
 	stack = (error.stack.split('\n')).splice(0,4);
 	ret = stack[0].substring(stack[0].indexOf(': ') + 2) + '\n';
@@ -34,9 +33,9 @@ function prettyPrintStack(error) {
 			e = e.replace(cwd, '.');
 		}
 
-		ret += (cList.RED + '\t-');
+		ret += (colors.RED + '\t-');
 		for (var dashes = 0; dashes < i; dashes++) ret += '-';
-		ret += ('> ' + cList.WHITE);
+		ret += ('> ' + colors.WHITE);
 		ret += (e.substring(e.indexOf('at ') + 3) + '\n');
 	});
 

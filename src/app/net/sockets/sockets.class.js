@@ -1,6 +1,6 @@
 /**
  * Sockets package
- * @exports {component(sockets)}
+ * @exports {Sockets}
  */
 
 'use strict';
@@ -12,24 +12,37 @@ var Socket = require('./socket.package');
 /* Methods -------------------------------------------------------------------*/
 
 /**
+ * Sockets class
+ * @constructor
+ * @param {Kalm} K Kalm reference
+ * @param {function} callback The callback method
+ */
+function Sockets(K, callback) {
+	this.p = K;
+
+	if (callback) callback();
+}
+
+/**
  * Creates a socket
  * @method create
  * @param {string|null} name The name for the socket
  * @param {object|null} options The options for the socket
  * @returns {Socket} The created socket
  */
-function create(name, options) {
-	var utils = this.getComponent('utils');
+Sockets.prototype.create = function(name, options) {
+	var utils = this.p.components.utils;
+	var s;
+
 	options = options || {};
 	options.label = name || utils.crypto.generate();
-	return new Socket(options);
-}
+
+	s = new Socket(options);
+	s.p = this.p;
+
+	return s;
+};
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	pkgName: 'sockets',
-	methods: {
-		create: create
-	}
-};
+module.exports = Sockets;

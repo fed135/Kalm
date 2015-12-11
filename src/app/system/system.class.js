@@ -1,6 +1,6 @@
 /**
  * System info package
- * @exports {component(system)}
+ * @exports {System}
  */
 
 'use_strict';
@@ -12,15 +12,18 @@ var os = require('os');
 /* Methods -------------------------------------------------------------------*/
 
 /**
- * The entry point for the systems analysis package
- * @method main
+ * System class
+ * @constructor
+ * @param {Kalm} K Kalm reference
  * @param {function} callback The callback method
  */
-function main(callback) {
+function System(K, callback) {
+	this.p = K;
+
 	var _defaultAddress = '127.0.0.1';
 	var _currAddress = null;
 	var interfaces = os.networkInterfaces();
-	var cl = this.getComponent('console');
+	var cl = this.p.components.console;
 
 	cl.log(' - Initializing system class');
 
@@ -38,15 +41,9 @@ function main(callback) {
 	this.arch = os.arch();
 	this.platform = os.platform();
 
-	callback();
+	if (callback) callback();
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	pkgName: 'system',
-	attributes: {},
-	methods: {
-		_init: main
-	}
-};
+module.exports = System;

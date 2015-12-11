@@ -10,25 +10,29 @@
 
 var ipc = require('ipc-light');
 
-/* Local variables -----------------------------------------------------------*/
-
-var server = null;
-
 /* Methods -------------------------------------------------------------------*/
+
+/**
+ * IPC adapter
+ * @constructor
+ */
+function IPC() {
+	this.type = 'ipc';
+	this.server = null;
+}
 
 /**
  * Listens for ipc connections on the selected port.
  * @method listen
+ * @memberof IPC
  * @param {object} options The config object for that adapter
  * @param {function} handler The central handling method for requests
  * @param {function} callback The success callback for the operation
  */
-function listen(options, handler, callback) {
-	server = ipc.createServer(function(req) {
-		if (!req.payload) req = { payload: req };
-		if (!req.origin) req.origin = {};
-		req.origin.adapter = 'ipc';
-		handler(req);
+IPC.prototype.listen = function(options, handler, callback) {
+	var _self = this;
+	this.server = ipc.createServer(function(req) {
+		handler(req, _self);
 	}).listen(options.path + options.port, callback);
 }
 

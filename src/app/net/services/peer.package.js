@@ -1,7 +1,7 @@
 /**
- * Service class
- * @class Service
- * @exports {Service}
+ * Peer class
+ * @class Peer
+ * @exports {Peer}
  */
 
 'use strict';
@@ -13,11 +13,11 @@ var Signal = require('signals');
 /* Methods -------------------------------------------------------------------*/
 
 /**
- * Service constructor
+ * Peer constructor
  * @constructor
- * @param {object} options The configuration options for the service
+ * @param {object} options The configuration options for the peer
  */
-function Service(options) {
+function Peer(options) {
 	this.label = options.label;
 	this.hostname = options.hostname || '0.0.0.0';
 	this.adapter = options.adapter || 'ipc';
@@ -32,29 +32,23 @@ function Service(options) {
 }
 
 /**
- * Recovers or create a socket for the service
+ * Recovers or create a socket for the peer
  * @method socket
- * @memberof Service
+ * @memberof Peer
  * @param {string|null} name The name of the socket. If none, will pool
  * @param {object|null} options The options for the socket
  * @returns {Socket} The recovered or created socket
  */
-Service.prototype.socket = function(name, options) {
-	var sockets = this.getComponent('sockets');
-	var connection = this.getComponent('connection');
+Peer.prototype.socket = function(name, options) {
+	var sockets = this.p.components.sockets;
 	var self = this;
 	var s;
 
 	options = options || Object.create(null);
-	options.service = this;
+	options.peer = this;
 
 	//Unnamed sockets - use pooling system
 	if (!name) {
-		//Make sure pooled sockets are still connected
-		this._pool = this._pool.filter(function(socket) {
-			return connection.isConnected(self, socket);
-		});
-
 		if (this._pool.length > 0) s = this._pool.shift();
 		else s = sockets.create(null, options);
 
@@ -77,14 +71,14 @@ Service.prototype.socket = function(name, options) {
 };
 
 /**
- * Recovers or create a socket for the service
+ * Recovers or create a socket for the peer
  * @system-reserved
  * @method _pushSocket
- * @memberof Service
+ * @memberof Peer
  * @param {Socket} socket The socket to re-introduce
  * @returns {boolean} Wether the socket was re-pooled or not
  */
-Service.prototype._pushSocket = function(socket) {
+Peer.prototype._pushSocket = function(socket) {
 	//Named sockets dont get moved.
 	if (!(socket.label in this._namedSockets)) {
 		if (this.poolSize > this._pool.length || this.poolSize === -1) {
@@ -104,10 +98,10 @@ Service.prototype._pushSocket = function(socket) {
  * Removes the socket from the pool
  * @system-reserved
  * @method _removeSocket
- * @memberof Service
+ * @memberof Peer
  * @param {Socket} socket The socket to remove
  */
-Service.prototype._removeSocket = function(socket) {
+Peer.prototype._removeSocket = function(socket) {
 	var i;
 
 	if (socket.label in this._namedSockets) {
@@ -125,4 +119,4 @@ Service.prototype._removeSocket = function(socket) {
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = Service;
+module.exports = Peer;
