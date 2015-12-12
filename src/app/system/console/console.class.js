@@ -22,17 +22,21 @@ var stacktrace = require('./stacktrace.package');
  */
 function Console(K, callback) {
 	this.p = K;
+	console.log('Yippe')
 
-	var config = this.p.config;
+	var config = this.p.appConf;
 
 	for (var c in colors) {
 		this[c] = _list[c];
 	}
 
 	/** Debug log levels */
-	this._dLog = debug(config.pkg.name + ':log');
-	this._dWarn = debug(config.pkg.name + ':warn');
-	this._dError = debug(config.pkg.name + ':error');
+	this._dLog = debug(config.name + ':log');
+	this._dWarn = debug(config.name + ':warn');
+	this._dError = debug(config.name + ':error');
+
+	//Enhances error display
+	process.on('uncaughtException', cl.error.bind(cl));
 
 	if (callback) callback();
 }

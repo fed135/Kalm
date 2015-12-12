@@ -1,7 +1,5 @@
 /**
- * Kalm App singleton
- * Reference to this class will be available accross the components as 
- * this.parent
+ * Kalm App instance
  * @exports {Kalm}
  */
 
@@ -9,8 +7,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var loader = require('./app/boot/loader');
-var configure = require('./app/boot/configure');
+var path = require('path');
 var Signal = require('signals');
 
 /* Methods -------------------------------------------------------------------*/
@@ -30,7 +27,7 @@ function Kalm(pkg, config) {
 		environment: 'dev',
 		mock: false,
 		debug: { noColor: false },
-		connections: {
+		adapters: {
 			ipc: {
 				port: 4001,
 				evt: 'message',
@@ -46,70 +43,58 @@ function Kalm(pkg, config) {
 	process.on('SIGINT', this.terminate.bind(this));
 	process.on('SIGTERM', this.terminate.bind(this));
 
-	process.on('uncaughtException', cl.error.bind(cl));
-
-	loader.load(
-		__dirname, 
-		'.class.js', 
-		this.registerComponent.bind(this), 
-		function boot() {
-			configure.call(_self, _self);
-		}
-	);
+	this._loadComponents(this.registerComponent, this.onReady.dispatch);
 }
 
 /**
- * Registers a component with Kalm
- * This makes it available accross the project
- * @method registerComponent
+ * Loads the listed components
+ * @private
+ * @method _loadComponents
  * @memberof Kalm
- * @param {object} pkg The component package to register (component definition)
- * @param {string|null} path The path where the package was found (debug)
+ * @param {function} method The method to call on every matching file
  * @param {function} callback The callback method
  */
-Kalm.prototype.registerComponent = function(pkg, path, callback) {
-	var p;
-
-	if (!pkg.pkgName) {
-		process.stdErr('No pkg name! ' + path);
-		return false;
-	}
-
-	if (this._components[pkg.pkgName]) {
-		if (callback) return callback();
-	}
+Kalm.prototype._loadComponents = function(method, callback) {
 	
-	p = pkg.attributes || {};
+	var classMarker = '.class';
 
-	p.getComponent = this.getComponent.bind(this);
-	p.__offSwitch = this.onShutdown;
+	//In load order
+	var components = {
+		utils: 'utils/utils',
+    system: 'system/system',
+    console: 'system/console/console',
+    net: 'net/net',
+		peers: 'net/peers/peers'
+	};
 
-	if (pkg.methods) {
-		Object.keys(pkg.methods).forEach(function(e) {
-			if (pkg.methods[e].bind) {
-				p[e] = pkg.methods[e].bind(p);
-			}
-			else {
-				process.stdErr(e + 'is not a method in ' + pkg.pkgName);
-			}
-		});
-	}
 
-	this._components[pkg.pkgName] = p;
+	Promise.all(Object.keys(components).map(function(e) {
+		return method(e, require('./app/'+components[e]+classMarker));
+	}), callback);
+};
 
-	if (this._components[pkg.pkgName]._init) {
-		this.moduleInits.push(this._components[pkg.pkgName]._init);
-	}
-
-	if (callback) callback();
+/**
+ * Registers a component with the Kalm instance
+ * @method registerComponent
+ * @memberof Kalm
+ * @param {string} pkgName The name of the component to register
+ * @param {function} pkg The constructor for the component
+ * @returns {Promise} Deferred promise for component registration
+ */
+Kalm.prototype.registerComponent = function(pkgName, pkg) {
+	var _self = this;
+	return new Promise(function(resolve) {
+		_self.components[pkgName] = new pkg(_self, resolve);
+	});
 };
 
 /**
  * Handles app termination
  * @method terminate
+ * @memberof {Kalm}
  * @param {function} callback The callback method
  */
-function terminate() {
+Kalm.prototype.terminate = function() {
 	var connection = this.getComponent('connection');
 	var cl = this.getComponent('console');
 	var utils = this.getComponent('utils');
@@ -127,17 +112,10 @@ function terminate() {
 	);
 
 	//Just in case something goes bad
-	setTimeout(_kill, 1500);
-}
-
-/**
- * Force-kills the process
- * @private
- * @method _kill
- */ 
-function _kill() {
-	process.exit();
-}
+	setTimeout(function _kill() {
+		process.exit();
+	}, 1500);
+};
 
 /* Exports -------------------------------------------------------------------*/
 

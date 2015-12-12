@@ -1,1 +1,3 @@
-require('./config.test.js');
+module.exports = function(server) {
+	
+	require('./config.test.js')(server);

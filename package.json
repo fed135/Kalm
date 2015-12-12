@@ -38,6 +38,8 @@
   "dependencies": {
     "debug": "2.2.0",
     "ipc-light": "1.0.4",
+    "msgpack-decode": "^1.0.0",
+    "msgpack-lite": "^0.1.13",
     "signals": "1.0.0",
     "walk": "2.3.9"
   }

@@ -28,11 +28,11 @@ var config = {
 
 describe('Starting service', function() {
 	it('constructor', function(done) {
-		server = new Kalm(config);
+		server = Kalm.create(config);
 		server.onReady.add(done);
 	});
 
 	it('check components', function() {
-		require('./components');	
+		require('./components')(server);	
 	});
 });
