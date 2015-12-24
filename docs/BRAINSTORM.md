@@ -87,3 +87,10 @@ Kalm = new Kalm()
   .async
   .crypto
   .object
+
+Promisify Error-prone sections:
+
+- Server bind,
+- Server write,
+- Request handling,
+- Shutdown protocol

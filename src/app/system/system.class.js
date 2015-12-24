@@ -20,12 +20,11 @@ var os = require('os');
 function System(K, callback) {
 	this.p = K;
 
+	console.log('init system');
+
 	var _defaultAddress = '127.0.0.1';
 	var _currAddress = null;
 	var interfaces = os.networkInterfaces();
-	var cl = this.p.components.console;
-
-	cl.log(' - Initializing system class');
 
 	Object.keys(interfaces).forEach(function(i) {
 		interfaces[i].forEach(function(e) {
@@ -41,7 +40,7 @@ function System(K, callback) {
 	this.arch = os.arch();
 	this.platform = os.platform();
 
-	if (callback) callback();
+	if (callback) callback(this);
 }
 
 /* Exports -------------------------------------------------------------------*/

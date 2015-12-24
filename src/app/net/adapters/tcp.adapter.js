@@ -10,100 +10,90 @@
 
 var net = require('net');
 
-/* Local variables -----------------------------------------------------------*/
-
-var server = null;
-
 /* Methods -------------------------------------------------------------------*/
+
+/**
+ * TCP adapter
+ * @constructor
+ * @param {Kalm} K The Kalm instance
+ */
+function TCP(K) {
+	this.type = 'tcp';
+	this.server = null;
+}
 
 /**
  * Listens for tcp connections on the selected port.
  * @method listen
+ * @memberof TCP
  * @param {object} options The config object for that adapter
  * @param {function} handler The central handling method for requests
  * @param {function} callback The success callback for the operation
  */
-function listen(options, handler, callback) {
-	server = net.createServer(function(req) {
+TCP.prototype.listen = function(options, handler, callback) {
+	var _self = this;
+	this.server = net.createServer(function(req) {
 		req.on('data', function(data) {
-			data = JSON.parse(data.toString());
-			if (!req.payload) req = { payload: req };
-			if (!req.origin) req.origin = {};
-			data.origin.adapter = 'tcp';
-			handler(data);
+			handler(data, _self);
 		});
 		
 	}).listen(options.port, callback);
-}
+};
 
 /**
- * Sends a message with a socket client, then pushes it back to its service
+ * Sends a message with a socket client, then pushes it back to its peer
  * @method send
- * @param {Service} service The service to send to
- * @param {object} options The details of the request
+ * @memberof TCP
+ * @param {Service} peer The peer to send to
+ * @param {Buffer} options The details of the request
  * @param {Socket} socket The socket to use
  * @param {function|null} callback The callback method
  */
-function send(service, options, socket, callback) {
-	socket.client.write(JSON.stringify(options), function() {
-		if (!service._pushSocket(socket)) {
+TCP.prototype.send = function(peer, options, socket, callback) {
+	socket.client.write(options, function() {
+		if (!peer._pushSocket(socket)) {
 			socket.client.destroy();
 		}
 
 		if (callback) callback();
 	});
-}
+};
 
 /**
  * Stops listening for ipc connections and closes the server
  * @method stop
+ * @memberof TCP
  * @param {function|null} callback The callback method
  */ 
-function stop(callback) {
-	if (server) server.close(callback);
+TCP.prototype.stop = function(callback) {
+	if (this.server) this.server.close(callback);
 	else callback();
-}
+};
 
 /**
  * Creates a client and adds the listeners to it
  * @method createClient
+ * @memberof TCP
  * @param {object} options The config object for that adapter
- * @param {Service} service The service to create the socket for
+ * @param {Service} peer The peer to create the socket for
  * @returns {Socket} The created tcp client
  */
-function createClient(options, service) {
-	var socket = net.connect(service);
+TCP.prototype.createClient = function(options, peer) {
+	var socket = net.connect(peer);
 
 	socket.on('disconnect', function() {
-		service._removeSocket(socket);
+		peer._removeSocket(socket);
 	});
 
 	socket.on('error', function() {
 		if (socket && socket.disconnect) {
 			socket.disconnect();
 		}
-		service._removeSocket(socket);
+		peer._removeSocket(socket);
 	});
 	return socket;
-}
-
-/**
- * Checks if a socket is valid and ready to send some data
- * @method isConnected
- * @param {Socket} socket The socket to check
- * @returns {boolean} Wether the socket is valid or not
- */
-function isConnected(socket) {
-	return (socket.client.status === 'connected');
-}
+};
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	name: 'tcp',
-	listen: listen,
-	send: send,
-	isConnected: isConnected,
-	createClient: createClient,
-	stop: stop
-};
+module.exports = TCP;

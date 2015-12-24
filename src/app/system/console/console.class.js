@@ -12,6 +12,10 @@ var debug = require('debug');
 var colors = require('./colors.package');
 var stacktrace = require('./stacktrace.package');
 
+/* Local variables -----------------------------------------------------------*/
+
+var sep = '\t:: ';
+
 /* Methods -------------------------------------------------------------------*/
 
 /**
@@ -22,23 +26,28 @@ var stacktrace = require('./stacktrace.package');
  */
 function Console(K, callback) {
 	this.p = K;
-	console.log('Yippe')
 
-	var config = this.p.appConf;
+	var config = this.p.config;
+	var name = config.name || config.label;
 
 	for (var c in colors) {
-		this[c] = _list[c];
+		this[c] = colors[c];
 	}
 
 	/** Debug log levels */
-	this._dLog = debug(config.name + ':log');
-	this._dWarn = debug(config.name + ':warn');
-	this._dError = debug(config.name + ':error');
+	this._dLog = debug(name + ':log');
+	this._dLog.log = console.log.bind(console);
+	this._dLog.color = '6';
+	this._dWarn = debug(name + ':warn');
+	this._dWarn.log = console.log.bind(console);
+	this._dWarn.color = '3';
+	this._dError = debug(name + ':error');
+	this._dError.color = '1';
 
 	//Enhances error display
-	process.on('uncaughtException', cl.error.bind(cl));
+	process.on('uncaughtException', this.error.bind(this));
 
-	if (callback) callback();
+	if (callback) callback(this);
 }
 
 /**
@@ -47,7 +56,7 @@ function Console(K, callback) {
  * @param {string} msg The message to print
  */
 Console.prototype.log = function(msg) {
-	_dLog(this.CYAN + 'Info  : ' + this.WHITE + msg);
+	this._dLog(this.CYAN + sep + this.WHITE + msg);
 };
 
 /**
@@ -56,7 +65,7 @@ Console.prototype.log = function(msg) {
  * @param {string} msg The message to print
  */
 Console.prototype.warn = function(msg) {
-	_dWarn(this.YELLOW + 'Warn  : ' + this.WHITE + msg);
+	this._dWarn(this.YELLOW + sep + this.WHITE + msg);
 };
 
 /**
@@ -67,10 +76,10 @@ Console.prototype.warn = function(msg) {
 Console.prototype.error = function(msg) {
 	if (msg instanceof Error) {
 		var _errInfo = stacktrace.call(this, msg);
-		_dError(this.RED + 'Error : ' + this.WHITE + _errInfo);
+		this._dError(this.RED + sep + this.WHITE + _errInfo);
 	}
 	else {
-		_dError(this.RED + 'Error : ' + this.WHITE + msg);
+		this._dError(this.RED + sep + this.WHITE + msg);
 	}
 };
 
@@ -80,7 +89,7 @@ Console.prototype.error = function(msg) {
  * @param {string} msg The message to print
  */
 Console.prototype.print = function(msg) {
-	_dLog(msg);
+	this._dLog(msg);
 };
 
 /* Exports -------------------------------------------------------------------*/

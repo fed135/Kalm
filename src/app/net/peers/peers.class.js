@@ -24,7 +24,7 @@ function Peers(K, callback) {
 	this._handlers = null;
 	this.p = K;
 
-	config = this.p.components.config;
+	config = this.p.config;
 
 	if (config.peers) {
 		Object.keys(config.peers).forEach(function(e){
@@ -32,7 +32,7 @@ function Peers(K, callback) {
 		}, this);
 	}
 
-	if (callback) callback();
+	if (callback) callback(this);
 }
 
 /**
@@ -45,12 +45,12 @@ function Peers(K, callback) {
  */
 Peers.prototype.create = function(name, options) {
 	var utils = this.p.components.utils;
-	var connection = this.p.components.connections;
+	var net = this.p.components.net;
 
 	name = name || utils.crypto.generate();
 	options = options || Object.create(null);
 
-	var adapter = connection.adapters[options.adapter || 'ipc'];
+	var adapter = net.adapters[options.adapter || 'ipc'];
 	var f;
 
 	if (options.circles === undefined) options.circles = [];
@@ -102,9 +102,9 @@ Peers.prototype.from = function(circle) {
  * @param {Peer} peer The peer to bind a handler to
  */
 Peers.prototype._bindPeerHandler = function(peer) {
-	if (_handlers !== null) {
-		if (peer.label in _handlers) {
-			peer.onRequest.add(_handlers[peer.label]);
+	if (this._handlers !== null) {
+		if (peer.label in this._handlers) {
+			peer.onRequest.add(this._handlers[peer.label]);
 		}
 	}
 };

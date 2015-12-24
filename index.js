@@ -24,7 +24,7 @@ function create(config, controllers, callback){
 
 	if (controllers) {
 		K.onReady.add(function bindControllers(){
-			K.getComponent('services').bindHandlers(controllers);
+			K.components.peers.bindHandlers(controllers);
 		});
 	}
 

@@ -29,17 +29,14 @@ function prettyPrintStack(error) {
 
 	stack.forEach(function(e, i){
 		//trim project base or add -node
-		if (e.indexOf(cwd) !== -1) {
-			e = e.replace(cwd, '.');
-		}
+		if (e.indexOf(cwd) !== -1) e = e.replace(cwd, '.');
+		if (i > 0) ret += '\n';
 
-		ret += (colors.RED + '\t-');
+		ret += (colors.RED + '\t\t  -');
 		for (var dashes = 0; dashes < i; dashes++) ret += '-';
 		ret += ('> ' + colors.WHITE);
-		ret += (e.substring(e.indexOf('at ') + 3) + '\n');
+		ret += (e.substring(e.indexOf('at ') + 3));
 	});
-
-	//ret += (colors.RED + '\t ...');
 
 	return ret;
 }

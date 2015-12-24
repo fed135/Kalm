@@ -19,7 +19,7 @@ function Socket(options) {
 	this.label = options.label;
 	this.service = options.service;
 
-	this.client = net.createClient(options.service);
+	this.client = null;
 
 	this.timeout = options.timeout || -1;
 }

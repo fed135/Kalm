@@ -9,6 +9,7 @@
 
 var path = require('path');
 var Signal = require('signals');
+var deepMixin = require('mixin-deep');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -22,8 +23,7 @@ function Kalm(pkg, config) {
 	var _self = this;
 
 	this.pkg = pkg;
-	this.appConf = config;
-	this.config = {
+	this.config = deepMixin({
 		environment: 'dev',
 		mock: false,
 		debug: { noColor: false },
@@ -34,7 +34,7 @@ function Kalm(pkg, config) {
 				path: '/tmp/socket-'
 			}
 		}
-	};
+	}, config);
 	this.components = {};
 
 	this.onReady = new Signal();
@@ -43,7 +43,10 @@ function Kalm(pkg, config) {
 	process.on('SIGINT', this.terminate.bind(this));
 	process.on('SIGTERM', this.terminate.bind(this));
 
-	this._loadComponents(this.registerComponent, this.onReady.dispatch);
+	this._loadComponents(this.registerComponent.bind(this), function() {
+		console.log('hey there!');
+		process.nextTick(_self.onReady.dispatch);
+	});
 }
 
 /**
@@ -67,10 +70,19 @@ Kalm.prototype._loadComponents = function(method, callback) {
 		peers: 'net/peers/peers'
 	};
 
-
-	Promise.all(Object.keys(components).map(function(e) {
-		return method(e, require('./app/'+components[e]+classMarker));
-	}), callback);
+	var tasks = Object.keys(components).map(function(c) {
+		return function() {
+			return method(
+				c, 
+				require('./app/'+components[c]+classMarker)
+			);
+		};
+	}).reduce(function(current, next, i) {
+			if (i === components.length -1) {
+				return current.then(next).then(callback);
+			}
+			return current.then(next);
+	}, Promise.resolve());
 };
 
 /**
@@ -84,8 +96,10 @@ Kalm.prototype._loadComponents = function(method, callback) {
 Kalm.prototype.registerComponent = function(pkgName, pkg) {
 	var _self = this;
 	return new Promise(function(resolve) {
-		_self.components[pkgName] = new pkg(_self, resolve);
-	});
+		return new pkg(_self, resolve);
+	}).then(function(component) {
+		_self.components[pkgName] = component;
+	}, function(err) { console.log(err.stack); });
 };
 
 /**
@@ -95,26 +109,23 @@ Kalm.prototype.registerComponent = function(pkgName, pkg) {
  * @param {function} callback The callback method
  */
 Kalm.prototype.terminate = function() {
-	var connection = this.getComponent('connection');
-	var cl = this.getComponent('console');
-	var utils = this.getComponent('utils');
+	var net = this.components.net;
+	var cl = this.components.console;
+	var utils = this.components.utils;
 
-	cl.print('\r  ');
 	cl.warn('Shutting down...');
 
-	this.__offSwitch.dispatch();
+	this.onShutdown.dispatch();
 
-	utils.async.all(
-		Object.keys(connection.adapters).map(function(e){
-			return connection.adapters[e].stop;
-		}),
-		_kill
-	);
-
-	//Just in case something goes bad
-	setTimeout(function _kill() {
-		process.exit();
-	}, 1500);
+	if (net && net.adapters) {
+		utils.async.all(
+			Object.keys(net.adapters).map(function(e){
+				return net.adapters[e].stop.bind(net.adapters[e]);
+			}),
+			process.exit
+		);
+	}
+	else process.exit();
 };
 
 /* Exports -------------------------------------------------------------------*/

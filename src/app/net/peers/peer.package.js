@@ -9,6 +9,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 var Signal = require('signals');
+var Socket = require('./socket.package');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -40,7 +41,6 @@ function Peer(options) {
  * @returns {Socket} The recovered or created socket
  */
 Peer.prototype.socket = function(name, options) {
-	var sockets = this.p.components.sockets;
 	var self = this;
 	var s;
 
@@ -50,7 +50,9 @@ Peer.prototype.socket = function(name, options) {
 	//Unnamed sockets - use pooling system
 	if (!name) {
 		if (this._pool.length > 0) s = this._pool.shift();
-		else s = sockets.create(null, options);
+		else {
+			s = new Socket(options);
+			this.p.components.net.createClient(s, this);
 
 		if (this.socketTimeout !== -1) {
 			s.__timeout = setTimeout(function() {
@@ -65,7 +67,9 @@ Peer.prototype.socket = function(name, options) {
 			return this._namedSockets[name];
 		}
 
-		this._namedSockets[name] = sockets.create(name, options);
+		options.label = name;
+		this._namedSockets[name] = new Socket(options);
+		this.p.components.net.createClient(this._namedSockets[name], this);
 		return this._namedSockets[name];
 	}
 };

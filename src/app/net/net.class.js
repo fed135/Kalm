@@ -24,7 +24,7 @@ function Net(K, callback) {
 
 	var utils = this.p.components.utils;
 	var config = this.p.config;
-	var cl = this.p.components.cl;
+	var cl = this.p.components.console;
 
 	var baseAdapters = ['ipc', 'tcp', 'udp'];
 	var _self = this;
@@ -33,17 +33,19 @@ function Net(K, callback) {
 
 	this.callWrapper = {
 		origin: { h: '0.0.0.0', p: 80 },
-		meta: { sId: '', id: config.pkg.name + '#' + manifest.id }
+		meta: { sId: '', id: process.pid }
 	};
-
-	cl.log(' - Initializing connections class');
 	
-	utils.async.all(baseAdapters.map(function(adapter) {
+	utils.async.all(baseAdapters.filter(function(adapter) {
+		return adapter in config.adapters;
+	}).map(function(adapter) {
 		return function(resolve) {
 			var adapterPkg = require('./adapters/' + adapter + '.adapter');
-			_self.loadAdapter.call(_self, adapterPkg, resolve);
+			_self.loadAdapter.call(_self, adapter, adapterPkg, resolve);
 		};
-	}), callback);
+	}), function() {
+		if (callback) callback(_self);
+	});
 }
 
 /**
@@ -53,18 +55,18 @@ function Net(K, callback) {
  * @param {object} adapter The adapter object to load (adapter definition)
  * @param {function} callback The callback method
  */
-Net.prototype.loadAdapter = function(adapter, callback) {
+Net.prototype.loadAdapter = function(name, adapter, callback) {
 	var config = this.p.config;
 	var cl = this.p.components.console;
 
 	cl.log(
-		'   - Starting ' + adapter.name + ' server' + 
-		' [ :' + config.connections[adapter.name].port + ' ]'
+		' - Starting ' + name + ' server' + 
+		' [ :' + config.adapters[name].port + ' ]'
 	);
 
-	this.adapters[adapter.name] = adapter;
-	adapter.listen(
-		config.connections[adapter.name], 
+	this.adapters[name] = new adapter(this.p);
+	this.adapters[name].listen(
+		config.adapters[name], 
 		this.handleRequest.bind(this), 
 		callback
 	);
@@ -73,15 +75,16 @@ Net.prototype.loadAdapter = function(adapter, callback) {
 /**
  * Interface for client creation, redirects to proper adapter
  * @method createClient
+ * @memberof Net
  * @param {Service} peer The peer to create a client for
  * @returns {object|null} The created client or null on error
  */
-Net.prototype.createClient = function(peer) {
+Net.prototype.createClient = function(socket, peer) {
 	var config = this.p.config;
 
 	if (!(peer.adapter in this.adapters)) return null;
 
-	return this.adapters[peer.adapter].createClient(
+	socket.client = this.adapters[peer.adapter].createClient(
 		config.connections[peer.adapter], 
 		peer
 	);
@@ -90,6 +93,7 @@ Net.prototype.createClient = function(peer) {
 /**
  * Interface for client sending method, redirects to proper adapter
  * @method send
+ * @memberof Net
  * @param {Service} peer The peer to create a client for
  * @param {?} payload The payload to send
  * @param {Socket} socket The socket to use
@@ -115,10 +119,11 @@ Net.prototype.send = function(peer, payload, socket, callback) {
  * Global capture method for incomming requests.
  * Redirects to the appropriate peer's handling method 
  * @method handleRequest
+ * @memberof Net
  * @param {object} req The incomming request payload
  * @param {function} reply The reply interface
  */
-function handleRequest(req, server) {
+Net.prototype.handleRequest = function(req, server) {
 	var config = this.p.config;
 	var peer;
 	var reply;
