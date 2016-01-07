@@ -20,7 +20,6 @@ var crypto = require('./crypto.package');
  */
 function Utils(K, callback) {
 	this.p = K;
-
 	this.async = async;
 	this.crypto = crypto;
 

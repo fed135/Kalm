@@ -33,7 +33,7 @@ function Net(K, callback) {
 
 	this.callWrapper = {
 		origin: { h: '0.0.0.0', p: 80 },
-		meta: { sId: '', id: process.pid }
+		meta: { sId: config.name || config.label, id: process.pid }
 	};
 	
 	utils.async.all(baseAdapters.filter(function(adapter) {
@@ -85,7 +85,7 @@ Net.prototype.createClient = function(socket, peer) {
 	if (!(peer.adapter in this.adapters)) return null;
 
 	socket.client = this.adapters[peer.adapter].createClient(
-		config.connections[peer.adapter], 
+		config.adapters[peer.adapter], 
 		peer
 	);
 };
@@ -96,23 +96,32 @@ Net.prototype.createClient = function(socket, peer) {
  * @memberof Net
  * @param {Service} peer The peer to create a client for
  * @param {?} payload The payload to send
- * @param {Socket} socket The socket to use
+ * @param {Object|null} options The options for the request 
+ * 		{channel, timeout}
  * @param {function} callback The callback method 
  */
-Net.prototype.send = function(peer, payload, socket, callback) {
+Net.prototype.send = function(peer, payload, options, callback) {
 	var config = this.p.config;
 	var system = this.p.components.system;
+	var socket;
 
 	if (!(peer.adapter in this.adapters)) {
 		return callback('Unknown type "' + peer.adapter + '"');
 	}
 
+	if (!options.channel) socket = peer.socket();
+	else socket = peer.socket(options.channel, options);
+
 	this.callWrapper.origin.h = system.location;
-	this.callWrapper.origin.p = config.connections[peer.adapter].port;
-	this.callWrapper.meta.sId = peer.label;
+	this.callWrapper.origin.p = config.adapters[peer.adapter].port;
 	this.callWrapper.payload = payload;
 
-	this.adapters[peer.adapter].send(peer, this.callWrapper, socket, callback);
+	this.adapters[peer.adapter].send(
+		peer, 
+		msgpack.encode(this.callWrapper),
+		socket,
+		callback
+	);
 }
 
 /**
@@ -125,6 +134,7 @@ Net.prototype.send = function(peer, payload, socket, callback) {
  */
 Net.prototype.handleRequest = function(req, server) {
 	var config = this.p.config;
+	var peers = this.p.components.peers;
 	var peer;
 	var reply;
 	var _self = this;
@@ -136,7 +146,9 @@ Net.prototype.handleRequest = function(req, server) {
 	req.origin.adapter = server.type;
 
 	if (req.meta) {
-		peer = peers.find(req.meta.sId, req.origin, true);
+		console.log(req.meta);
+		console.log(peers._list);
+		peer = peers.find(req.meta.sId);
 
 		reply = function(payload, callback) {
 			// Service existing or created during handleRequest
@@ -148,6 +160,7 @@ Net.prototype.handleRequest = function(req, server) {
 			peer.onRequest.dispatch(req, reply);
 			return true;
 		}
+		// Catch unhandled requests
 	}
 
 	// Not captured by any peer, no packet info - should drop

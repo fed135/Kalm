@@ -53,6 +53,7 @@ Peer.prototype.socket = function(name, options) {
 		else {
 			s = new Socket(options);
 			this.p.components.net.createClient(s, this);
+		}
 
 		if (this.socketTimeout !== -1) {
 			s.__timeout = setTimeout(function() {
@@ -72,6 +73,11 @@ Peer.prototype.socket = function(name, options) {
 		this.p.components.net.createClient(this._namedSockets[name], this);
 		return this._namedSockets[name];
 	}
+};
+
+Peer.prototype.send = function(payload, options, callback) {
+	var net = this.p.components.net;
+	net.send(this, payload, options, callback);
 };
 
 /**

@@ -102,9 +102,15 @@ Peers.prototype.from = function(circle) {
  * @param {Peer} peer The peer to bind a handler to
  */
 Peers.prototype._bindPeerHandler = function(peer) {
+	console.log(this._handlers);
 	if (this._handlers !== null) {
 		if (peer.label in this._handlers) {
 			peer.onRequest.add(this._handlers[peer.label]);
+		}
+		else {
+			if ('default' in this._handlers) {
+				peer.onRequest.add(this._handlers['default']);
+			}
 		}
 	}
 };
@@ -116,11 +122,18 @@ Peers.prototype._bindPeerHandler = function(peer) {
  * @param {object} handlers The collection of handlers for the app
  */
 Peers.prototype.bindHandlers = function(handlers) {
-	var i;
+	var _self = this;
 
-	this._handlers = handlers;
+	if (!handlers) return;
+	if (!handlers.length) handlers = [handlers];
 
-	for(i in this._list) {
+	handlers.forEach(function(e) {
+		Object.keys(e).forEach(function(h) {
+			_self._handlers[h] = e[h];
+		});
+	});
+
+	for(var i in this._list) {
 		this._bindPeerHandler(this._list[i]);
 	}
 };

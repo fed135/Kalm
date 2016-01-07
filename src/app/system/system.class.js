@@ -20,8 +20,6 @@ var os = require('os');
 function System(K, callback) {
 	this.p = K;
 
-	console.log('init system');
-
 	var _defaultAddress = '127.0.0.1';
 	var _currAddress = null;
 	var interfaces = os.networkInterfaces();

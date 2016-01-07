@@ -42,12 +42,12 @@ IPC.prototype.listen = function(options, handler, callback) {
  * @method send
  * @memberof IPC
  * @param {Service} peer The peer to send to
- * @param {Buffer} options The details of the request
+ * @param {Buffer} payload The body of the request
  * @param {Socket} socket The socket to use
  * @param {function|null} callback The callback method
  */
-IPC.prototype.send = function(peer, options, socket, callback) {
-	socket.client.emit(options, function() {
+IPC.prototype.send = function(peer, payload, socket, callback) {
+	socket.client.emit(payload, function() {
 		if (!peer._pushSocket(socket)) {
 			socket.client.disconnect();
 		}

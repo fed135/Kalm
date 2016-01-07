@@ -44,7 +44,6 @@ function Kalm(pkg, config) {
 	process.on('SIGTERM', this.terminate.bind(this));
 
 	this._loadComponents(this.registerComponent.bind(this), function() {
-		console.log('hey there!');
 		process.nextTick(_self.onReady.dispatch);
 	});
 }
@@ -60,7 +59,7 @@ function Kalm(pkg, config) {
 Kalm.prototype._loadComponents = function(method, callback) {
 	
 	var classMarker = '.class';
-
+	var _self = this;
 	//In load order
 	var components = {
 		utils: 'utils/utils',
@@ -71,18 +70,17 @@ Kalm.prototype._loadComponents = function(method, callback) {
 	};
 
 	var tasks = Object.keys(components).map(function(c) {
-		return function() {
-			return method(
-				c, 
-				require('./app/'+components[c]+classMarker)
-			);
-		};
-	}).reduce(function(current, next, i) {
-			if (i === components.length -1) {
-				return current.then(next).then(callback);
-			}
+		var component = new Promise(function(resolve) {
+			method(c, require('./app/'+components[c]+classMarker), resolve);
+		});
+		component.catch(function(e) {
+			console.log(e.stack);
+			_self.terminate.call(_self);
+		});
+		return component;
+	}).reduce(function(current, next) {
 			return current.then(next);
-	}, Promise.resolve());
+	}, Promise.resolve()).then(callback);
 };
 
 /**
@@ -93,13 +91,8 @@ Kalm.prototype._loadComponents = function(method, callback) {
  * @param {function} pkg The constructor for the component
  * @returns {Promise} Deferred promise for component registration
  */
-Kalm.prototype.registerComponent = function(pkgName, pkg) {
-	var _self = this;
-	return new Promise(function(resolve) {
-		return new pkg(_self, resolve);
-	}).then(function(component) {
-		_self.components[pkgName] = component;
-	}, function(err) { console.log(err.stack); });
+Kalm.prototype.registerComponent = function(pkgName, pkg, callback) {
+	this.components[pkgName] = new pkg(this, callback);
 };
 
 /**
