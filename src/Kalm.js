@@ -73,13 +73,10 @@ Kalm.prototype._loadComponents = function(method, callback) {
 		var component = new Promise(function(resolve) {
 			method(c, require('./app/'+components[c]+classMarker), resolve);
 		});
-		component.catch(function(e) {
-			console.log(e.stack);
-			_self.terminate.call(_self);
-		});
+		component.catch(_interrupt.bind(_self));
 		return component;
 	}).reduce(function(current, next) {
-			return current.then(next);
+			return current.then(next, _interrupt.bind(_self));
 	}, Promise.resolve()).then(callback);
 };
 
@@ -120,6 +117,19 @@ Kalm.prototype.terminate = function() {
 	}
 	else process.exit();
 };
+
+/**
+ * Interrupt method - displays the error message, then terminates
+ * @private
+ * @method _interrupt
+ * @param {Error|object|string|null} err The error to display
+ */
+function _interrupt(err) {
+	// Call bound to Kalm intance
+	if (this.components.console) this.components.console.error(err);
+	else console.error(err);
+	this.terminate();
+}
 
 /* Exports -------------------------------------------------------------------*/
 

@@ -146,8 +146,6 @@ Net.prototype.handleRequest = function(req, server) {
 	req.origin.adapter = server.type;
 
 	if (req.meta) {
-		console.log(req.meta);
-		console.log(peers._list);
 		peer = peers.find(req.meta.sId);
 
 		reply = function(payload, callback) {
@@ -157,7 +155,7 @@ Net.prototype.handleRequest = function(req, server) {
 		}
 
 		if (peer.onRequest.getNumListeners() > 0) {
-			peer.onRequest.dispatch(req, reply);
+			peer.onRequest.dispatch(req, reply, _self.p);
 			return true;
 		}
 		// Catch unhandled requests

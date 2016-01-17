@@ -56,7 +56,7 @@ function Console(K, callback) {
  * @param {string} msg The message to print
  */
 Console.prototype.log = function(msg) {
-	this._dLog(this.CYAN + sep + this.WHITE + msg);
+	this._dLog(this.CYAN + sep + this.WHITE + JSON.stringify(msg));
 };
 
 /**
@@ -65,7 +65,7 @@ Console.prototype.log = function(msg) {
  * @param {string} msg The message to print
  */
 Console.prototype.warn = function(msg) {
-	this._dWarn(this.YELLOW + sep + this.WHITE + msg);
+	this._dWarn(this.YELLOW + sep + this.WHITE + JSON.stringify(msg));
 };
 
 /**
@@ -79,7 +79,7 @@ Console.prototype.error = function(msg) {
 		this._dError(this.RED + sep + this.WHITE + _errInfo);
 	}
 	else {
-		this._dError(this.RED + sep + this.WHITE + msg);
+		this._dError(this.RED + sep + this.WHITE + JSON.stringify(msg));
 	}
 };
 

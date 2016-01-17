@@ -21,7 +21,7 @@ function Peers(K, callback) {
 	var config;
 
 	this._list = {};
-	this._handlers = null;
+	this._handlers = {};
 	this.p = K;
 
 	config = this.p.config;
@@ -102,7 +102,6 @@ Peers.prototype.from = function(circle) {
  * @param {Peer} peer The peer to bind a handler to
  */
 Peers.prototype._bindPeerHandler = function(peer) {
-	console.log(this._handlers);
 	if (this._handlers !== null) {
 		if (peer.label in this._handlers) {
 			peer.onRequest.add(this._handlers[peer.label]);
