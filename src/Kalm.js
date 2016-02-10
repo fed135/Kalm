@@ -30,8 +30,7 @@ function Kalm(pkg, config) {
 		adapters: {
 			ipc: {
 				port: 4001,
-				evt: 'message',
-				path: '/tmp/socket-'
+				evt: 'message'
 			}
 		}
 	}, config);
@@ -57,23 +56,23 @@ function Kalm(pkg, config) {
  * @param {function} callback The callback method
  */
 Kalm.prototype._loadComponents = function(method, callback) {
-	
-	var classMarker = '.class';
 	var _self = this;
 	//In load order
 	var components = {
-		utils: 'utils/utils',
-    system: 'system/system',
-    console: 'system/console/console',
-    net: 'net/net',
-		peers: 'net/peers/peers'
+		utils: 'utils',
+    system: 'system',
+    console: 'system/console',
+    net: 'net',
+		peers: 'net/peers'
 	};
 
 	var tasks = Object.keys(components).map(function(c) {
 		var component = new Promise(function(resolve) {
-			method(c, require('./app/'+components[c]+classMarker), resolve);
+			method(c, require('./app/'+components[c]), resolve);
 		});
-		component.catch(_interrupt.bind(_self));
+		component.catch(function(err) {
+			_interrupt.call(_self, err, components[c]); 
+		});
 		return component;
 	}).reduce(function(current, next) {
 			return current.then(next, _interrupt.bind(_self));
@@ -101,19 +100,19 @@ Kalm.prototype.registerComponent = function(pkgName, pkg, callback) {
 Kalm.prototype.terminate = function() {
 	var net = this.components.net;
 	var cl = this.components.console;
-	var utils = this.components.utils;
 
 	cl.warn('Shutting down...');
 
 	this.onShutdown.dispatch();
 
 	if (net && net.adapters) {
-		utils.async.all(
+		Promise.all(
 			Object.keys(net.adapters).map(function(e){
-				return net.adapters[e].stop.bind(net.adapters[e]);
-			}),
-			process.exit
-		);
+				return new Promise(function(resolve) {
+					net.adapters[e].stop.call(net.adapters[e], resolve);
+				});
+			})
+		).then(process.exit);
 	}
 	else process.exit();
 };
@@ -123,11 +122,18 @@ Kalm.prototype.terminate = function() {
  * @private
  * @method _interrupt
  * @param {Error|object|string|null} err The error to display
+ * @param {string|null} component The component that failed instantiation
  */
-function _interrupt(err) {
+function _interrupt(err, component) {
 	// Call bound to Kalm intance
-	if (this.components.console) this.components.console.error(err);
-	else console.error(err);
+	if (this.components.console) {
+		if (component) this.components.console.error('Failure to load component "' + component + '"');
+		this.components.console.error(err);
+	}
+	else {
+		if (component) console.error('Failure to load component "' + component + '"');
+		console.error(err);
+	}
 	this.terminate();
 }
 

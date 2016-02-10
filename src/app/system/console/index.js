@@ -9,8 +9,8 @@
 /* Requires ------------------------------------------------------------------*/
 
 var debug = require('debug');
-var colors = require('./colors.package');
-var stacktrace = require('./stacktrace.package');
+var colors = require('./colors');
+var stacktrace = require('./stacktrace');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -26,6 +26,9 @@ var sep = '\t:: ';
  */
 function Console(K, callback) {
 	this.p = K;
+
+	// Smaller error stack, for slightly better perfs...on error
+	Error.stackTraceLimit = 3;
 
 	var config = this.p.config;
 	var name = config.name || config.label;

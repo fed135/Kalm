@@ -7,8 +7,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var async = require('./async.package');
-var crypto = require('./crypto.package');
+var crypto = require('./crypto');
 
 /* Methods  ------------------------------------------------------------------*/
 
@@ -20,7 +19,6 @@ var crypto = require('./crypto.package');
  */
 function Utils(K, callback) {
 	this.p = K;
-	this.async = async;
 	this.crypto = crypto;
 
 	if (callback) callback(this);

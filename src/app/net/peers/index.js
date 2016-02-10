@@ -7,7 +7,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var Peer = require('./peer.package');
+var Peer = require('./peer');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -46,22 +46,24 @@ function Peers(K, callback) {
 Peers.prototype.create = function(name, options) {
 	var utils = this.p.components.utils;
 	var net = this.p.components.net;
+	var console = this.p.components.console;
 
-	name = name || utils.crypto.generate();
-	options = options || Object.create(null);
-
-	var adapter = net.adapters[options.adapter || 'ipc'];
 	var f;
 
+	if (!name) {
+		console.error('Name is required for new Peer');
+		return;
+	}
+
+	options = options || {};
+
 	if (options.circles === undefined) options.circles = [];
-	if (options.poolSize === undefined) options.poolSize = adapter.poolSize;
 	options.label = name;
 
-	f = new Peer(options);
 	options.circles = options.circles.concat(['global']);
+	f = new Peer(this.p, options);
 	this._bindPeerHandler(f);
 	this._list[f.label] = f;
-	f.p = this.p;
 	return f;
 };
 
@@ -104,11 +106,11 @@ Peers.prototype.from = function(circle) {
 Peers.prototype._bindPeerHandler = function(peer) {
 	if (this._handlers !== null) {
 		if (peer.label in this._handlers) {
-			peer.onRequest.add(this._handlers[peer.label]);
+			//peer.onRequest.add(this._handlers[peer.label]);
 		}
 		else {
 			if ('default' in this._handlers) {
-				peer.onRequest.add(this._handlers['default']);
+				//peer.onRequest.add(this._handlers['default']);
 			}
 		}
 	}

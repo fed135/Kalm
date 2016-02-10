@@ -19,7 +19,7 @@ var pkg = require('./package');
  * @param {function|null} callback The callback method on service ready
  * @returns {Kalm} The created Kalm instance
  */
-function create(config, controllers, callback){
+function create(config, controllers, callback) {
 	var K = new Kalm(pkg, config);
 
 	if (controllers) {

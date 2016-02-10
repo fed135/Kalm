@@ -6,9 +6,9 @@
 
 Kalm is a micro-services NodeJS Framework specifically designed for minimal network overhead and resiliance.
 
-It has a very lean design with minimal noise, but is packed with powerful stuff like out-of the box socket management for tcp, udp and ipc. It's also very flexible, so you can load your own custom adapters for protocols like http or zmq.
+It has a very lean design with minimal noise, but is packed with powerful stuff like out-of the box socket management for tcp, udp web-sockets and [ipc](https://github.com/fed135/ipc-light). It's also very flexible, so you can load your own custom adapters for protocols like http or zmq.
 
-It's perfect for network-intensive applications and games.
+You can choose how you communicate, wrapped stateless packets, or persistent stateful socket connections. It's perfect for network-intensive applications and games!
 
 
 ## The idea

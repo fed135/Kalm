@@ -36,16 +36,19 @@ function Net(K, callback) {
 		meta: { sId: config.name || config.label, id: process.pid }
 	};
 	
-	utils.async.all(baseAdapters.filter(function(adapter) {
-		return adapter in config.adapters;
-	}).map(function(adapter) {
-		return function(resolve) {
-			var adapterPkg = require('./adapters/' + adapter + '.adapter');
-			_self.loadAdapter.call(_self, adapter, adapterPkg, resolve);
-		};
-	}), function() {
-		if (callback) callback(_self);
-	});
+	baseAdapters
+		.filter(function(adapter) {
+			return adapter in config.adapters;
+		})
+		.map(function(adapter) {
+			return new Promise(function(resolve) {
+				var adapterPkg = require('./adapters/' + adapter + '.adapter');
+				_self.loadAdapter.call(_self, adapter, adapterPkg, resolve);
+			});
+		})
+		.reduce(function(curr, next) {
+			return curr.then(next);
+		}, Promise.resolve()).then(callback);
 }
 
 /**
@@ -125,6 +128,21 @@ Net.prototype.send = function(peer, payload, options, callback) {
 }
 
 /**
+ * Disconnect
+ * @method disconnect
+ * @memberof Net
+ * @param {Peer} peer The peer that made the request
+ * @param {Socket} socket The socket to disconnect
+ */
+Net.prototype.disconnect = function(peer, socket) {
+	if (!(peer.adapter in this.adapters)) {
+		return callback('Unknown type "' + peer.adapter + '"');
+	}
+
+	this.adapters[peer.adapter].removeClient(socket);
+};
+
+/**
  * Global capture method for incomming requests.
  * Redirects to the appropriate peer's handling method 
  * @method handleRequest
@@ -132,10 +150,9 @@ Net.prototype.send = function(peer, payload, options, callback) {
  * @param {object} req The incomming request payload
  * @param {function} reply The reply interface
  */
-Net.prototype.handleRequest = function(req, server) {
+Net.prototype.handleRequest = function(req, server, peer) {
 	var config = this.p.config;
 	var peers = this.p.components.peers;
-	var peer;
 	var reply;
 	var _self = this;
 
@@ -145,8 +162,10 @@ Net.prototype.handleRequest = function(req, server) {
 	if (!req.origin) req.origin = {};
 	req.origin.adapter = server.type;
 
-	if (req.meta) {
-		peer = peers.find(req.meta.sId);
+	if (req.meta || peer) {
+		if (!peer) {
+			peer = peers.find(req.meta.sId);
+		}
 
 		reply = function(payload, callback) {
 			// Service existing or created during handleRequest
