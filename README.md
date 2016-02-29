@@ -6,18 +6,36 @@
 
 [!!!Early Dev Stage!!!]
 
-A batteries-included framework specifically designed to quickly setup low-latency services.
+A library to simplify and optimize your Socket communications.
 
-It has a business-oriented design with minimal noise (not a lot of dependencies), but is packed with powerful stuff like socket management for tcp, udp and ipc. It's also flexible enough so that you can load your own custom adapters - say you wanted support for protocols like http, web-sockets or zmq.
+It includes a bunch of adapters:
 
-## Getting started
+- IPC [ipc-light](https://github.com/fed135/ipc-light)
+- TCP
+- UDP
+- WebSocket [socket.io](https://github.com/socketio/socket.io)
 
-A template application is available [here](https://github.com/fed135/Kalm-template). You can simply clone it and start playing around.
+It also includes encoders:
 
+- JSON
+- MSG-PACK [msgpack-lite](https://github.com/kawanet/msgpack-lite)
+
+It's also flexible enough so that you can load your own custom adapters or encoders - say you wanted support for protocols like zmq or yaml.
+
+
+## Usage
+
+    // TODO
+
+
+## Performance analysis
+
+    // TODO
+    
 
 ## Installation
 
-    npm install
+    npm install kalm
 
 
 ## Run tests
@@ -27,36 +45,8 @@ A template application is available [here](https://github.com/fed135/Kalm-templa
 
 ## Debugging
 
-By default, all Kalm logs are absorbed. They can be enabled through the DEBUG environement variable. They can after be piped to a file or remote server.
+By default, all Kalm logs are absorbed. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
 
 Ex:
 
-    $ DEBUG=myApp:* > logs.txt
-
-
-## Usage
-
-    // Crude usage
-    var Kalm = require('kalm');
-
-    var config = {
-        label: 'myApp',
-        adapters: {
-            ipc: { port: 4001 }
-        },
-        peers: {
-            logger: {
-                port: 4002
-            }
-        }
-    };
-
-    var myControllers = {
-        log: function(body, reply) {
-            console.log('peer ' + this.peer.label + ' recieved:';
-            console.log(body);
-            reply('gotcha');
-        }
-     };
-
-    var myApp = new Kalm(config);
+    $ DEBUG=kalm
