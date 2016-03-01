@@ -4,32 +4,40 @@
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
 
-Kalm is a micro-services NodeJS Framework specifically designed for minimal network overhead and resiliance.
 
-It has a very lean design with minimal noise, but is packed with powerful stuff like out-of the box socket management for tcp, udp web-sockets and [ipc](https://github.com/fed135/ipc-light). It's also very flexible, so you can load your own custom adapters for protocols like http or zmq.
+[!!!Early Dev Stage!!!]
 
-You can choose how you communicate, wrapped stateless packets, or persistent stateful socket connections. It's perfect for network-intensive applications and games!
+A library to simplify and optimize your Socket communications.
+
+It includes a bunch of adapters:
+
+- IPC [ipc-light](https://github.com/fed135/ipc-light)
+- TCP
+- UDP
+- WebSocket [socket.io](https://github.com/socketio/socket.io)
+
+It also includes encoders:
+
+- JSON
+- MSG-PACK [msgpack-lite](https://github.com/kawanet/msgpack-lite)
+
+It's also flexible enough so that you can load your own custom adapters or encoders - say you wanted support for protocols like zmq or yaml.
 
 
-## The idea
+## Usage
 
-Instead of separating your services in different processes, which is difficult to manage and maintain, Kalm proposes to regroup them all under a single cluster-ready process. This means that your entire application can live and be spread accross multiple machines, making it very resilient and portable.
-
-You can use this [Template](https://github.com/fed135/Kalm-template) to get you started
-All you need to do is to define your peers in the config and write your controllers.
+    // TODO
 
 
-## Documentation
+## Performance analysis
 
-1. [Why](./docs/WHY.md)
-1. [API Docs](https://github.com/fed135/Kalm-docs)
-1. [Roadmap](./docs/ROADMAP.md)
-1. [Kalm coding rules](./docs/RULES.md)
+    // TODO
+    
 
 
 ## Installation
 
-    npm install
+    npm install kalm
 
 
 ## Run tests
@@ -37,10 +45,13 @@ All you need to do is to define your peers in the config and write your controll
     npm test
 
 
-## Usage
+## Debugging
 
-    var Kalm = require('kalm');
-    var myApp = Kalm.create(config, controllers);
+By default, all Kalm logs are absorbed. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
+
+Ex:
+
+    $ DEBUG=kalm
 
 
 ## Roadmap
