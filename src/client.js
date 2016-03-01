@@ -1,62 +1,60 @@
 /**
- * Peer class
- * @class Peer
- * @exports {Peer}
+ * Client class
+ * @class Client
+ * @exports {Client}
  */
 
 'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
+var debug = require('debug')('kalm');
+
+var adapters = require('./adapters');
 var Channel = require('./channel');
+var encoders = require('./encoders');
 
 /* Methods -------------------------------------------------------------------*/
 
 /**
- * Peer constructor
+ * Client constructor
  * @constructor
- * @param {object} options The configuration options for the peer
+ * @param {object} options The configuration options for the client
  */
-function Peer(k, options) {
-	var _self = this;
+function Client(options) {
+	options = options || {};
 
-	this.label = options.label;
-	this.circles = options.circles;
 	this.options = {
 		hostname: options.hostname || '0.0.0.0',
 		adapter: options.adapter || 'ipc',
-		port: options.port || 80
+		encoder: options.encoder || 'json',
+		port: options.port || 80,
+		maxBundle: options.maxBundle || 100,	// Maybe put an hard limit ?
+		bundleDelay: options.bundleDelay || (1000/128)
 	};
-	this.p = k;
 
 	this.channels = {};
-	this.handlers = {};
 }
 
 /**
- * Recovers or create a channel for the peer
+ * Recovers or create a channel for the client
  * @method channel
- * @memberof Peer
+ * @memberof Client
  * @param {string|null} name The name of the channel.
- * @param {object|null} options The options for the channel
  * @returns {Channel} The recovered or created channel
  */
-Peer.prototype.channel = function(name, options) {
-	var net = this.p.components.net;
-	var console = this.p.components.console;
+Client.prototype.channel = function(name) {
 	var s;
 
 	name = name || '/';
-	options = options || { channel: name };
 
 	if (name in this.channels) return this.channels[name];
 
-	console.log('New Channel ' + name + ' for peer ' + this.label);
+	debug('log: New Channel ' + name);
 
-	options.peer = this;
-	s = new Channel(options);
+	s = new Channel(name, this);
 	this.channels[name] = s;
-	s.connect(net.adapters[this.options.adapter]);
+	s.connect(adapters[this.options.adapter]);
 	s.onDisconnect.add(this.removeChannel.bind(this));
 
 	return s;
@@ -65,15 +63,12 @@ Peer.prototype.channel = function(name, options) {
 /**
  * Calls the disconnect method for the channel
  * @method removechannel
- * @memberof Peer
+ * @memberof Client
  * @param {Channel} channel The channel to disconnect, then remove from the list
  */
-Peer.prototype.removeChannel = function(channel) {
+Client.prototype.removeChannel = function(channel) {
 	// TODO: Auto-reconnect (will hook onto another cluster or server)
-	var console = this.p.components.console;
-	console.warn('Connection with peer ' + 
-		this.label + 
-		', for channel ' + 
+	debug('warn: Connection for channel ' + 
 		channel.label +
 		' lost.'
 	);
@@ -81,6 +76,10 @@ Peer.prototype.removeChannel = function(channel) {
 	delete this.channels[channel.channel];
 };
 
+Client.prototype._handleRequest = function(body) {
+	console.log(encoders[this.options.encoder].decode(body));
+};
+
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = Peer;
+module.exports = Client;

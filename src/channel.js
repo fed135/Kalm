@@ -8,7 +8,10 @@
 
 /* Requires ------------------------------------------------------------------*/
 
+var debug = require('debug')('kalm');
+
 var Signal = require('signals');
+var encoders = require('./encoders');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -17,9 +20,9 @@ var Signal = require('signals');
  * @constructor
  * @param {object} options The configuration options for the channel
  */
-function Channel(options) {
-	this.label = options.channel || options.label;
-	this.peer = options.peer;
+function Channel(name, peer) {
+	this.label = name;
+	this.peer = peer;
 
 	this.adapter = null;
 	this.client = null;
@@ -36,8 +39,6 @@ function Channel(options) {
 	// Send.
 	// If an item is added and delay timer is not started, start it. 
 	this.bundles = [];
-	this.maxBundle = options.maxBundle || 100;	// Maybe put an hard limit ?
-	this.bundleDelay = options.bundleDelay || (1000/128);
 	this._bundleTimer = null;
 	this.enableBundles = true;
 }
@@ -48,7 +49,7 @@ function Channel(options) {
  * @memberof Channel
  */
 Channel.prototype.destroy = function() {
-	this.adapter.removeClient(this);
+	this.adapter.prototype.removeClient.call(this);
 	this.onDisconnect.dispatch(this);
 };
 
@@ -62,11 +63,11 @@ Channel.prototype.send = function(payload) {
 	if (this.enableBundles) {
 		this.bundles.push(payload);
 		if (this._bundleTimer === null) {
-			this._bundleTimer = setTimeout(this._tick.bind(this), this.bundleDelay);
+			this._bundleTimer = setTimeout(this._tick.bind(this), this.peer.options.bundleDelay);
 		}
 	}
 	else {
-		this.adapter.send(payload);
+		this.adapter.prototype.send.call(this, encoders[this.peer.options.encoder].encode(payload));
 		this.onComplete.dispatch();
 	}
 };
@@ -78,14 +79,14 @@ Channel.prototype.send = function(payload) {
  * @memberof Channel
  */
 Channel.prototype._tick = function() {
-	if (this.bundles.length > this.maxBundle) {
-		this._bundleTimer = setTimeout(this._tick.bind(this), this.bundleDelay);
+	if (this.bundles.length > this.peer.options.maxBundle) {
+		this._bundleTimer = setTimeout(this._tick.bind(this), this.peer.options.bundleDelay);
 	}
 	else {
 		this._bundleTimer = null;
 	}
 
-	this.adapter.send(this.bundles.splice(0, this.maxBundle), this);
+	this.adapter.prototype.send.call(this, encoders[this.peer.options.encoder].encode(this.bundles.splice(0, this.peer.options.maxBundle)));
 	this.onComplete.dispatch();
 };
 
@@ -96,10 +97,10 @@ Channel.prototype._tick = function() {
  */
 Channel.prototype.connect = function(adapter) {
 	this.adapter = adapter;
-	this.client = adapter.createClient(
+	this.client = adapter.prototype.createClient.call(
+		this,
 		this.peer, 
-		this, 
-		this.peer.handlers[this.label]
+		this.peer._handleRequest.bind(this.peer)
 	);
 };
 

@@ -18,8 +18,9 @@ var http = require('http');
  * @constructor
  * @param {Kalm} K The Kalm instance
  */
-function WS(K) {
-	this.type = 'ws';
+function WS(options, handler) {
+	this.options = options;
+	this.handler = handler;
 	this.server = null;
 }
 
@@ -31,14 +32,16 @@ function WS(K) {
  * @param {function} handler The central handling method for requests
  * @param {function} callback The success callback for the operation
  */
-WS.prototype.listen = function(options, handler, callback) {
+WS.prototype.listen = function(callback) {
 	var _self = this;
-	this.server = http.createServer(function(req) {
-		handler(req, _self);
-	});
+	var hs = http.createServer();
+	this.server = io(hs);
 
-	io.listen(this.server);
-	this.server.listen(options.path + options.port, callback);
+	this.server.on('connection', function(socket) {
+  	socket.on('event', _self.handler);
+  });
+
+	hs.listen(this.options.port, callback);
 };
 
 /**
@@ -50,14 +53,8 @@ WS.prototype.listen = function(options, handler, callback) {
  * @param {Socket} socket The socket to use
  * @param {function|null} callback The callback method
  */
-WS.prototype.send = function(peer, payload, socket, callback) {
-	socket.client.emit(payload, function() {
-		if (!peer._pushSocket(socket)) {
-			socket.client.disconnect();
-		}
-
-		if (callback) callback();
-	});
+WS.prototype.send = function(payload, socket, callback) {
+	socket.client.emit(payload, callback || function() {});
 };
 
 /**
@@ -68,18 +65,21 @@ WS.prototype.send = function(peer, payload, socket, callback) {
  * @param {Service} peer The peer to create the socket for
  * @returns {Client} The created ws client
  */
-WS.prototype.createClient = function(options, peer) {
-	var socket = io.connect(options.url + ':' + peer.port);
-
-	socket.ondisconnect.add(function() {
-		peer._removeSocket(socket);
-	});
-
-	socket.onerror.add(function() {
-		peer._removeSocket(socket);
-	});
+WS.prototype.createClient = function(peer, handler) {
+	var socket = io.connect(this.peer.port);
+	socket.on('data', handler);
 
 	return socket;
+};
+
+/**
+ * Calls the disconnect method on a socket
+ * @method removeClient
+ * @memberof WS
+ * @param {Socket} socket The socket to disconnect
+ */
+ WS.prototype.removeClient = function() {
+	this.client.disconnect();
 };
 
 /**
