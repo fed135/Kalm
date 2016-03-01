@@ -17,8 +17,9 @@ var dgram = require('dgram');
  * @constructor
  * @param {Kalm} K The Kalm instance
  */
-function UDP(K) {
-	this.type = 'udp';
+function UDP(options, handler) {
+	this.options = options;
+	this.handler = handler;
 	this.server = null;
 }
 
@@ -30,29 +31,12 @@ function UDP(K) {
  * @param {function} handler The central handling method for requests
  * @param {function} callback The success callback for the operation
  */
-UDP.prototype.listen = function(options, handler, callback) {
+UDP.prototype.listen = function(callback) {
 	var _self = this;
 	this.server = dgram.createSocket('udp4');
-	this.server.on('message', function (req) {
-		handler(req, _self);
-	});
-	this.server.bind(options.port, '127.0.0.1');
-	callback();
-};
-
-/**
- * Creates a client and adds the listeners to it
- * @method createClient
- * @memberof UDP
- * @param {object} options The config object for that adapter
- * @param {Service} peer The peer to create the socket for
- * @returns {dgram.Socket} The created udp client
- */
-UDP.prototype.createClient = function(options, peer) {
-	var socket = dgram.createSocket('udp4');
-	socket.__active = true;
-
-	return socket;
+	this.server.on('message', this.handler);
+	this.server.bind(this.options.port, '127.0.0.1');
+	if (callback) callback();
 };
 
 /**
@@ -64,28 +48,39 @@ UDP.prototype.createClient = function(options, peer) {
  * @param {Socket} socket The socket to use
  * @param {function|null} callback The callback method
  */
-UDP.prototype.send = function(peer, options, socket, callback) {
+UDP.prototype.send = function(payload, socket, callback) {
 	socket.client.send(
-		options, 
+		payload, 
 		0, 
-		options.length, 
-		peer.port, 
-		peer.hostname, 
-		function(err, bytes) {
-			if (err !== 0 || bytes !== options.length) {
-				socket.client.close();
-				socket.client.__active = false;
-			}
-			else {
-				if (!peer._pushSocket(socket)) {
-					socket.client.close();
-					socket.client.__active = false;
-				}
-			}
-
-			if (callback) callback();
-		}
+		payload.length, 
+		this.peer.options.port, 
+		this.peer.options.hostname, 
+		callback || function() {}
 	);
+};
+
+/**
+ * Creates a client and adds the listeners to it
+ * @method createClient
+ * @memberof UDP
+ * @param {object} options The config object for that adapter
+ * @param {Service} peer The peer to create the socket for
+ * @returns {dgram.Socket} The created udp client
+ */
+UDP.prototype.createClient = function(peer, handler) {
+	var socket = dgram.createSocket('udp4');
+
+	return socket;
+};
+
+/**
+ * Calls the disconnect method on a socket
+ * @method removeClient
+ * @memberof UDP
+ * @param {Socket} socket The socket to disconnect
+ */
+UDP.prototype.removeClient = function() {
+	this.client.disconnect();
 };
 
 /**

@@ -4,6 +4,7 @@
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
 
+
 [!!!Early Dev Stage!!!]
 
 A library to simplify and optimize your Socket communications.
@@ -33,6 +34,7 @@ It's also flexible enough so that you can load your own custom adapters or encod
     // TODO
     
 
+
 ## Installation
 
     npm install kalm
@@ -50,3 +52,8 @@ By default, all Kalm logs are absorbed. They can be enabled through the DEBUG en
 Ex:
 
     $ DEBUG=kalm
+
+
+## Roadmap
+
+[Milestones](https://github.com/fed135/Kalm/milestones)

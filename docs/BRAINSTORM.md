@@ -94,3 +94,19 @@ Promisify Error-prone sections:
 - Server write,
 - Request handling,
 - Shutdown protocol
+
+------------------------------------------
+
+Stateless & stateful socket management
+
+### Stateless
+
+- Wrapped
+- Anonymous pooled sockets
+- Emit, Broadcast, Receive from server
+
+### Stateful
+
+- (Un)wrapped
+- Named sockets (client channel)
+--> Check if channel is present to toggle modes
