@@ -3,25 +3,45 @@
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Dependencies status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
 
 
 [!!!Early Dev Stage!!!]
 
 A library to simplify and optimize your Socket communications.
 
-It includes a bunch of adapters:
+## Adapters
 
-- IPC [ipc-light](https://github.com/fed135/ipc-light)
-- TCP
-- UDP
-- WebSocket [socket.io](https://github.com/socketio/socket.io)
+Allow you to easily use different socket types, hassle-free
 
-It also includes encoders:
+| **Type** | **Library used** | **Status** |
+|---|---|---|
+| IPC |  | DEV |
+| TCP |  | DEV |
+| UDP |  | DEV |
+| WebSocket | [socket.io](https://github.com/socketio/socket.io) | DEV |
 
-- JSON
-- MSG-PACK [msgpack-lite](https://github.com/kawanet/msgpack-lite)
 
-It's also flexible enough so that you can load your own custom adapters or encoders - say you wanted support for protocols like zmq or yaml.
+## Encoders
+
+Encode the payloads before emitting.
+
+| **Type** | **Library used** | **Status** |
+|---|---|---|
+| JSON |  | PROD |
+| MSG-PACK | [msgpack-lite](https://github.com/kawanet/msgpack-lite) | PROD |
+
+
+## Middleware
+
+Perform batch operation of payloads.
+
+| **Type** | **Library used** | **Status** |
+|---|---|---|
+| Bundler |  | DEV |
+
+
+The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq or yaml encoding.
 
 
 ## Usage
@@ -33,7 +53,6 @@ It's also flexible enough so that you can load your own custom adapters or encod
 
     // TODO
     
-
 
 ## Installation
 

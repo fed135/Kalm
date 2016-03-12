@@ -8,9 +8,12 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var ipc = require('ipc-light');
+var net = require('net');
+var fs = require('fs');
 
 /* Methods -------------------------------------------------------------------*/
+
+IPC.defaultPath = '/tmp/app.socket-';
 
 /**
  * IPC adapter
@@ -32,8 +35,12 @@ function IPC(options, handler) {
  * @param {function} callback The success callback for the operation
  */
 IPC.prototype.listen = function(callback) {
-	this.server = ipc.createServer(this.handler)
-		.listen(ipc.defaults.path + '-' + this.options.port, callback);
+	var _self = this;
+
+	fs.unlink(this.path, function bindSocket() {
+		_self.server = net.createServer(_self.handler);
+		_self.server.listen(IPC.defaultPath + _self.options.port, callback);
+	});
 };
 
 /**
@@ -42,10 +49,9 @@ IPC.prototype.listen = function(callback) {
  * @memberof IPC
  * @param {Buffer} payload The body of the request
  * @param {Socket} socket The socket to use
- * @param {function|null} callback The callback method
  */
-IPC.prototype.send = function(payload, socket, callback) {
-	this.client.emit(payload, callback || function() {});
+IPC.prototype.send = function(socket, payload) {
+	socket.write(payload);
 };
 
 /**
@@ -53,18 +59,10 @@ IPC.prototype.send = function(payload, socket, callback) {
  * @method createClient
  * @memberof IPC
  * @param {Service} peer The peer to create the socket for
- * @returns {ipc.Client} The created ipc client
+ * @returns {Socket} The created ipc client
  */
 IPC.prototype.createClient = function(peer, handler) {
-	var socket = ipc.connect({
-		path: ipc.defaults.path + '-' + peer.options.port
-	});
-
-	socket.ondisconnect.add(this.destroy.bind(this));
-	socket.onerror.add(this.destroy.bind(this));
-	socket.ondata.add(handler);
-
-	return socket;
+	return net.connect(IPC.defaultPath + this.options.port);
 };
 
 /**
@@ -73,8 +71,8 @@ IPC.prototype.createClient = function(peer, handler) {
  * @memberof IPC
  * @param {Socket} socket The socket to disconnect
  */
-IPC.prototype.removeClient = function() {
-	this.client.disconnect();
+IPC.prototype.removeClient = function(socket) {
+	socket.disconnect();
 };
 
 /**

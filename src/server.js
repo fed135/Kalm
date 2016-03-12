@@ -58,8 +58,8 @@ Server.prototype.stop = function() {
 	if (this._server) this._server.stop();
 };
 
-Server.prototype._handleRequest = function(body) {
-	console.log(encoders[this.options.encoder].decode(body));
+Server.prototype._handleRequest = function(evt, data) {
+	console.log(encoders[this.options.encoder].decode(evt || data));
 };
 
 /* Exports -------------------------------------------------------------------*/

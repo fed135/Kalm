@@ -27,49 +27,34 @@ function TCP(options, handler) {
  * Listens for tcp connections on the selected port.
  * @method listen
  * @memberof TCP
- * @param {object} options The config object for that adapter
- * @param {function} handler The central handling method for requests
  * @param {function} callback The success callback for the operation
  */
 TCP.prototype.listen = function(callback) {
-	var _self = this;
-	this.server = net.createServer(function(req) {
-		req.on('error', function(err) { console.log(err); });
-		req.on('connect', function() { console.log('connect'); });
-		req.on('disconnect', function() { console.log('disconnect'); });
-		req.on('data', _self.handler);
-	}).listen(this.options.port, callback);
+	this.server = net.createServer(this.handler)
+		.listen(this.options.port, callback);
 };
 
 /**
- * Sends a message with a socket client, then pushes it back to its peer
+ * Sends a message with a socket client
  * @method send
  * @memberof TCP
- * @param {Service} peer The peer to send to
- * @param {Buffer} options The details of the request
+ * @param {Buffer} payload The body of the request
  * @param {Socket} socket The socket to use
  * @param {function|null} callback The callback method
  */
 TCP.prototype.send = function(payload, socket, callback) {
-	socket.client.write(payload, callback || function(){});
+	socket.write(payload, callback);
 };
 
 /**
- * Creates a client and adds the listeners to it
+ * Creates a client
  * @method createClient
  * @memberof TCP
- * @param {object} options The config object for that adapter
- * @param {Service} peer The peer to create the socket for
+ * @param {Client} client The client to create the socket for
  * @returns {Socket} The created tcp client
  */
-TCP.prototype.createClient = function(peer, handler) {
-	var socket = net.connect(peer.options);
-
-	socket.on('data', handler);
-	socket.on('disconnect', this.destroy.bind(this));
-	socket.on('error', this.destroy.bind(this));
-
-	return socket;
+TCP.prototype.createClient = function(client) {
+	return net.connect(this.options.port);
 };
 
 /**
@@ -78,8 +63,8 @@ TCP.prototype.createClient = function(peer, handler) {
  * @memberof TCP
  * @param {Socket} socket The socket to disconnect
  */
-TCP.prototype.removeClient = function() {
-	this.client.disconnect();
+TCP.prototype.removeClient = function(socket) {
+	socket.disconnect();
 };
 
 /**

@@ -5,9 +5,15 @@ describe('Starting service', function() {
 	it('constructor', function(done) {
 		Kalm.listen({
 			port: 3000,
+			adapter: 'ws',
 			encoder: 'msg-pack'
 		}).then(function(server) {
-			var client = new Kalm.Client({port: 3000, encoder:'msg-pack', hostname: '0.0.0.0'});
+			var client = new Kalm.Client({
+				port: 3000, 
+				adapter: 'ws', 
+				encoder:'msg-pack', 
+				hostname: '0.0.0.0'
+			});
 			client.channel('rare_pepes').send('kalm_pepe');
 			client.channel('rare_pepes').send('kalm_doge');
 

@@ -38,6 +38,7 @@ WS.prototype.listen = function(callback) {
 	this.server = io(hs);
 
 	this.server.on('connection', function(socket) {
+		console.log('connection');
   	socket.on('event', _self.handler);
   });
 
@@ -54,6 +55,7 @@ WS.prototype.listen = function(callback) {
  * @param {function|null} callback The callback method
  */
 WS.prototype.send = function(payload, socket, callback) {
+	console.log('send');
 	socket.client.emit(payload, callback || function() {});
 };
 
@@ -66,7 +68,8 @@ WS.prototype.send = function(payload, socket, callback) {
  * @returns {Client} The created ws client
  */
 WS.prototype.createClient = function(peer, handler) {
-	var socket = io.connect(this.peer.port);
+	var socket = new io.Socket(this.peer.port);
+	console.log(socket);
 	socket.on('data', handler);
 
 	return socket;
