@@ -40,14 +40,31 @@ Perform batch operation of payloads.
 |---|---|---|
 | Bundler |  | DEV |
 
+---
 
 The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq or yaml encoding.
 
 
 ## Usage
 
-    // TODO
+    var Kalm = require('Kalm');
 
+    var client = new Kalm.Client({
+      hostname: '0.0.0.0', // Some ip
+      port: 3000, // Some port
+      adapter: 'tcp',
+      encoder: 'msg-pack',
+      channels: {
+        '/': function(data) {} // Handler
+    });
+
+    var server = new Kalm.Server({
+      port: 6000,
+      adapter: 'udp',
+      encoder: 'json'
+    });
+
+    server.on('myEvent', function(data) {} // Handler
 
 ## Performance analysis
 
