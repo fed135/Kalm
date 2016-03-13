@@ -55,16 +55,26 @@ The framework is flexible enough so that you can load your own custom adapters, 
       adapter: 'tcp',
       encoder: 'msg-pack',
       channels: {
-        '/': function(data) {} // Handler
+        'myEvent': function(data) {} // Handler
+      }
     });
+
+    client.send('myEvent', {foo: 'bar'});	// Can send Objects, Strings or Buffers 
+    client.on('someOtherEvent', function() {}); // Can add other handlers dynamically 
 
     var server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
-      encoder: 'json'
+      encoder: 'json',
+      channels: {
+        'myEvent': function(data) {} // Handler - new connections will register to these events
+      }
     });
 
-    server.on('myEvent', function(data) {} // Handler
+    server.on('connection', function(client) {} // Handler, where client is an instance of Kalm.Client
+
+    server.broadcast('someOtherEvent', 'hello!');
+    
 
 ## Performance analysis
 
