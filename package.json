@@ -1,7 +1,7 @@
 {
   "name": "kalm",
-  "version": "1.1.0",
-  "description": "A Kalm Application.",
+  "version": "0.0.1",
+  "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
     "test": "mocha tests/unit/index.js"
@@ -11,41 +11,35 @@
     "url": "git+https://github.com/fed135/Kalm.git"
   },
   "keywords": [
-    "framework",
     "socket",
     "tcp",
     "udp",
-    "ws",
+    "client",
+    "server",
     "service",
     "peer",
     "micro-service",
     "low-latency",
     "light",
-    "ipc"
+    "ipc",
+    "messaging",
+    "queue"
   ],
-  "author": "frederic charette",
-  "licenses": [
-    {
-      "type": "GNU GPL V2",
-      "url": "https://github.com/fed135/Kalm/blob/master/LICENSE"
-    }
-  ],
+  "author": "frederic charette <fredericcharette@gmail.com>",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/fed135/Kalm/issues"
   },
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
-    "chai": "2.3.0",
-    "mocha": "2.2.4"
+    "chai": "3.4.x",
+    "mocha": "2.4.x",
+    "coveralls": "2.11.x",
+    "istanbul": "0.4.x"
   },
   "dependencies": {
     "debug": "2.2.x",
-    "socket.io": "1.4.x",
-    "ipc-light": "1.0.x",
-    "mixin-deep": "1.1.x",
     "msgpack-decode": "1.0.x",
-    "msgpack-lite": "0.1.x",
-    "signals": "1.0.x",
-    "walk": "2.3.x"
+    "msgpack-lite": "0.1.x"
   }
 }

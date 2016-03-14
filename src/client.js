@@ -47,8 +47,8 @@ function Client(options) {
 	// Socket object
 	this.socket = options.socket || null;
 
-	// Data packets - transient state
-	this._packets = [];
+	// Data packets - transient state - by channel
+	this._packets = {};
 
 	// Init
 	this._updateSocket();
@@ -64,11 +64,12 @@ function Client(options) {
 Client.prototype.on = function(name, handler) {
 	name = name || '/';
 
-	if (name in this._channels) return;
-	this._channels[name] = handler;
-	debug('log: New Channel ' + name);
+	if (!(name in this._channels)) {
+		debug('log: New Channel ' + name);
+		this._channels[name] = [];
+	}
 
-	this._updateSocket();
+	this._channels[name].push(handler);
 	return this;
 };
 
@@ -77,24 +78,19 @@ Client.prototype.use = function(socket) {
 	return this;
 };
 
-Client.prototype._updateSocket = function() {
-	if (!this.socket) return;
-
-	this.socket.on('data', this._handleRequest.bind(this));
-	for (var i in this._channels) {
-		this.socket.on(i, this._channels[i]);
-	}
-};
-
 /**
  * Sends a packet through the channel
  * @method send
  * @memberof Channel
  * @param {string|object} payload The payload to send 
  */
-Client.prototype.send = function(payload) {
+Client.prototype.send = function(channel, payload) {
 	// Go through middlewares
 	middleware.process(this, payload);
+};
+
+Client.prototype._createSocket = function() {
+	this.socket = adapters.resolve(this.adapter).createSocket(this);
 };
 
 Client.prototype._emit = function(payload) {

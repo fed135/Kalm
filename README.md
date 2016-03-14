@@ -16,10 +16,9 @@ Allow you to easily use different socket types, hassle-free
 
 | **Type** | **Library used** | **Status** |
 |---|---|---|
-| IPC |  | DEV |
-| TCP |  | DEV |
-| UDP |  | DEV |
-| WebSocket | [socket.io](https://github.com/socketio/socket.io) | DEV |
+| IPC |  | IN-DEV |
+| TCP |  | - |
+| UDP |  | - |
 
 
 ## Encoders
@@ -38,7 +37,7 @@ Perform batch operation of payloads.
 
 | **Type** | **Library used** | **Status** |
 |---|---|---|
-| Bundler |  | DEV |
+| Bundler |  | IN-DEV |
 
 ---
 
@@ -74,7 +73,7 @@ The framework is flexible enough so that you can load your own custom adapters, 
     server.on('connection', function(client) {} // Handler, where client is an instance of Kalm.Client
 
     server.broadcast('someOtherEvent', 'hello!');
-    
+
 
 ## Performance analysis
 
