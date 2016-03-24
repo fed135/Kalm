@@ -10,6 +10,12 @@
 
 A library to simplify and optimize your Socket communications.
 
+- Packet bundling
+- Packet minification
+- Easy-to-use single syntax for all protocols
+- Multiplexing for everyone!
+
+
 ## Adapters
 
 Allow you to easily use different socket types, hassle-free
@@ -41,7 +47,7 @@ Perform batch operation of payloads.
 
 ---
 
-The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq or yaml encoding.
+The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq, WebSockets or have yaml encoding.
 
 
 ## Usage
@@ -71,7 +77,6 @@ The framework is flexible enough so that you can load your own custom adapters, 
     });
 
     server.on('connection', function(client) {} // Handler, where client is an instance of Kalm.Client
-
     server.broadcast('someOtherEvent', 'hello!');
 
 

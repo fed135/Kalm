@@ -8,6 +8,9 @@
 
 /* Requires ------------------------------------------------------------------*/
 
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
+
 var debug = require('debug')('kalm');
 
 var adapters = require('./adapters');
@@ -22,6 +25,8 @@ var middleware = require('./middleware');
  * @param {object} options The configuration options for the client
  */
 function Client(options) {
+	EventEmitter.call(this);
+	
 	options = options || {};
 
 	this.options = {
@@ -49,9 +54,6 @@ function Client(options) {
 
 	// Data packets - transient state - by channel
 	this._packets = {};
-
-	// Init
-	this._updateSocket();
 }
 
 /**
@@ -61,11 +63,17 @@ function Client(options) {
  * @param {string|null} name The name of the channel.
  * @returns {Channel} The recovered or created channel
  */
-Client.prototype.on = function(name, handler) {
+Client.prototype.channel = function(name, handler) {
 	name = name || '/';
 
+	if (name[0] !== '/') name = '/' + name;
+
 	if (!(name in this._channels)) {
-		debug('log: New Channel ' + name);
+		debug(
+			'log: new channel ' + 
+			this.options.adapter + '://' + this.options.hostname + ':' + 
+			this.options.port + name
+		);
 		this._channels[name] = [];
 	}
 
@@ -104,6 +112,8 @@ Client.prototype._handleRequest = function(evt, data) {
 	console.log('test');
 	console.log(encoders[this.options.encoder].decode(evt || data));
 };
+
+util.inherits(Client, EventEmitter);
 
 /* Exports -------------------------------------------------------------------*/
 

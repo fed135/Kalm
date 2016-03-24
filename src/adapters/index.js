@@ -10,7 +10,6 @@
 var ipc = require('./ipc.adapter');
 var tcp = require('./tcp.adapter');
 var udp = require('./udp.adapter');
-var ws = require('./ws.adapter');
 
 var debug = require('debug')('kalm');
 
@@ -19,8 +18,7 @@ var debug = require('debug')('kalm');
 var list = {
 	ipc: ipc,
 	tcp: tcp,
-	udp: udp,
-	ws: ws
+	udp: udp
 };
 
 /* Methods -------------------------------------------------------------------*/

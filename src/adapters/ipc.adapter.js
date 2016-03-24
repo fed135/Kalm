@@ -24,7 +24,7 @@ var defaultPath = '/tmp/app.socket-';
  * @param {function} callback The callback for the operation
  */
 function listen(server, callback) {
-	fs.unlink(this.path, function _bindSocket() {
+	fs.unlink(defaultPath + server.options.port, function _bindSocket() {
 		server.listener = net.createServer(server._handleRequest);
 		server.listener.listen(defaultPath + server.options.port, callback);
 	});

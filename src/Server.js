@@ -8,9 +8,12 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var debug = require('debug')('kalm');
-var Signal = require('signals');
+var util = require('util');
+var EventEmitter = require('events').EventEmitter;
 
+var debug = require('debug')('kalm');
+
+var Client = require('./Client');
 var adapters = require('./adapters');
 var encoders = require('./encoders');
 
@@ -22,6 +25,8 @@ var encoders = require('./encoders');
  * @param {object} options The configuration options for the server
  */
 function Server(options) {
+	EventEmitter.call(this);
+
 	options = options || {};
 
 	this.status = 'off';
@@ -31,15 +36,7 @@ function Server(options) {
 		port: options.port || 80
 	};
 
-	this.onReady = new Signal();
-
-	if (this.options.adapter in adapters) {
-		this._server = new adapters[this.options.adapter](this.options, this._handleRequest.bind(this));
-	}
-	else {
-		// Custom adapter
-		this._server = new this.options.adapter(this.options, this._handleRequest);
-	}
+	this.listen();
 }
 
 /**
@@ -48,19 +45,30 @@ function Server(options) {
  * @memberof Server
  */
 Server.prototype.listen = function(callback) {
-	var _self = this;
-	if (this._server) {
-		this._server.listen(callback);
+	var adapter = adapters.resolve(this.options.adapter);
+	if (adapter) {
+		debug('log: listening ' + this.options.adapter + '://0.0.0.0:' + this.options.port);
+		adapter.listen(this, this._handleLift.bind(this));
+	}
+	else {
+		debug('error: no adapter found "' + this.options.adapter + '"');
 	}
 };
 
-Server.prototype.stop = function() {
-	if (this._server) this._server.stop();
+Server.prototype._handleLift = function() {
+	this.emit('ready');
 };
 
-Server.prototype._handleRequest = function(evt, data) {
-	console.log(encoders[this.options.encoder].decode(evt || data));
+Server.prototype.stop = function() {
+	if (this.listener) this.listener.stop();
 };
+
+Server.prototype._handleRequest = function(socket) {
+	console.log(socket);
+	this.emit('connection', new Client(socket));
+};
+
+util.inherits(Server, EventEmitter);
 
 /* Exports -------------------------------------------------------------------*/
 

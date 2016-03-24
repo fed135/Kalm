@@ -3,7 +3,9 @@ var Kalm = require('../../index');
 
 describe('Starting service', function() {
 	it('constructor', function(done) {
-		Kalm.listen({
+		console.log('test');
+		console.log(Kalm);
+		var server = new Kalm.Server({
 			port: 3000,
 			adapter: 'ipc',
 			encoder: 'msg-pack'

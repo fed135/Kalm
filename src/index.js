@@ -7,24 +7,12 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var Client = require('./client');
-var Server = require('./server');
-
-/* Methods -------------------------------------------------------------------*/
-
-function listen(options) {
-	return new Promise(function(resolve) {
-		var server = new Server(options);
-		server.listen(function() {
-			resolve(server);
-		});
-	});
-}
+var Client = require('./Client');
+var Server = require('./Server');
 
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
 	Client: Client,
-	Server: Server,
-	listen: listen
+	Server: Server
 };
