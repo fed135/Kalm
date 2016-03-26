@@ -1,13 +1,27 @@
-function process() {
-	if (this.bundles.length > this.peer.options.maxBundle) {
-		this._bundleTimer = setTimeout(this._tick.bind(this), this.peer.options.bundleDelay);
-	}
-	else {
-		this._bundleTimer = null;
+function process(client, channel, payload) {
+	var options = client.options.transform.bundler;
+
+	if (!client.__bundler) {
+		client.__bundler = {
+			timers: {}
+		};
 	}
 
-	this.adapter.prototype.send.call(this, encoders[this.peer.options.encoder].encode(this.bundles.splice(0, this.peer.options.maxBundle)));
-	this.onComplete.dispatch();
+	if (client.packets[channel].length > options.maxPackets) {
+		if (client.__bundler.timers[channel]) {
+			clearTimeout(client.__bundler.timers[channel]);
+		}
+		client._emit.call(client, channel);
+	}
+
+	if (!client.__bundler.timers[channel]) {
+		client.__bundler.timers[channel] = setTimeout(
+			function _emitBundle() {
+				client._emit.call(client, channel);
+			}, 
+			options.delay
+		);
+	}
 }
 	// Bundling logic
 	// -----------------------------

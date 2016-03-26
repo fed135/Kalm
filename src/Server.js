@@ -29,12 +29,14 @@ function Server(options) {
 
 	options = options || {};
 
-	this.status = 'off';
 	this.options = {
 		adapter: options.adapter || 'ipc',
 		encoder: options.encoder || 'json',
 		port: options.port || 80
 	};
+
+	this.connections = [];
+	this.channels = options.channels || {};
 
 	this.listen();
 }
@@ -55,17 +57,30 @@ Server.prototype.listen = function(callback) {
 	}
 };
 
+Server.prototype.broadcast = function(channel, payload) {
+	for (var i = this.connections.length - 1; i >= 0; i--) {
+		this.connections[i].send(channel, payload);
+	}
+};
+
 Server.prototype._handleLift = function() {
 	this.emit('ready');
 };
 
 Server.prototype.stop = function() {
+	this.connections.length = 0;
 	if (this.listener) this.listener.stop();
 };
 
 Server.prototype._handleRequest = function(socket) {
-	console.log(socket);
-	this.emit('connection', new Client(socket));
+	var client = new Client(socket, {
+		adapter: this.options.adapter,
+		encoder: this.options.encoder,
+		channels: this.channels
+	});
+	socket.on('data', client._handleRequest.bind(client));
+	this.connections.push(client);
+	this.emit('connection', client);
 };
 
 util.inherits(Server, EventEmitter);

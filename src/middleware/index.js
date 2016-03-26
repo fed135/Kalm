@@ -4,8 +4,10 @@ var list = {
 	bundler: bundler
 };
 
-function process(socket, payload) {
-
+function process(client, channel, payload) {
+	for (var t in client.options.transform) {
+		if (t in list) list[t].process(client, channel, payload);
+	}
 }
 
 function register(name, mod) {

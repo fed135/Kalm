@@ -25,7 +25,7 @@ var defaultPath = '/tmp/app.socket-';
  */
 function listen(server, callback) {
 	fs.unlink(defaultPath + server.options.port, function _bindSocket() {
-		server.listener = net.createServer(server._handleRequest);
+		server.listener = net.createServer(server._handleRequest.bind(server));
 		server.listener.listen(defaultPath + server.options.port, callback);
 	});
 };
@@ -47,7 +47,7 @@ function send(socket, payload) {
  * @returns {Socket} The created ipc socket
  */
 function createSocket(client) {
-	var socket = net.connect(defaultPath + this.options.port);
+	var socket = net.connect(defaultPath + client.options.port);
 	socket.on('data', client._handleRequest.bind(client));
 
 	return socket;

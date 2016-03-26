@@ -19,14 +19,22 @@ var middleware = require('./middleware');
 
 /* Methods -------------------------------------------------------------------*/
 
+Client.UID = 0;
+
 /**
  * Client constructor
  * @constructor
  * @param {object} options The configuration options for the client
  */
-function Client(options) {
+function Client(socket, options) {
 	EventEmitter.call(this);
 	
+	this.uid = Client.UID++;
+
+	if (options === undefined) {
+		options = socket;
+		socket = null;
+	}
 	options = options || {};
 
 	this.options = {
@@ -47,13 +55,20 @@ function Client(options) {
 	};
 
 	// List of channels 
-	this._channels = options.channels || {};
+	this.channels = {};
+	// Populate channels
+	if (options.channels) {
+		for (var c in options.channels) {
+			this.channel(c, options.channels[c]);
+		}
+	}
 
 	// Socket object
-	this.socket = options.socket || null;
+	if (socket) this.socket = socket;
+	else this.socket = this._createSocket();
 
 	// Data packets - transient state - by channel
-	this._packets = {};
+	this.packets = {};
 }
 
 /**
@@ -68,16 +83,16 @@ Client.prototype.channel = function(name, handler) {
 
 	if (name[0] !== '/') name = '/' + name;
 
-	if (!(name in this._channels)) {
+	if (!(name in this.channels)) {
 		debug(
 			'log: new channel ' + 
 			this.options.adapter + '://' + this.options.hostname + ':' + 
 			this.options.port + name
 		);
-		this._channels[name] = [];
+		this.channels[name] = [];
 	}
 
-	this._channels[name].push(handler);
+	this.channels[name].push(handler);
 	return this;
 };
 
@@ -93,24 +108,39 @@ Client.prototype.use = function(socket) {
  * @param {string|object} payload The payload to send 
  */
 Client.prototype.send = function(channel, payload) {
+	channel = channel || '/';
+	if (!this.packets[channel]) this.packets[channel] = [];
+	this.packets[channel].push(payload);
 	// Go through middlewares
-	middleware.process(this, payload);
+	middleware.process(this, channel, payload);
 };
 
 Client.prototype._createSocket = function() {
-	this.socket = adapters.resolve(this.adapter).createSocket(this);
+	return adapters.resolve(this.options.adapter).createSocket(this);
 };
 
-Client.prototype._emit = function(payload) {
-	this.adapter.prototype.send(
+Client.prototype._emit = function(channel) {
+	adapters.resolve(this.options.adapter).send(
 		this.socket, 
-		encoders[this.peer.options.encoder].encode(payload)
+		encoders.resolve(this.options.encoder).encode({
+			c: channel,
+			d: this.packets[channel]
+		})
 	);
+	this.packets[channel].length = 0;
 }
 
-Client.prototype._handleRequest = function(evt, data) {
-	console.log('test');
-	console.log(encoders[this.options.encoder].decode(evt || data));
+Client.prototype._handleRequest = function(evt) {
+	var raw = encoders.resolve(this.options.encoder).decode(evt);
+	if (raw.c[0] !== '/') raw.c = '/' + raw.c;
+
+	if (raw.c in this.channels) {
+		for (var i = 0; i<raw.d.length; i++) {
+			for (var c = 0; c<this.channels[raw.c].length; c++) {
+				this.channels[raw.c][c](raw.d[i]);
+			}
+		}
+	}
 };
 
 util.inherits(Client, EventEmitter);
