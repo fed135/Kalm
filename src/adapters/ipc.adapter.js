@@ -27,8 +27,15 @@ function listen(server, callback) {
 	fs.unlink(defaultPath + server.options.port, function _bindSocket() {
 		server.listener = net.createServer(server._handleRequest.bind(server));
 		server.listener.listen(defaultPath + server.options.port, callback);
+		server.listener.on('error', function _handleServerError(err) {
+			server.emit('error', err);
+		});
 	});
 };
+
+function stop(server, callback) {
+	server.listener.close(callback || function() {});
+}
 
 /**
  * Sends a message with a socket client, then pushes it back to its peer
@@ -46,9 +53,14 @@ function send(socket, payload) {
  * @param {Kalm.Client} client The client to create the socket for
  * @returns {Socket} The created ipc socket
  */
-function createSocket(client) {
-	var socket = net.connect(defaultPath + client.options.port);
+function createSocket(client, socket) {
+	if (!socket) {
+		socket = net.connect(defaultPath + client.options.port);
+	}
 	socket.on('data', client._handleRequest.bind(client));
+	socket.on('error', function _handleSocketError(err) {
+		client.emit('error', err);
+	});
 
 	return socket;
 };
@@ -58,5 +70,6 @@ function createSocket(client) {
 module.exports = {
 	listen: listen,
 	send: send,
-	createSocket: createSocket
+	createSocket: createSocket,
+	stop: stop
 };

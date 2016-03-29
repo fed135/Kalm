@@ -1,34 +1,31 @@
 var assert = require('chai').assert;
-var Kalm = require('../../index');
+var Kalm = require('../index');
 
 describe('Starting service', function() {
 	it('constructor', function(done) {
-		console.log('test');
-		console.log(Kalm);
 		var server = new Kalm.Server({
 			port: 3000,
 			adapter: 'ipc',
 			encoder: 'msg-pack'
-		}).then(function(server) {
+		});
+
+		server.on('ready', function() {
 			var client = new Kalm.Client({
 				port: 3000, 
 				adapter: 'ipc', 
 				encoder:'msg-pack', 
 				hostname: '0.0.0.0'
 			});
-			client.channel('rare_pepes').send('kalm_pepe');
-			client.channel('rare_pepes').send('kalm_doge');
+			client.send('test', 'data');
+			client.send('test', 'data2');
 
-			client.channel().send('klam klam');
+			client.send('test2', 'data3');
 			done();
-		},
-		function(err) {
+		});
+
+		server.on('error', function(err) {
 			console.log('Server error:');
 			console.log(err.stack);
 		});
 	});
-
-	// it('check components', function() {
-		// require('./components')(server);	
-	// });
 });

@@ -48,8 +48,8 @@ function Client(socket, options) {
 		// Transformations (middleware)
 		transform: options.transform || {
 			bundler: {
-				maxPackets: 100,
-				delay: (1000/128)
+				maxPackets: 512,
+				delay: 16
 			}
 		}
 	};
@@ -64,8 +64,7 @@ function Client(socket, options) {
 	}
 
 	// Socket object
-	if (socket) this.socket = socket;
-	else this.socket = this._createSocket();
+	this.socket = this._createSocket(socket);
 
 	// Data packets - transient state - by channel
 	this.packets = {};
@@ -115,8 +114,8 @@ Client.prototype.send = function(channel, payload) {
 	middleware.process(this, channel, payload);
 };
 
-Client.prototype._createSocket = function() {
-	return adapters.resolve(this.options.adapter).createSocket(this);
+Client.prototype._createSocket = function(socket) {
+	return adapters.resolve(this.options.adapter).createSocket(this, socket);
 };
 
 Client.prototype._emit = function(channel) {

@@ -35,6 +35,6 @@ server.on('ready', function() {
 	client.send('channel1', 'some data');
 	client.send('channel1', 'some more data');
 	setTimeout(function() {
-		client.send(null, 'later sent data');
+		client.send(null, {message:'object'});
 	}, 1000);
 });

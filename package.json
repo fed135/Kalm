@@ -1,10 +1,10 @@
 {
   "name": "kalm",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
-    "test": "mocha tests/unit/index.js"
+    "test": "mocha tests/index.js"
   },
   "repository": {
     "type": "git",
@@ -33,9 +33,9 @@
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
     "chai": "3.4.x",
-    "mocha": "2.4.x",
     "coveralls": "2.11.x",
-    "istanbul": "0.4.x"
+    "istanbul": "0.4.x",
+    "mocha": "2.4.x"
   },
   "dependencies": {
     "debug": "2.2.x",

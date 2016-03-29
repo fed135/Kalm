@@ -57,6 +57,10 @@ Server.prototype.listen = function(callback) {
 	}
 };
 
+Server.prototype.channel = function(name, handler) {
+	this.channels[name] = handler;
+};
+
 Server.prototype.broadcast = function(channel, payload) {
 	for (var i = this.connections.length - 1; i >= 0; i--) {
 		this.connections[i].send(channel, payload);
@@ -67,9 +71,11 @@ Server.prototype._handleLift = function() {
 	this.emit('ready');
 };
 
-Server.prototype.stop = function() {
+Server.prototype.stop = function(callback) {
 	this.connections.length = 0;
-	if (this.listener) this.listener.stop();
+	if (this.listener) {
+		adapters.resolve(this.options.adapter).stop(this, callback);
+	}
 };
 
 Server.prototype._handleRequest = function(socket) {
@@ -78,7 +84,6 @@ Server.prototype._handleRequest = function(socket) {
 		encoder: this.options.encoder,
 		channels: this.channels
 	});
-	socket.on('data', client._handleRequest.bind(client));
 	this.connections.push(client);
 	this.emit('connection', client);
 };

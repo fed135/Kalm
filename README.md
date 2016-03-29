@@ -3,17 +3,18 @@
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
-[![Dependencies status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
+[![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
+[![Current Stage](https://img.shields.io/badge/stage-alpha-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
 
-
-[!!!Early Dev Stage!!!]
 
 A library to simplify and optimize your Socket communications.
 
 - Packet bundling
 - Packet minification
 - Easy-to-use single syntax for all protocols
-- Multiplexing for everyone!
+- Channels for all protocols
+- Plug-and-play
+- Ultra-flexible and extensible
 
 
 ## Adapters
@@ -22,9 +23,9 @@ Allow you to easily use different socket types, hassle-free
 
 | **Type** | **Library used** | **Status** |
 |---|---|---|
-| IPC |  | IN-DEV |
-| TCP |  | - |
-| UDP |  | - |
+| IPC |  | STABLE |
+| TCP |  | STABLE |
+| UDP |  | DEV |
 
 
 ## Encoders
@@ -33,8 +34,8 @@ Encode the payloads before emitting.
 
 | **Type** | **Library used** | **Status** |
 |---|---|---|
-| JSON |  | PROD |
-| MSG-PACK | [msgpack-lite](https://github.com/kawanet/msgpack-lite) | PROD |
+| JSON |  | STABLE |
+| MSG-PACK | [msgpack-lite](https://github.com/kawanet/msgpack-lite) | STABLE |
 
 
 ## Middleware
@@ -43,7 +44,7 @@ Perform batch operation of payloads.
 
 | **Type** | **Library used** | **Status** |
 |---|---|---|
-| Bundler |  | IN-DEV |
+| Bundler |  | STABLE |
 
 ---
 
@@ -82,8 +83,28 @@ The framework is flexible enough so that you can load your own custom adapters, 
 
 ## Performance analysis
 
-    // TODO
-    
+### Requests per minute
+
+|  | IPC | TCP | UDP | 
+|---|---|---|---|
+| Raw  | 1332330 |  844750 | - |
+| Kalm | 5558920 | 1102570 | - |
+| **Result** | +417.2% | +30.5% | - |
+
+*Benchmarks based on a single-thread queue test with default settings*
+
+*5 runs average*
+
+### Bytes transfered
+
+|  | IPC | TCP | UDP | 
+|---|---|---|---|
+| Raw  | N/A | 81000 | - |
+| Kalm | N/A | 6759 | - |
+| **Result** | N/A | 11.9x less |  |
+
+*Using wireshark - number of bytes transfered per **1000** requests*
+*I estimate a very decent decrease in overhead bytes on IPC too, haven't found a way to put a number on it, though.
 
 ## Installation
 
@@ -107,3 +128,11 @@ Ex:
 ## Roadmap
 
 [Milestones](https://github.com/fed135/Kalm/milestones)
+
+
+## Contributing
+
+I am looking for contributors to help improve the codebase and create adapters, encoders and middleware.
+Email me for details.
+
+Thank you!
