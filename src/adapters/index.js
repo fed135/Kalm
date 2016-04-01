@@ -46,6 +46,7 @@ function resolve(name) {
  * @param {object} mod The body of the adapter
  */
 function register(name, mod) {
+	debug('log: registering new adapter "' + name + '":');
 	list[name] = mod;
 }
 

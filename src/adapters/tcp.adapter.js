@@ -35,7 +35,6 @@ function listen(server, callback) {
  * @param {function|null} callback The callback method
  */
 function send(socket, payload) {
-	console.log('write');
 	socket.write(payload);
 }
 
