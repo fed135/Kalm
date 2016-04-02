@@ -57,25 +57,15 @@ Simplify and optimize your Socket communications with:
 
 ## Performance analysis
 
-### Requests per minute
+**Requests per minute**
 
-|  | IPC | TCP | UDP | Web Sockets |
-|---|---|---|---|---|
-| Raw  | 1332330 |  844750 | 822690 | - |
-| Kalm | 5558920 | 1102570 | 5219490 | - |
-| **Result** | +417.2% | +30.5% | +634.5% | - |
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/test2.png">
 
 *Benchmarks based on a single-thread queue test with Kalm default bundling settings AND msg-pack enabled*
 
-*5 run average*
+**Bytes transfered**
 
-### Bytes transfered
-
-|  | IPC | TCP | UDP | WebSockets |
-|---|---|---|---|---|
-| Raw  | 81000 | 81000 | 57000 | - |
-| Kalm | 6759 | 6759 | 8601 | - |
-| **Result** | 11.9x less | 11.9x less | 6.6x less | - |
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/test3.png">
 
 *Using wireshark - number of bytes transfered per 1000 requests*
 
@@ -124,9 +114,7 @@ The framework is flexible enough so that you can load your own custom adapters, 
 
 By default, all Kalm logs are absorbed. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
 
-Ex:
-
-    $ DEBUG=kalm
+    export DEBUG=kalm
 
 
 ## Roadmap
@@ -138,5 +126,3 @@ Ex:
 
 I am looking for contributors to help improve the codebase and create adapters, encoders and middleware.
 Email me for details.
-
-Thank you!
