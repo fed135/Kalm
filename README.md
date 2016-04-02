@@ -1,4 +1,6 @@
+[![Kalm](http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo.png)](https://github.com/fed135/Kalm)
 # Kalm
+*The Socket Optimizer*
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
