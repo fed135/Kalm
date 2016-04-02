@@ -1,4 +1,4 @@
-[![Kalm](http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo.png)](https://github.com/fed135/Kalm)
+<img align="left" src="http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo.png">
 # Kalm
 *The Socket Optimizer*
 
@@ -8,6 +8,7 @@
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Current Stage](https://img.shields.io/badge/stage-alpha-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
 
+---
 
 A library to simplify and optimize your Socket communications.
 
