@@ -14,7 +14,9 @@ Simplify and optimize your Socket communications with:
 - Packet bundling and minification
 - Easy-to-use single syntax for all protocols
 - Event channels for all protocols
-- Ultra-flexible and extensible
+- Ultra-flexible and extensible adapters
+
+---
 
 
 ## Installation
