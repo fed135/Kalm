@@ -20,7 +20,7 @@ var defaultPath = '/tmp/app.socket-';
 /**
  * Listens for ipc connections, updates the 'listener' property of the server
  * @method listen
- * @param {Kalm.Server} server The server object
+ * @param {Server} server The server object
  * @param {function} callback The callback for the operation
  */
 function listen(server, callback) {
@@ -38,7 +38,7 @@ function stop(server, callback) {
 }
 
 /**
- * Sends a message with a socket client, then pushes it back to its peer
+ * Sends a message with a socket client
  * @method send
  * @param {Socket} socket The socket to use
  * @param {Buffer} payload The body of the request
@@ -50,7 +50,8 @@ function send(socket, payload) {
 /**
  * Creates a client and adds the data listener(s) to it
  * @method createSocket
- * @param {Kalm.Client} client The client to create the socket for
+ * @param {Client} client The client to create the socket for
+ * @param {Socket} socket Optionnal existing socket object.
  * @returns {Socket} The created ipc socket
  */
 function createSocket(client, socket) {
@@ -65,11 +66,21 @@ function createSocket(client, socket) {
 	return socket;
 };
 
+/**
+ * Attempts to disconnect the socket
+ * @method disconnect
+ * @param {Socket} socket The socket to disconnect
+ */
+function disconnect(socket) {
+	if (socket.disconnect) socket.disconnect();
+}
+
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
 	listen: listen,
 	send: send,
 	createSocket: createSocket,
-	stop: stop
+	stop: stop,
+	disconnect: disconnect
 };

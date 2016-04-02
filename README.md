@@ -25,7 +25,8 @@ Allow you to easily use different socket types, hassle-free
 |---|---|---|
 | IPC |  | STABLE |
 | TCP |  | STABLE |
-| UDP |  | DEV |
+| UDP |  | STABLE |
+| Web Socket | [kalm-websocket](https://github.com/fed135/kalm-websocket) | DEV |
 
 
 ## Encoders
@@ -51,6 +52,11 @@ Perform batch operation of payloads.
 The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq, WebSockets or have yaml encoding.
 
 
+## Installation
+
+    npm install kalm
+
+
 ## Usage
 
     var Kalm = require('Kalm');
@@ -66,7 +72,7 @@ The framework is flexible enough so that you can load your own custom adapters, 
     });
 
     client.send('myEvent', {foo: 'bar'});	// Can send Objects, Strings or Buffers 
-    client.on('someOtherEvent', function() {}); // Can add other handlers dynamically 
+    client.channel('someOtherEvent', function() {}); // Can add other handlers dynamically 
 
     var server = new Kalm.Server({
       port: 6000,
@@ -85,30 +91,25 @@ The framework is flexible enough so that you can load your own custom adapters, 
 
 ### Requests per minute
 
-|  | IPC | TCP | UDP | 
-|---|---|---|---|
-| Raw  | 1332330 |  844750 | - |
-| Kalm | 5558920 | 1102570 | - |
-| **Result** | +417.2% | +30.5% | - |
+|  | IPC | TCP | UDP | Web Sockets |
+|---|---|---|---|---|
+| Raw  | 1332330 |  844750 | 822690 | - |
+| Kalm | 5558920 | 1102570 | 5219490 | - |
+| **Result** | +417.2% | +30.5% | +634.5% | - |
 
-*Benchmarks based on a single-thread queue test with default settings*
+*Benchmarks based on a single-thread queue test with Kalm default bundling settings AND msg-pack enabled*
 
-*5 runs average*
+*5 run average*
 
 ### Bytes transfered
 
-|  | IPC | TCP | UDP | 
+|  | IPC | TCP | UDP | WebSockets |
 |---|---|---|---|
-| Raw  | N/A | 81000 | - |
-| Kalm | N/A | 6759 | - |
-| **Result** | N/A | 11.9x less |  |
+| Raw  | 81000 | 81000 | 57000 | - |
+| Kalm | 6759 | 6759 | 8601 | - |
+| **Result** | 11.9x less | 11.9x less | 6.6x less | - |
 
-*Using wireshark - number of bytes transfered per **1000** requests*
-*I estimate a very decent decrease in overhead bytes on IPC too, haven't found a way to put a number on it, though.
-
-## Installation
-
-    npm install kalm
+*Using wireshark - number of bytes transfered per 1000 requests*
 
 
 ## Run tests

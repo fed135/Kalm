@@ -1,8 +1,10 @@
 // TODO: Cleanup!
 
 var Kalm = require('./kalm.test');
-var Raw = require('./raw.test');
+//var Raw = require('./raw.test');
 //var Raw = require('./raw-ipc.test');
+var Raw = require('./raw-udp.test');
+//var Raw = require('./raw-ws.test');
 
 var settings = require('./settings');
 

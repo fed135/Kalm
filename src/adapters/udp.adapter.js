@@ -1,5 +1,5 @@
 /**
- * InterProcessCall connector methods
+ * UDP connector methods
  * @adapter udp
  * @exports {object}
  */
@@ -10,90 +10,102 @@
 
 var dgram = require('dgram');
 
+/* Helpers -------------------------------------------------------------------*/
+
+function _handleNewSocket(data, origin) {
+	var key = origin.address+':'+origin.port;
+
+	if (!this.__clients) this.__clients = {};
+	if (!(key in this.__clients)) {
+		this.__clients[key] = this._handleRequest(createSocket({
+			options: {
+				hostname: origin.address,
+				port: origin.port
+			}
+		}));
+	}
+
+	this.__clients[key]._handleRequest(data);
+}
+
 /* Methods -------------------------------------------------------------------*/
 
 /**
- * UDP adapter
- * @constructor
- * @param {Kalm} K The Kalm instance
- */
-function UDP(options, handler) {
-	this.options = options;
-	this.handler = handler;
-	this.server = null;
-}
-
-/**
- * Listens for udp connections on the selected port.
+ * Listens for udp connections, updates the 'listener' property of the server
  * @method listen
- * @memberof UDP
- * @param {object} options The config object for that adapter
- * @param {function} handler The central handling method for requests
+ * @param {Server} server The server object
  * @param {function} callback The success callback for the operation
  */
-UDP.prototype.listen = function(callback) {
-	var _self = this;
-	this.server = dgram.createSocket('udp4');
-	this.server.on('message', this.handler);
-	this.server.bind(this.options.port, '127.0.0.1');
-	if (callback) callback();
+function listen(server, callback) {
+	server.listener = dgram.createSocket('udp4');
+	server.listener.on('message', _handleNewSocket.bind(server));
+	server.listener.bind(server.options.port, '127.0.0.1');
+	
+	process.nextTick(callback);
 };
 
 /**
- * Sends a message with a socket client, then pushes it back to its peer
+ * Sends a message with a socket client
  * @method send
- * @memberof UDP
- * @param {Service} peer The peer to send to
- * @param {Buffer} options The details of the request
  * @param {Socket} socket The socket to use
- * @param {function|null} callback The callback method
+ * @param {Buffer} payload The body of the request
  */
-UDP.prototype.send = function(payload, socket, callback) {
-	socket.client.send(
+function send(socket, payload) {
+	console.log('send');
+	socket.send(
 		payload, 
 		0, 
 		payload.length, 
-		this.peer.options.port, 
-		this.peer.options.hostname, 
-		callback || function() {}
+		socket.__port, 
+		socket.__hostname
 	);
 };
 
 /**
- * Creates a client and adds the listeners to it
- * @method createClient
- * @memberof UDP
- * @param {object} options The config object for that adapter
- * @param {Service} peer The peer to create the socket for
- * @returns {dgram.Socket} The created udp client
+ * Stops the server.
+ * @method stop
+ * @param {Server} server The server object
+ * @param {function} callback The success callback for the operation
  */
-UDP.prototype.createClient = function(peer, handler) {
+function stop(server, callback) {
+	if (server.listener && server.listener.close) {
+		server.listener.close(callback);
+	}
+	else callback();
+}
+
+/**
+ * Creates a client
+ * @method createSocket
+ * @param {Client} client The client to create the socket for
+ * @param {Socket} soc Optionnal existing socket object. - Not used for UPC
+ * @returns {Socket} The created tcp client
+ */
+function createSocket(client, soc) {
+	if (soc) return soc;
+
 	var socket = dgram.createSocket('udp4');
+	socket.__port = client.options.port;
+	socket.__hostname = client.options.hostname;
 
 	return socket;
 };
 
 /**
- * Calls the disconnect method on a socket
- * @method removeClient
- * @memberof UDP
+ * Attempts to disconnect the socket
+ * @method disconnect
  * @param {Socket} socket The socket to disconnect
  */
-UDP.prototype.removeClient = function() {
-	this.client.disconnect();
-};
-
-/**
- * Stops listening for udp connections and closes the server
- * @method stop
- * @memberof UDP
- * @param {function|null} callback The callback method
- */ 
-UDP.prototype.stop = function(callback) {
-	if (this.server) this.server.close(callback);
-	else callback();
-};
+function disconnect(socket) {
+	// Nothing to do
+}
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = UDP;
+module.exports = {
+	listen: listen,
+	send: send,
+	createSocket: createSocket,
+	stop: stop,
+	disconnect: disconnect
+};

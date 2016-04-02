@@ -1,5 +1,5 @@
 /**
- * InterProcessCall connector methods
+ * TCP connector methods
  * @adapter tcp
  * @exports {object}
  */
@@ -13,9 +13,9 @@ var net = require('net');
 /* Methods -------------------------------------------------------------------*/
 
 /**
- * Listens for tcp connections on the selected port.
+ * Listens for tcp connections, updates the 'listener' property of the server
  * @method listen
- * @memberof TCP
+ * @param {Server} server The server object
  * @param {function} callback The success callback for the operation
  */
 function listen(server, callback) {
@@ -29,15 +29,19 @@ function listen(server, callback) {
 /**
  * Sends a message with a socket client
  * @method send
- * @memberof TCP
- * @param {Buffer} payload The body of the request
  * @param {Socket} socket The socket to use
- * @param {function|null} callback The callback method
+ * @param {Buffer} payload The body of the request
  */
 function send(socket, payload) {
 	socket.write(payload);
 }
 
+/**
+ * Stops the server.
+ * @method stop
+ * @param {Server} server The server object
+ * @param {function} callback The success callback for the operation
+ */
 function stop(server, callback) {
 	server.listener.close(callback || function() {});
 }
@@ -45,8 +49,8 @@ function stop(server, callback) {
 /**
  * Creates a client
  * @method createSocket
- * @memberof TCP
  * @param {Client} client The client to create the socket for
+ * @param {Socket} socket Optionnal existing socket object.
  * @returns {Socket} The created tcp client
  */
 function createSocket(client, socket) {
@@ -61,11 +65,21 @@ function createSocket(client, socket) {
 	return socket;
 }
 
+/**
+ * Attempts to disconnect the socket
+ * @method disconnect
+ * @param {Socket} socket The socket to disconnect
+ */
+function disconnect(socket) {
+	if (socket.disconnect) socket.disconnect();
+}
+
 /* Exports -------------------------------------------------------------------*/
 
 module.exports = {
 	listen: listen,
 	send: send,
 	createSocket: createSocket,
-	stop: stop
+	stop: stop,
+	disconnect: disconnect
 };
