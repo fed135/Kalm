@@ -17,41 +17,6 @@ A library to simplify and optimize your Socket communications.
 - Ultra-flexible and extensible
 
 
-## Adapters
-
-Allow you to easily use different socket types, hassle-free
-
-| **Type** | **Library used** | **Status** |
-|---|---|---|
-| IPC |  | STABLE |
-| TCP |  | STABLE |
-| UDP |  | STABLE |
-| Web Socket | [kalm-websocket](https://github.com/fed135/kalm-websocket) | DEV |
-
-
-## Encoders
-
-Encode the payloads before emitting.
-
-| **Type** | **Library used** | **Status** |
-|---|---|---|
-| JSON |  | STABLE |
-| MSG-PACK | [msgpack-lite](https://github.com/kawanet/msgpack-lite) | STABLE |
-
-
-## Middleware
-
-Perform batch operation of payloads.
-
-| **Type** | **Library used** | **Status** |
-|---|---|---|
-| Bundler |  | STABLE |
-
----
-
-The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq, WebSockets or have yaml encoding.
-
-
 ## Installation
 
     npm install kalm
@@ -110,6 +75,41 @@ The framework is flexible enough so that you can load your own custom adapters, 
 | **Result** | 11.9x less | 11.9x less | 6.6x less | - |
 
 *Using wireshark - number of bytes transfered per 1000 requests*
+
+
+## Adapters
+
+Allow you to easily use different socket types, hassle-free
+
+| **Type** | **Library used** | **Status** |
+|---|---|---|
+| IPC |  | STABLE |
+| TCP |  | STABLE |
+| UDP |  | STABLE |
+| [kalm-websocket](https://github.com/fed135/kalm-websocket) | [socket.io](http://socket.io/) | DEV |
+
+
+## Encoders
+
+Encode the payloads before emitting.
+
+| **Type** | **Library used** | **Status** |
+|---|---|---|
+| JSON |  | STABLE |
+| MSG-PACK | [msgpack-lite](https://github.com/kawanet/msgpack-lite) | STABLE |
+
+
+## Middleware
+
+Perform batch operation of payloads.
+
+| **Type** | **Library used** | **Status** |
+|---|---|---|
+| Bundler |  | STABLE |
+
+---
+
+The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq, WebSockets or have yaml encoding.
 
 
 ## Run tests
