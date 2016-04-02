@@ -104,7 +104,7 @@ The framework is flexible enough so that you can load your own custom adapters, 
 ### Bytes transfered
 
 |  | IPC | TCP | UDP | WebSockets |
-|---|---|---|---|
+|---|---|---|---|---|
 | Raw  | 81000 | 81000 | 57000 | - |
 | Kalm | 6759 | 6759 | 8601 | - |
 | **Result** | 11.9x less | 11.9x less | 6.6x less | - |
