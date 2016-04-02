@@ -4,19 +4,16 @@
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
-[![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Current Stage](https://img.shields.io/badge/stage-alpha-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
 
 ---
 
-A library to simplify and optimize your Socket communications.
+Simplify and optimize your Socket communications with:
 
-- Packet bundling
-- Packet minification
+- Packet bundling and minification
 - Easy-to-use single syntax for all protocols
-- Channels for all protocols
-- Plug-and-play
+- Event channels for all protocols
 - Ultra-flexible and extensible
 
 
@@ -27,6 +24,7 @@ A library to simplify and optimize your Socket communications.
 
 ## Usage
 
+```node
     var Kalm = require('Kalm');
 
     var client = new Kalm.Client({
@@ -53,7 +51,7 @@ A library to simplify and optimize your Socket communications.
 
     server.on('connection', function(client) {} // Handler, where client is an instance of Kalm.Client
     server.broadcast('someOtherEvent', 'hello!');
-
+```
 
 ## Performance analysis
 
