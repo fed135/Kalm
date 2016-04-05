@@ -4,9 +4,9 @@ var list = {
 	bundler: bundler
 };
 
-function process(client, channel, payload) {
+function process(client, emit, channel, payload) {
 	for (var t in client.options.transform) {
-		if (t in list) list[t].process(client, channel, payload);
+		if (t in list) list[t].process(client, emit, channel, payload);
 	}
 }
 

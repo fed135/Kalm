@@ -43,6 +43,9 @@ function send(socket, payload) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
+	server.connections.forEach(function _killConnection(e) {
+		e.socket.destroy();
+	});
 	server.listener.close(callback || function() {});
 }
 

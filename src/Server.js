@@ -54,7 +54,9 @@ Server.prototype.listen = function(callback) {
 	if (adapter) {
 		debug('log: listening ' + this.options.adapter + '://0.0.0.0:' + this.options.port);
 		adapter.listen(this, function _handleLift() {
-			_self.emit('ready');
+			process.nextTick(function _deferredLift() {
+				_self.emit('ready');
+			});
 		});
 	}
 	else {
@@ -99,9 +101,11 @@ Server.prototype.broadcast = function(channel, payload) {
  * @param {function} callback The callback method for the operation
  */
 Server.prototype.stop = function(callback) {
-	this.connections.length = 0;
 	if (this.listener) {
 		adapters.resolve(this.options.adapter).stop(this, callback);
+	}
+	else {
+		callback();
 	}
 };
 

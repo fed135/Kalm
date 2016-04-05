@@ -126,7 +126,7 @@ Client.prototype.send = function(channel, payload) {
 	if (!this.packets[channel]) this.packets[channel] = [];
 	this.packets[channel].push(payload);
 	// Go through middlewares
-	middleware.process(this, channel, payload);
+	middleware.process(this, this._emit.bind(this), channel, payload);
 
 	return this;
 };

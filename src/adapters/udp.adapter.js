@@ -41,7 +41,7 @@ function listen(server, callback) {
 	server.listener.on('message', _handleNewSocket.bind(server));
 	server.listener.bind(server.options.port, '127.0.0.1');
 	
-	process.nextTick(callback);
+	callback();
 };
 
 /**

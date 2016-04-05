@@ -26,33 +26,49 @@ Simplify and optimize your Socket communications with:
 
 ## Usage
 
+**Server**
+
 ```node
     var Kalm = require('Kalm');
 
-    var client = new Kalm.Client({
-      hostname: '0.0.0.0', // Some ip
-      port: 3000, // Some port
-      adapter: 'tcp',
-      encoder: 'msg-pack',
-      channels: {
-        'myEvent': function(data) {} // Handler
-      }
-    });
-
-    client.send('myEvent', {foo: 'bar'});	// Can send Objects, Strings or Buffers 
-    client.channel('someOtherEvent', function() {}); // Can add other handlers dynamically 
-
+    // Create a server, a listener for incomming connections
     var server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
-      encoder: 'json',
+      encoder: 'msg-pack',
       channels: {
-        'myEvent': function(data) {} // Handler - new connections will register to these events
+        messageEvent: function(data) {               // Handler - new connections will register to these events
+          console.log('User sent message ' + data.body);
+        }
       }
     });
 
-    server.on('connection', function(client) {} // Handler, where client is an instance of Kalm.Client
-    server.broadcast('someOtherEvent', 'hello!');
+    // When a connection is received, send a message to all connected users
+    server.on('connection', function(client) {    // Handler, where client is an instance of Kalm.Client
+      server.broadcast('userEvent', 'A new user has connected');  
+    });
+    
+```
+
+**Client**
+
+```node
+    // Create a connection to the server
+    var client = new Kalm.Client({
+      hostname: '0.0.0.0', // Server's IP
+      port: 6000, // Server's port
+      adapter: 'udp', // Server's adapter
+      encoder: 'msg-pack', // Server's encoder
+      channels: {
+        'userEvent': function(data) {
+          console.log('Server: ' + data);
+        }
+      }
+    });
+
+    client.send('messageEvent', {body: 'This is an object!'});	// Can send Objects, Strings or Buffers 
+    client.channel('someOtherEvent', function() {}); // Can add other handlers dynamically 
+
 ```
 
 ## Performance analysis
@@ -67,42 +83,44 @@ Simplify and optimize your Socket communications with:
 
 <img src="http://i231.photobucket.com/albums/ee109/FeD135/test3.png">
 
-*Using wireshark - number of bytes transfered per 1000 requests*
+*Number of bytes transfered per 1000 requests*
 
 
 ## Adapters
 
 Allow you to easily use different socket types, hassle-free
 
-| **Type** | **Library used** | **Status** |
-|---|---|---|
-| IPC |  | STABLE |
-| TCP |  | STABLE |
-| UDP |  | STABLE |
-| [kalm-websocket](https://github.com/fed135/kalm-websocket) | [socket.io](http://socket.io/) | DEV |
+- ipc (bundled)
+- tcp (bundled)
+- udp (bundled)
+- [kalm-websocket](https://github.com/fed135/kalm-websocket)
 
 
 ## Encoders
 
-Encode the payloads before emitting.
+Encodes/Decodes the payloads
 
-| **Type** | **Library used** | **Status** |
-|---|---|---|
-| JSON |  | STABLE |
-| MSG-PACK | [msgpack-lite](https://github.com/kawanet/msgpack-lite) | STABLE |
+- json (bundled)
+- msg-pack (bundled)
 
 
-## Middleware
-
-Perform batch operation of payloads.
-
-| **Type** | **Library used** | **Status** |
-|---|---|---|
-| Bundler |  | STABLE |
-
----
+## Loading custom adapters
 
 The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq, WebSockets or have yaml encoding.
+
+```node
+    // Custom adapter loading example
+    var Kalm = require('Kalm');
+    var MyCustomAdapter = require('my-custom-adapter');
+
+    Kalm.adapters.register('my-custom-adapter', MyCustomAdapter);
+
+    var server = new Kalm.Server({
+      port: 3000,
+      adapter: 'my-custom-adapter',
+      encoder: 'msg-pack'
+    });
+```
 
 
 ## Run tests
@@ -112,7 +130,7 @@ The framework is flexible enough so that you can load your own custom adapters, 
 
 ## Debugging
 
-By default, all Kalm logs are absorbed. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
+By default, all Kalm logs are hidden. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
 
     export DEBUG=kalm
 

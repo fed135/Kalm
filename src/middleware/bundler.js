@@ -1,5 +1,5 @@
-function process(client, channel, payload) {
-	var options = client.options.transform.bundler;
+function process(client, emit, channel, payload) {
+	var options = client.options.transform.bundler || {};
 
 	if (!client.__bundler) {
 		client.__bundler = {
@@ -7,19 +7,20 @@ function process(client, channel, payload) {
 		};
 	}
 
-	if (client.packets[channel].length > options.maxPackets) {
+	if (client.packets[channel].length > options.maxPackets || 0) {
 		if (client.__bundler.timers[channel]) {
 			clearTimeout(client.__bundler.timers[channel]);
 		}
-		client._emit.call(client, channel);
+		emit(channel);
+		return;
 	}
 
 	if (!client.__bundler.timers[channel]) {
 		client.__bundler.timers[channel] = setTimeout(
 			function _emitBundle() {
-				client._emit.call(client, channel);
+				emit(channel);
 			}, 
-			options.delay
+			options.delay || 1000/60
 		);
 	}
 }

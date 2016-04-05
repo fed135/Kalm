@@ -13,7 +13,7 @@ var fs = require('fs');
 
 /* Local variables -----------------------------------------------------------*/
 
-var defaultPath = '/tmp/app.socket-';
+var _path = '/tmp/app.socket-';
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -24,16 +24,25 @@ var defaultPath = '/tmp/app.socket-';
  * @param {function} callback The callback for the operation
  */
 function listen(server, callback) {
-	fs.unlink(defaultPath + server.options.port, function _bindSocket() {
+	fs.unlink(_path + server.options.port, function _bindSocket() {
 		server.listener = net.createServer(server._handleRequest.bind(server));
-		server.listener.listen(defaultPath + server.options.port, callback);
+		server.listener.listen(_path + server.options.port, callback);
 		server.listener.on('error', function _handleServerError(err) {
 			server.emit('error', err);
 		});
 	});
 };
 
+/**
+ * Stops the server.
+ * @method stop
+ * @param {Server} server The server object
+ * @param {function} callback The success callback for the operation
+ */
 function stop(server, callback) {
+	server.connections.forEach(function _killConnection(e) {
+		e.socket.destroy();
+	});
 	server.listener.close(callback || function() {});
 }
 
@@ -56,7 +65,7 @@ function send(socket, payload) {
  */
 function createSocket(client, socket) {
 	if (!socket) {
-		socket = net.connect(defaultPath + client.options.port);
+		socket = net.connect(_path + client.options.port);
 	}
 	socket.on('data', client._handleRequest.bind(client));
 	socket.on('error', function _handleSocketError(err) {
