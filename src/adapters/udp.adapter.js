@@ -51,7 +51,6 @@ function listen(server, callback) {
  * @param {Buffer} payload The body of the request
  */
 function send(socket, payload) {
-	console.log('send');
 	socket.send(
 		payload, 
 		0, 

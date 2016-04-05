@@ -32,7 +32,7 @@ function Server(options) {
 	this.options = {
 		adapter: options.adapter || 'ipc',
 		encoder: options.encoder || 'json',
-		port: options.port || 80
+		port: options.port || 3000
 	};
 
 	this.connections = [];

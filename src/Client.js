@@ -41,7 +41,7 @@ function Client(socket, options) {
 	this.options = {
 		// Basic info
 		hostname: options.hostname || '0.0.0.0',
-		port: options.port || 80,
+		port: options.port || 3000,
 		// Adapter
 		adapter: options.adapter || 'ipc',
 		// Encoding
