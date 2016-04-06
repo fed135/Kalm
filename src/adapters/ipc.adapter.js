@@ -43,6 +43,7 @@ function stop(server, callback) {
 	server.connections.forEach(function _killConnection(e) {
 		e.socket.destroy();
 	});
+	server.connections.length = 0;
 	server.listener.close(callback || function() {});
 }
 
