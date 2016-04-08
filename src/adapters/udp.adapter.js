@@ -12,6 +12,9 @@ var dgram = require('dgram');
 
 /* Helpers -------------------------------------------------------------------*/
 
+/**
+ * Creates a socket + Client on UDP data
+ */ 
 function _handleNewSocket(data, origin) {
 	var key = origin.address+':'+origin.port;
 
@@ -67,6 +70,7 @@ function send(socket, payload) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
+	server.connections.length = 0;
 	if (server.listener && server.listener.close) {
 		server.listener.close(callback);
 	}

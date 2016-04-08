@@ -1,4 +1,22 @@
-function process(client, emit, channel, payload) {
+/**
+ * Packet bundler
+ * @middleware bundler
+ * @exports {object}
+ */
+
+'use strict';
+
+/* Methods -------------------------------------------------------------------*/
+
+/**
+ * Processes a new packet marked for sending
+ * Bundling is performed over channels separatly
+ * @method process
+ * @param {Client} client The Kalm Client affected
+ * @param {function} emit The method to call to emit a channel's stack
+ * @param {string} channel The target channel
+ */
+function process(client, emit, channel) {
 	var options = client.options.transform.bundler || {};
 
 	if (!client.__bundler) {
@@ -7,7 +25,7 @@ function process(client, emit, channel, payload) {
 		};
 	}
 
-	if (client.packets[channel].length > options.maxPackets || 0) {
+	if (client.packets[channel].length > options.maxPackets || 512) {
 		if (client.__bundler.timers[channel]) {
 			clearTimeout(client.__bundler.timers[channel]);
 		}
@@ -20,18 +38,12 @@ function process(client, emit, channel, payload) {
 			function _emitBundle() {
 				emit(channel);
 			}, 
-			options.delay || 1000/60
+			options.delay || 16		// 60 FPS
 		);
 	}
 }
-	// Bundling logic
-	// -----------------------------
-	// Add new calls to the bundle stack
-	// If stack length exceeds limit OR
-	// If time since last chunk sent is greater than the delay -
-	// AND there is an item in the stack
-	// Send.
-	// If an item is added and delay timer is not started, start it. 
+
+/* Exports -------------------------------------------------------------------*/
 
 module.exports = {
 	process: process

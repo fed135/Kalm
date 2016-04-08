@@ -29,7 +29,6 @@ Client.UID = 0;
  */
 function Client(socket, options) {
 	EventEmitter.call(this);
-	
 	this.uid = Client.UID++;
 
 	if (options === undefined) {
@@ -106,6 +105,7 @@ Client.prototype.channel = function(name, handler) {
  */
 Client.prototype.use = function(socket) {
 	if (this.socket) {
+		debug('log: disconnecting current socket');
 		adapters.resolve(this.options.adapter).disconnect(this.socket);
 	}
 

@@ -101,6 +101,7 @@ Server.prototype.broadcast = function(channel, payload) {
  * @param {function} callback The callback method for the operation
  */
 Server.prototype.stop = function(callback) {
+	debug('warn: stopping server');
 	if (this.listener) {
 		adapters.resolve(this.options.adapter).stop(this, callback);
 	}
