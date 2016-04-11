@@ -12,6 +12,7 @@ var Server = require('./Server');
 var adapters = require('./adapters');
 var encoders = require('./encoders');
 var middleware = require('./middleware');
+var defaults = require('./defaults');
 
 /* Exports -------------------------------------------------------------------*/
 
@@ -20,5 +21,6 @@ module.exports = {
 	Server: Server,
 	adapters: adapters,
 	encoders: encoders,
-	middleware: middleware
+	middleware: middleware,
+	defaults: defaults
 };

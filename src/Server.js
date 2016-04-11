@@ -13,6 +13,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var debug = require('debug')('kalm');
 
+var defaults = require('./defaults');
 var Client = require('./Client');
 var adapters = require('./adapters');
 var encoders = require('./encoders');
@@ -30,9 +31,9 @@ function Server(options) {
 	options = options || {};
 
 	this.options = {
-		adapter: options.adapter || 'ipc',
-		encoder: options.encoder || 'json',
-		port: options.port || 3000
+		adapter: options.adapter || defaults.adapter,
+		encoder: options.encoder || defaults.encoder,
+		port: options.port || defaults.port
 	};
 
 	this.connections = [];

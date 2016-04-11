@@ -20,18 +20,23 @@ var handbreak = true;
 
 /* Methods -------------------------------------------------------------------*/
 
+function _absorb(err) {
+	console.log(err);
+	return;
+}
+
 function setup(resolve) {
 	server = dgram.createSocket('udp4');
 	server.on('message', function() {
 		count++;
 	});
 	handbreak = false;
+	server.on('error', _absorb);
 	server.bind(settings.port, '0.0.0.0');
 	resolve();
 }
 
 function teardown(resolve) {
-	handbreak = true;
 	server.close(function() {
 		server = null;
 		client = null;
@@ -39,10 +44,16 @@ function teardown(resolve) {
 	});
 }
 
+function stop(resolve) {
+	handbreak = true;
+	setTimeout(resolve, 0);
+}
+
 function step(resolve) {
 	if (handbreak) return;
 	if (!client) {
 		client = dgram.createSocket('udp4');
+		client.on('error', _absorb);
 	}
 
 	var payload = new Buffer(JSON.stringify(settings.testPayload));
@@ -62,5 +73,6 @@ function step(resolve) {
 module.exports = {
 	setup: setup,
 	teardown: teardown,
-	step: step
+	step: step,
+	stop: stop
 };

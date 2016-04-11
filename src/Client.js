@@ -13,6 +13,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var debug = require('debug')('kalm');
 
+var defaults = require('./defaults');
 var adapters = require('./adapters');
 var encoders = require('./encoders');
 var middleware = require('./middleware');
@@ -39,19 +40,14 @@ function Client(socket, options) {
 
 	this.options = {
 		// Basic info
-		hostname: options.hostname || '0.0.0.0',
-		port: options.port || 3000,
+		hostname: options.hostname || defaults.hostname,
+		port: options.port || defaults.port,
 		// Adapter
-		adapter: options.adapter || 'ipc',
+		adapter: options.adapter || defaults.adapter,
 		// Encoding
-		encoder: options.encoder || 'json',
+		encoder: options.encoder || defaults.encoder,
 		// Transformations (middleware)
-		transform: options.transform || {
-			bundler: {
-				maxPackets: 512,
-				delay: 16
-			}
-		}
+		transform: options.transform || defaults.transform
 	};
 
 	// List of channels 
@@ -123,7 +119,7 @@ Client.prototype.use = function(socket) {
  */
 Client.prototype.send = function(channel, payload) {
 	channel = channel || '/';
-	if (!this.packets[channel]) this.packets[channel] = [];
+	if (!this.packets.hasOwnProperty(channel)) this.packets[channel] = [];
 	this.packets[channel].push(payload);
 	// Go through middlewares
 	middleware.process(this, this._emit.bind(this), channel, payload);
@@ -170,11 +166,16 @@ Client.prototype._emit = function(channel) {
  */
 Client.prototype._handleRequest = function(evt) {
 	var raw = encoders.resolve(this.options.encoder).decode(evt);
+
 	if (raw.c[0] !== '/') raw.c = '/' + raw.c;
+
+	var i = 0;
+	var c = 0;
+	var _listeners = this.channels[raw.c].length;
 
 	if (raw.c in this.channels) {
 		for (var i = 0; i<raw.d.length; i++) {
-			for (var c = 0; c<this.channels[raw.c].length; c++) {
+			for (var c = 0; c<_listeners; c++) {
 				this.channels[raw.c][c](raw.d[i]);
 			}
 		}

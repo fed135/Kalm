@@ -42,6 +42,9 @@ function _handleNewSocket(data, origin) {
 function listen(server, callback) {
 	server.listener = dgram.createSocket('udp4');
 	server.listener.on('message', _handleNewSocket.bind(server));
+	server.listener.on('error', function _handleServerError(err) {
+		server.emit('error', err);
+	});
 	server.listener.bind(server.options.port, '127.0.0.1');
 	
 	callback();
@@ -90,6 +93,9 @@ function createSocket(client, soc) {
 	var socket = dgram.createSocket('udp4');
 	socket.__port = client.options.port;
 	socket.__hostname = client.options.hostname;
+	socket.on('error', function _handleSocketError(err) {
+		client.emit('error', err);
+	});
 
 	return socket;
 };

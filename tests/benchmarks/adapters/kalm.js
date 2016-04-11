@@ -35,12 +35,16 @@ function setup(resolve) {
 }
 
 function teardown(resolve) {
-	handbreak = true;
 	if (server) server.stop(function() {
 		server = null;
 		client = null;
 		resolve(count);
 	});
+}
+
+function stop(resolve) {
+	handbreak = true;
+	setTimeout(resolve, 0);
 }
 
 function step(resolve) {
@@ -69,5 +73,6 @@ function step(resolve) {
 module.exports = {
 	setup: setup,
 	teardown: teardown,
-	step: step
+	step: step,
+	stop: stop
 };

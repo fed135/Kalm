@@ -33,8 +33,10 @@ var results = {};
 function _measure(adapter, resolve) {
 	_curr = 0;
 	adapter.setup(function _setupHandler() {
-		setTimeout(function _finish() {
-			adapter.teardown(resolve);
+		setTimeout(function _stopAdapter() {
+			adapter.stop(function _finish() {
+				adapter.teardown(resolve);
+			});
 		}, settings.testDuration);
 
 		function _repeat() {
@@ -69,6 +71,9 @@ function _postResults() {
 /* Init ----------------------------------------------------------------------*/
 
 
+// Roll port number
+settings.port = 3000 + Math.round(Math.random()*1000);
+
 var adpts = Object.keys(Suite).map(function(k) {
 	return {
 		adapter: k,
@@ -80,12 +85,12 @@ var adpts = Object.keys(Suite).map(function(k) {
 
 adpts.forEach(function(i) {
 	tests.push(function(resolve) {
-		//console.log('Configuring ' + i.adapter);
+		console.log('Configuring ' + i.adapter);
 		_updateSettings(i.settings, resolve);
 	});
 
 	tests.push(function(resolve) {
-		//console.log('Measuring raw ' + i.adapter);
+		console.log('Measuring raw ' + i.adapter);
 		_measure(i.raw, function(total) {
 			results['raw_' + i.adapter] = total;
 			resolve();
@@ -93,7 +98,7 @@ adpts.forEach(function(i) {
 	});
 
 	tests.push(function(resolve) {
-		//console.log('Measuring Kalm ' + i.adapter);
+		console.log('Measuring Kalm ' + i.adapter);
 		_measure(i.kalm, function(total) {
 			results['kalm_' + i.adapter] = total;
 			resolve();

@@ -150,40 +150,40 @@ describe('Middleware', function() {
 
 describe('Smoke test', function() {
 	it('run ipc + json', function(done) {
-		var server = new Kalm.Server();
+		var server = new Kalm.Server({adapter:'ipc', encoder:'json'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client();
+			var client = new Kalm.Client({adapter:'ipc', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
 	it('run ipc + msg-pack', function(done) {
-		var server = new Kalm.Server({encoder: 'msg-pack'});
+		var server = new Kalm.Server({adapter:'ipc', encoder: 'msg-pack'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({encoder: 'msg-pack'});
+			var client = new Kalm.Client({adapter:'ipc', encoder: 'msg-pack'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
 	it('run tcp + json', function(done) {
-		var server = new Kalm.Server({adapter:'tcp'});
+		var server = new Kalm.Server({adapter:'tcp', encoder:'json'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({adapter:'tcp'});
+			var client = new Kalm.Client({adapter:'tcp', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
@@ -202,14 +202,14 @@ describe('Smoke test', function() {
 	});
 
 	it('run udp + json', function(done) {
-		var server = new Kalm.Server({adapter:'udp'});
+		var server = new Kalm.Server({adapter:'udp', encoder:'json'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({adapter:'udp'});
+			var client = new Kalm.Client({adapter:'udp', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
