@@ -75,6 +75,10 @@ Server.prototype.listen = function(callback) {
 Server.prototype.channel = function(name, handler) {
 	this.channels[name] = handler;
 
+	for (var i = this.connections.length - 1; i >= 0; i--) {
+		this.connections[i].channel(name, handler);
+	}
+
 	return this;
 };
 
