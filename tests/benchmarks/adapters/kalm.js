@@ -54,11 +54,9 @@ function step(resolve) {
 			port: settings.port, 
 			adapter: settings.adapter, 
 			encoder: settings.encoder,
-			transform: {
-				bundler: {
-					maxPackets: settings.bundlerMaxPackets,
-					delay: settings.bundlerDelay
-				}
+			bundler: {
+				maxPackets: settings.bundlerMaxPackets,
+				delay: settings.bundlerDelay
 			},
 			hostname: '0.0.0.0'
 		});

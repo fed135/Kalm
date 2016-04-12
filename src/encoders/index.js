@@ -28,7 +28,7 @@ var list = {
  * @returns {object|undefined} The encoder
  */
 function resolve(name) {
-	if (list[name]) {
+	if (list.hasOwnProperty(name)) {
 		return list[name];
 	}
 	else {

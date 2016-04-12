@@ -16,7 +16,12 @@ var debug = require('debug')('kalm');
 var defaults = require('./defaults');
 var adapters = require('./adapters');
 var encoders = require('./encoders');
-var middleware = require('./middleware');
+
+var Channel = require('./Channel');
+
+/* Local variables -----------------------------------------------------------*/
+
+var _channelBase = '/';
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -47,11 +52,12 @@ function Client(socket, options) {
 		// Encoding
 		encoder: options.encoder || defaults.encoder,
 		// Transformations (middleware)
-		transform: options.transform || defaults.transform
+		bundler: options.bundler || defaults.bundler
 	};
 
 	// List of channels 
 	this.channels = {};
+
 	// Populate channels
 	if (options.channels) {
 		for (var c in options.channels) {
@@ -61,9 +67,6 @@ function Client(socket, options) {
 
 	// Socket object
 	this.use(socket);
-
-	// Data packets - transient state - by channel
-	this.packets = {};
 }
 
 /**
@@ -75,20 +78,25 @@ function Client(socket, options) {
  * @returns {Client} The client, for chaining
  */
 Client.prototype.channel = function(name, handler) {
-	name = name || '/';
+	name = name || _channelBase;
 
-	if (name[0] !== '/') name = '/' + name;
-
-	if (!(name in this.channels)) {
+	if (!this.channels.hasOwnProperty(name)) {
 		debug(
 			'log: new channel ' + 
 			this.options.adapter + '://' + this.options.hostname + ':' + 
-			this.options.port + name
+			this.options.port + '/' + name
 		);
-		this.channels[name] = [];
+		this.channels[name] = new Channel(
+			name, 
+			this.options.bundler, 
+			this._emit.bind(this)
+		);
 	}
 
-	this.channels[name].push(handler);
+	if (handler) {
+		this.channels[name].addHandler(handler);
+	}
+
 	return this;
 };
 
@@ -113,17 +121,15 @@ Client.prototype.use = function(socket) {
  * Queues a packet for transfer on the given channel
  * @method send
  * @memberof Client
- * @param {string} channel The channel to send to data through
+ * @param {string} name The channel to send to data through
  * @param {string|object} payload The payload to send 
  * @returns {Client} The client, for chaining
  */
-Client.prototype.send = function(channel, payload) {
-	channel = channel || '/';
-	if (!this.packets.hasOwnProperty(channel)) this.packets[channel] = [];
-	this.packets[channel].push(payload);
-	// Go through middlewares
-	middleware.process(this, this._emit.bind(this), channel, payload);
-
+Client.prototype.send = function(name, payload) {
+	if (!this.channels.hasOwnProperty(name)) {
+		this.channel(name);
+	}
+	this.channels[name].send(payload);
 	return this;
 };
 
@@ -146,15 +152,14 @@ Client.prototype._createSocket = function(socket) {
  * @memberof Client
  * @param {string} channel The channel targeted for transfer
  */
-Client.prototype._emit = function(channel) {
+Client.prototype._emit = function(channel, packets) {
 	adapters.resolve(this.options.adapter).send(
 		this.socket, 
 		encoders.resolve(this.options.encoder).encode({
 			c: channel,
-			d: this.packets[channel]
+			d: packets
 		})
 	);
-	this.packets[channel].length = 0;
 }
 
 /**
@@ -167,17 +172,9 @@ Client.prototype._emit = function(channel) {
 Client.prototype._handleRequest = function(evt) {
 	var raw = encoders.resolve(this.options.encoder).decode(evt);
 
-	if (raw.c[0] !== '/') raw.c = '/' + raw.c;
-
-	var i = 0;
-	var c = 0;
-	var _listeners = this.channels[raw.c].length;
-
-	if (raw.c in this.channels) {
-		for (var i = 0; i<raw.d.length; i++) {
-			for (var c = 0; c<_listeners; c++) {
-				this.channels[raw.c][c](raw.d[i]);
-			}
+	if (raw && raw.c) {
+		if (this.channels.hasOwnProperty(raw.c)) {
+			this.channels[raw.c].handleData(raw.d);
 		}
 	}
 };

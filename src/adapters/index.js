@@ -30,7 +30,7 @@ var list = {
  * @returns {object|undefined} The adapter
  */
 function resolve(name) {
-	if (list[name]) {
+	if (list.hasOwnProperty(name)) {
 		return list[name];
 	}
 	else {

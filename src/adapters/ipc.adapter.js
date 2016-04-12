@@ -11,6 +11,8 @@
 var net = require('net');
 var fs = require('fs');
 
+var debug = require('debug')('kalm');
+
 /* Local variables -----------------------------------------------------------*/
 
 var _path = '/tmp/app.socket-';
@@ -28,6 +30,7 @@ function listen(server, callback) {
 		server.listener = net.createServer(server._handleRequest.bind(server));
 		server.listener.listen(_path + server.options.port, callback);
 		server.listener.on('error', function _handleServerError(err) {
+			debug('error: ' + err);
 			server.emit('error', err);
 		});
 	});
@@ -43,8 +46,11 @@ function stop(server, callback) {
 	server.connections.forEach(function _killConnection(e) {
 		e.socket.destroy();
 	});
-	server.connections.length = 0;
-	server.listener.close(callback || function() {});
+	
+	process.nextTick(function() {
+		server.connections.length = 0;
+		server.listener.close(callback || function() {});
+	});
 }
 
 /**
@@ -54,7 +60,7 @@ function stop(server, callback) {
  * @param {Buffer} payload The body of the request
  */
 function send(socket, payload) {
-	socket.write(payload);
+	if (socket) socket.write(payload);
 };
 
 /**
@@ -70,7 +76,13 @@ function createSocket(client, socket) {
 	}
 	socket.on('data', client._handleRequest.bind(client));
 	socket.on('error', function _handleSocketError(err) {
+		debug('error: ' + err);
 		client.emit('error', err);
+	});
+
+	// Will auto-reconnect
+	socket.on('close', function _handleSocketClosed() {
+		client.socket = null;
 	});
 
 	return socket;

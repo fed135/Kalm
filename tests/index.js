@@ -24,10 +24,6 @@ var encoderFormat = {
 	decode: function() {}
 };
 
-var middlewareFormat = {
-	process: function() {}
-};
-
 /* Suite ---------------------------------------------------------------------*/
 
 describe('Index', function() {
@@ -36,7 +32,6 @@ describe('Index', function() {
 		assert.property(Kalm, 'Server', 'Server not exposed in Kalm index');
 		assert.property(Kalm, 'adapters', 'adapters not exposed in Kalm index');
 		assert.property(Kalm, 'encoders', 'encoders not exposed in Kalm index');
-		assert.property(Kalm, 'middleware', 'middleware not exposed in Kalm index');
 	});
 });
 
@@ -125,104 +120,84 @@ describe('Encoders', function() {
 	});
 });
 
-describe('Middleware', function() {
-	it('index', function() {
-		assert.isFunction(Kalm.middleware.register, 'register method not valid in Kalm middleware');
-	});
-
-	describe('methods', function() {
-		it('register', function() {
-			Kalm.middleware.register('test', middlewareFormat);
-			Kalm.middleware.register('test2', null);
-		});
-
-		it('process', function(done) {
-			Kalm.middleware.process({
-				packets: { testChannel: [] },
-				options: { transform: { bundler: null } }
-			}, function(channel) {
-				assert.equal(channel, 'testChannel', 'bundler channel matches');
-				done();
-			}, 'testChannel', null);
-		});
-	});
-});
-
 describe('Smoke test', function() {
+	var server;
+	var client;
+
 	it('run ipc + json', function(done) {
-		var server = new Kalm.Server({adapter:'ipc', encoder:'json'});
+		server = new Kalm.Server({adapter:'ipc', encoder:'json'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({adapter:'ipc', encoder:'json'});
+			client = new Kalm.Client({adapter:'ipc', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
 	it('run ipc + msg-pack', function(done) {
-		var server = new Kalm.Server({adapter:'ipc', encoder: 'msg-pack'});
+		server = new Kalm.Server({adapter:'ipc', encoder: 'msg-pack'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({adapter:'ipc', encoder: 'msg-pack'});
+			client = new Kalm.Client({adapter:'ipc', encoder: 'msg-pack'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
 	it('run tcp + json', function(done) {
-		var server = new Kalm.Server({adapter:'tcp', encoder:'json'});
+		server = new Kalm.Server({adapter:'tcp', encoder:'json'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({adapter:'tcp', encoder:'json'});
+			client = new Kalm.Client({adapter:'tcp', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
-	it('run ipc + msg-pack', function(done) {
-		var server = new Kalm.Server({encoder: 'msg-pack', adapter:'tcp'});
+	it('run tcp + msg-pack', function(done) {
+		server = new Kalm.Server({encoder: 'msg-pack', adapter:'tcp'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({encoder: 'msg-pack', adapter:'tcp'});
+			client = new Kalm.Client({encoder: 'msg-pack', adapter:'tcp'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
 	it('run udp + json', function(done) {
-		var server = new Kalm.Server({adapter:'udp', encoder:'json'});
+		server = new Kalm.Server({adapter:'udp', encoder:'json'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({adapter:'udp', encoder:'json'});
+			client = new Kalm.Client({adapter:'udp', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
 	it('run udp + msg-pack', function(done) {
-		var server = new Kalm.Server({encoder: 'msg-pack', adapter:'udp'});
+		server = new Kalm.Server({encoder: 'msg-pack', adapter:'udp'});
 		server.channel('test', function(data) {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
 		server.on('ready', function() {
-			var client = new Kalm.Client({encoder: 'msg-pack', adapter:'udp'});
+			client = new Kalm.Client({encoder: 'msg-pack', adapter:'udp'});
 			client.send('test', {foo:'bar'});
 		});
 	});
