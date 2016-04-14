@@ -5,7 +5,7 @@
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
-[![Current Stage](https://img.shields.io/badge/stage-alpha-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Current Stage](https://img.shields.io/badge/stage-beta-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
 
 ---
 

@@ -16,7 +16,6 @@ var debug = require('debug')('kalm');
 var defaults = require('./defaults');
 var Client = require('./Client');
 var adapters = require('./adapters');
-var encoders = require('./encoders');
 
 /* Methods -------------------------------------------------------------------*/
 

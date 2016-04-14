@@ -89,7 +89,7 @@ Client.prototype.channel = function(name, handler) {
 		this.channels[name] = new Channel(
 			name, 
 			this.options.bundler, 
-			this._emit.bind(this)
+			this
 		);
 	}
 

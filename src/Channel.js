@@ -14,11 +14,12 @@
  * @param {Socket} socket An optionnal socket object to use for communication
  * @param {object} options The configuration options for the client
  */
-function Channel(name, options, emitter) {
+function Channel(name, options, client) {
 	this.name = name;
 	this.options = options;
 
-	this._emitter = emitter;
+	this._client = client;
+	this._emitter = client._emit.bind(client);
 
 	this._timer = null;
 	this._packets = [];
@@ -85,7 +86,7 @@ Channel.prototype.handleData = function(payload) {
 
 	for (i = 0; i<_reqs; i++) {
 		for (c = 0; c<_listeners; c++) {
-			this._handlers[c](payload[i]);
+			this._handlers[c](payload[i], this._client);
 		}
 	}
 };

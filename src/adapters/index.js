@@ -7,19 +7,16 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var ipc = require('./ipc.adapter');
-var tcp = require('./tcp.adapter');
-var udp = require('./udp.adapter');
-
 var debug = require('debug')('kalm');
 
-/* Local variables -----------------------------------------------------------*/
+var list = {};
 
-var list = {
-	ipc: ipc,
-	tcp: tcp,
-	udp: udp
-};
+// If running in the browser, do not load net adapters
+if (!process.env.NODE_ENV) {
+	list.ipc = require('./ipc.adapter');
+	list.tcp = require('./tcp.adapter');
+	list.udp = require('./udp.adapter');
+}
 
 /* Methods -------------------------------------------------------------------*/
 
