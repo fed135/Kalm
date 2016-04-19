@@ -73,6 +73,7 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	channel(name, handler) {
+		name = name + '';
 		this.channels[name] = handler;
 
 		for (var i = this.connections.length - 1; i >= 0; i--) {

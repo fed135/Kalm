@@ -38,12 +38,7 @@ class Channel {
 		this._packets.push(payload);
 
 		// Bundling process
-		if (this._packets.length >= this.options.maxPackets) {
-			if (this._timer !== null) {
-				clearTimeout(this._timer);
-				this._timer = null;
-			}
-			
+		if (this._packets.length >= this.options.maxPackets) {			
 			this._emit();
 			return;
 		}
@@ -62,6 +57,8 @@ class Channel {
 	_emit() {
 		this._emitter(this.name, this._packets);
 		this._packets.length = 0;
+		clearTimeout(this._timer);
+		this._timer = null;
 	}
 
 	/**

@@ -18,10 +18,6 @@ var encoders = require('./encoders');
 
 var Channel = require('./Channel');
 
-/* Local variables -----------------------------------------------------------*/
-
-const _channelBase = '/';
-
 /* Methods -------------------------------------------------------------------*/
 
 class Client extends EventEmitter{
@@ -75,7 +71,7 @@ class Client extends EventEmitter{
 	 * @returns {Client} The client, for chaining
 	 */
 	channel(name, handler) {
-		name = name || _channelBase;
+		name = name + '';
 
 		if (!this.channels.hasOwnProperty(name)) {
 			debug(
