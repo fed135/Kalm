@@ -26,6 +26,8 @@ class Channel {
 		this._timer = null;
 		this._packets = [];
 		this._handlers = [];
+
+		this.splitBatches = true;
 	}
 
 	/**
@@ -83,9 +85,16 @@ class Channel {
 		var i;
 		var c;
 
-		for (i = 0; i<_reqs; i++) {
+		if (this.splitBatches) {
+			for (i = 0; i<_reqs; i++) {
+				for (c = 0; c<_listeners; c++) {
+					this._handlers[c](payload[i], this._client);
+				}
+			}
+		}
+		else {
 			for (c = 0; c<_listeners; c++) {
-				this._handlers[c](payload[i], this._client);
+				this._handlers[c](payload, this._client);
 			}
 		}
 	};
