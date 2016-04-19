@@ -8,14 +8,14 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var net = require('net');
-var fs = require('fs');
+const net = require('net');
+const fs = require('fs');
 
-var debug = require('debug')('kalm');
+const debug = require('debug')('kalm');
 
 /* Local variables -----------------------------------------------------------*/
 
-var _path = '/tmp/app.socket-';
+const _path = '/tmp/app.socket-';
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -26,10 +26,10 @@ var _path = '/tmp/app.socket-';
  * @param {function} callback The callback for the operation
  */
 function listen(server, callback) {
-	fs.unlink(_path + server.options.port, function _bindSocket() {
+	fs.unlink(_path + server.options.port, () => {
 		server.listener = net.createServer(server._handleRequest.bind(server));
 		server.listener.listen(_path + server.options.port, callback);
-		server.listener.on('error', function _handleServerError(err) {
+		server.listener.on('error', (err) => {
 			debug('error: ' + err);
 			server.emit('error', err);
 		});
@@ -43,11 +43,11 @@ function listen(server, callback) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
-	server.connections.forEach(function _killConnection(e) {
+	server.connections.forEach((e) => {
 		e.socket.destroy();
 	});
 	
-	process.nextTick(function() {
+	process.nextTick(() => {
 		server.connections.length = 0;
 		server.listener.close(callback || function() {});
 	});
@@ -75,13 +75,13 @@ function createSocket(client, socket) {
 		socket = net.connect(_path + client.options.port);
 	}
 	socket.on('data', client._handleRequest.bind(client));
-	socket.on('error', function _handleSocketError(err) {
+	socket.on('error', (err) => {
 		debug('error: ' + err);
 		client.emit('error', err);
 	});
 
 	// Will auto-reconnect
-	socket.on('close', function _handleSocketClosed() {
+	socket.on('close', () => {
 		client.socket = null;
 	});
 

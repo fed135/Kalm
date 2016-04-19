@@ -8,9 +8,9 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var dgram = require('dgram');
+const dgram = require('dgram');
 
-var debug = require('debug')('kalm');
+const debug = require('debug')('kalm');
 
 /* Helpers -------------------------------------------------------------------*/
 
@@ -44,7 +44,7 @@ function _handleNewSocket(data, origin) {
 function listen(server, callback) {
 	server.listener = dgram.createSocket('udp4');
 	server.listener.on('message', _handleNewSocket.bind(server));
-	server.listener.on('error', function _handleServerError(err) {
+	server.listener.on('error', (err) => {
 		debug('error: ' + err);
 		server.emit('error', err);
 	});
@@ -96,7 +96,7 @@ function createSocket(client, soc) {
 	var socket = dgram.createSocket('udp4');
 	socket.__port = client.options.port;
 	socket.__hostname = client.options.hostname;
-	socket.on('error', function _handleSocketError(err) {
+	socket.on('error', (err) => {
 		debug('error: ' + err);
 		client.emit('error', err);
 	});

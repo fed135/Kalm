@@ -10,7 +10,7 @@
 var json = require('./json');
 var msgPack = require('./msg-pack');
 
-var debug = require('debug')('kalm');
+const debug = require('debug')('kalm');
 
 /* Local variables -----------------------------------------------------------*/
 

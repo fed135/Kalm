@@ -8,8 +8,8 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var msgDecode = require('msgpack-decode');
-var msgPack = require('msgpack-lite');
+const msgDecode = require('msgpack-decode');
+const msgPack = require('msgpack-lite');
 
 /* Methods -------------------------------------------------------------------*/
 

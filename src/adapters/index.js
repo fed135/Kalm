@@ -7,12 +7,12 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var debug = require('debug')('kalm');
+const debug = require('debug')('kalm');
 
 var list = {};
 
 // If running in the browser, do not load net adapters
-if (!process.env.NODE_ENV) {
+if (process.env.NODE_ENV !== 'browser') {
 	list.ipc = require('./ipc.adapter');
 	list.tcp = require('./tcp.adapter');
 	list.udp = require('./udp.adapter');
