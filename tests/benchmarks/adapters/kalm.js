@@ -6,8 +6,8 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var settings = require('./settings'); 
-var Kalm = require('../../index');
+var settings = require('../settings'); 
+var Kalm = require('../../../index');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -15,6 +15,7 @@ var server;
 var client;
 
 var count = 0;
+var handbreak = true;
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -29,28 +30,33 @@ function setup(resolve) {
 		count++;
 	});
 
+	handbreak = false;
 	server.on('ready', resolve);
 }
 
 function teardown(resolve) {
-	if (server) server.stop();
-	server = null;
-	client = null;
-	resolve(count);
+	if (server) server.stop(function() {
+		server = null;
+		client = null;
+		resolve(count);
+	});
+}
+
+function stop(resolve) {
+	handbreak = true;
+	setTimeout(resolve, 0);
 }
 
 function step(resolve) {
-	if (!server) return;
+	if (handbreak) return;
 	if (!client) {
 		client = new Kalm.Client({
 			port: settings.port, 
 			adapter: settings.adapter, 
 			encoder: settings.encoder,
-			transform: {
-				bundler: {
-					maxPackets: settings.bundlerMaxPackets,
-					delay: settings.bundlerDelay
-				}
+			bundler: {
+				maxPackets: settings.bundlerMaxPackets,
+				delay: settings.bundlerDelay
 			},
 			hostname: '0.0.0.0'
 		});
@@ -65,5 +71,6 @@ function step(resolve) {
 module.exports = {
 	setup: setup,
 	teardown: teardown,
-	step: step
+	step: step,
+	stop: stop
 };

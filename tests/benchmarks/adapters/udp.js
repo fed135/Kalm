@@ -8,7 +8,7 @@
 
 var dgram = require('dgram');
 
-var settings = require('./settings'); 
+var settings = require('../settings'); 
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -16,16 +16,24 @@ var server;
 var client;
 
 var count = 0;
+var handbreak = true;
 
 /* Methods -------------------------------------------------------------------*/
+
+function _absorb(err) {
+	console.log(err);
+	return;
+}
 
 function setup(resolve) {
 	server = dgram.createSocket('udp4');
 	server.on('message', function() {
 		count++;
 	});
+	handbreak = false;
+	server.on('error', _absorb);
 	server.bind(settings.port, '0.0.0.0');
-	process.nextTick(resolve);
+	resolve();
 }
 
 function teardown(resolve) {
@@ -36,10 +44,16 @@ function teardown(resolve) {
 	});
 }
 
+function stop(resolve) {
+	handbreak = true;
+	setTimeout(resolve, 0);
+}
+
 function step(resolve) {
-	if (!server) return;
+	if (handbreak) return;
 	if (!client) {
 		client = dgram.createSocket('udp4');
+		client.on('error', _absorb);
 	}
 
 	var payload = new Buffer(JSON.stringify(settings.testPayload));
@@ -59,5 +73,6 @@ function step(resolve) {
 module.exports = {
 	setup: setup,
 	teardown: teardown,
-	step: step
+	step: step,
+	stop: stop
 };

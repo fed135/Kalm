@@ -8,7 +8,9 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var net = require('net');
+const net = require('net');
+
+const debug = require('debug')('kalm');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -21,7 +23,8 @@ var net = require('net');
 function listen(server, callback) {
 	server.listener = net.createServer(server._handleRequest.bind(server));
 	server.listener.listen(server.options.port, callback);
-	server.listener.on('error', function _handleServerError(err) {
+	server.listener.on('error', (err) => {
+		debug('error: ' + err);
 		server.emit('error', err);
 	});
 }
@@ -33,7 +36,7 @@ function listen(server, callback) {
  * @param {Buffer} payload The body of the request
  */
 function send(socket, payload) {
-	socket.write(payload);
+	if (socket) socket.write(payload);
 }
 
 /**
@@ -43,7 +46,14 @@ function send(socket, payload) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
-	server.listener.close(callback || function() {});
+	server.connections.forEach((e) => {
+		e.socket.destroy();
+	});
+	
+	process.nextTick(() => {
+		server.connections.length = 0;
+		server.listener.close(callback || function() {});
+	});
 }
 
 /**
@@ -58,8 +68,14 @@ function createSocket(client, socket) {
 		socket = net.connect(client.options.port, client.options.hostname);
 	}
 	socket.on('data', client._handleRequest.bind(client));
-	socket.on('error', function _handleSocketError(err) {
+	socket.on('error', (err) => {
+		debug('error: ' + err);
 		client.emit('error', err);
+	});
+
+	// Will auto-reconnect
+	socket.on('close', () => {
+		client.socket = null;
 	});
 
 	return socket;

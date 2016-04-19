@@ -10,7 +10,7 @@
 var json = require('./json');
 var msgPack = require('./msg-pack');
 
-var debug = require('debug')('kalm');
+const debug = require('debug')('kalm');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -28,7 +28,7 @@ var list = {
  * @returns {object|undefined} The encoder
  */
 function resolve(name) {
-	if (list[name]) {
+	if (list.hasOwnProperty(name)) {
 		return list[name];
 	}
 	else {

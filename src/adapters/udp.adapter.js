@@ -8,10 +8,15 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var dgram = require('dgram');
+const dgram = require('dgram');
+
+const debug = require('debug')('kalm');
 
 /* Helpers -------------------------------------------------------------------*/
 
+/**
+ * Creates a socket + Client on UDP data
+ */ 
 function _handleNewSocket(data, origin) {
 	var key = origin.address+':'+origin.port;
 
@@ -39,9 +44,13 @@ function _handleNewSocket(data, origin) {
 function listen(server, callback) {
 	server.listener = dgram.createSocket('udp4');
 	server.listener.on('message', _handleNewSocket.bind(server));
+	server.listener.on('error', (err) => {
+		debug('error: ' + err);
+		server.emit('error', err);
+	});
 	server.listener.bind(server.options.port, '127.0.0.1');
 	
-	process.nextTick(callback);
+	callback();
 };
 
 /**
@@ -51,7 +60,6 @@ function listen(server, callback) {
  * @param {Buffer} payload The body of the request
  */
 function send(socket, payload) {
-	console.log('send');
 	socket.send(
 		payload, 
 		0, 
@@ -68,6 +76,7 @@ function send(socket, payload) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
+	server.connections.length = 0;
 	if (server.listener && server.listener.close) {
 		server.listener.close(callback);
 	}
@@ -87,6 +96,10 @@ function createSocket(client, soc) {
 	var socket = dgram.createSocket('udp4');
 	socket.__port = client.options.port;
 	socket.__hostname = client.options.hostname;
+	socket.on('error', (err) => {
+		debug('error: ' + err);
+		client.emit('error', err);
+	});
 
 	return socket;
 };
