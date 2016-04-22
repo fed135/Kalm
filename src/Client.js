@@ -103,7 +103,7 @@ class Client extends EventEmitter{
 	use(socket) {
 		if (this.socket) {
 			debug('log: disconnecting current socket');
-			adapters.resolve(this.options.adapter).disconnect(this.socket);
+			adapters.resolve(this.options.adapter).disconnect(this);
 		}
 
 		this.socket = this._createSocket(socket);
@@ -167,9 +167,18 @@ class Client extends EventEmitter{
 
 		if (raw && raw.c) {
 			if (this.channels.hasOwnProperty(raw.c)) {
-				this.channels[raw.c].handleData(raw.d);
+				this.channels[raw.c].handleData(raw.c, raw.d);
 			}
 		}
+	}
+
+	/**
+	 * Destroys the client and connection
+	 * @method destroy
+	 * @memberof Client
+	 */
+	destroy() {
+		adapters.resolve(this.options.adapter).disconnect(this)
 	}
 }
 

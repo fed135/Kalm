@@ -74,12 +74,21 @@ class Channel {
 	}
 
 	/**
+	 * Destroys the client and connection
+	 * @method destroy
+	 * @memberof Client
+	 */
+	destroy() {
+		this._client.destroy();
+	}
+
+	/**
 	 * Handles channel data
 	 * @method handleData
 	 * @memberof Channel
 	 * @param {array} payload The received payload
 	 */
-	handleData(payload) {
+	handleData(channel, payload) {
 		var _reqs = payload.length;
 		var _listeners = this._handlers.length;
 		var i;
@@ -88,13 +97,13 @@ class Channel {
 		if (this.splitBatches) {
 			for (i = 0; i<_reqs; i++) {
 				for (c = 0; c<_listeners; c++) {
-					this._handlers[c](payload[i], this._client);
+					this._handlers[c](payload[i], this.send, this);
 				}
 			}
 		}
 		else {
 			for (c = 0; c<_listeners; c++) {
-				this._handlers[c](payload, this._client);
+				this._handlers[c](payload, this.send, this);
 			}
 		}
 	};

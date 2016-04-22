@@ -85,6 +85,7 @@ class Server extends EventEmitter {
 
 	/**
 	 * Sends data to all connected clients
+	 * !! Creates the channel if it has to !!
 	 * @method broadcast
 	 * @memberof Server
 	 * @param {string} channel The name of the channel to send to
@@ -94,6 +95,27 @@ class Server extends EventEmitter {
 	broadcast(channel, payload) {
 		for (var i = this.connections.length - 1; i >= 0; i--) {
 			this.connections[i].send(channel, payload);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Sends data to all connected clients with a specific channel opened
+	 * !! Does not create new channels !!
+	 * @method whisper
+	 * @memberof Server
+	 * @param {string} channel The name of the channel to send to
+	 * @param {string|object} payload The payload to send
+	 * @returns {Server} Returns itself for chaining
+	 */
+	whisper(channel, payload) {
+		for (var i = this.connections.length - 1; i >= 0; i--) {
+			for (var u = this.connections[i].channels.length -1; u >= 0; u--) {
+				if (this.connections[i].channels[u].name === channel) {
+					this.connections[i].channels[u].send(payload);
+				}
+			}
 		}
 
 		return this;

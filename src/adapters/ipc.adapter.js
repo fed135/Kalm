@@ -43,9 +43,7 @@ function listen(server, callback) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
-	server.connections.forEach((e) => {
-		e.socket.destroy();
-	});
+	server.connections.forEach(disconnect);
 	
 	process.nextTick(() => {
 		server.connections.length = 0;
@@ -89,12 +87,14 @@ function createSocket(client, socket) {
 };
 
 /**
- * Attempts to disconnect the socket
+ * Attempts to disconnect the client's connection
  * @method disconnect
- * @param {Socket} socket The socket to disconnect
+ * @param {Client} client The client to disconnect
  */
-function disconnect(socket) {
-	if (socket.disconnect) socket.disconnect();
+function disconnect(client) {
+	if (client.socket && client.socket.destroy) {
+		client.socket.destroy();
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/
