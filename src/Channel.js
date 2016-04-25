@@ -97,7 +97,11 @@ class Channel {
 		if (this.splitBatches) {
 			for (i = 0; i<_reqs; i++) {
 				for (c = 0; c<_listeners; c++) {
-					this._handlers[c](payload[i], this.send, this);
+					((_c, _i) => {
+						process.nextTick(() => {
+							this._handlers[_c](payload[_i], this.send, this);
+						});
+					})(c, i);
 				}
 			}
 		}

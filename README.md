@@ -140,6 +140,8 @@ By default, all Kalm logs are hidden. They can be enabled through the DEBUG envi
 [Milestones](https://github.com/fed135/Kalm/milestones)
 
 - Fix ENOENT when multiple ipc clients attempt to connect to a server at once
+- Reduce bottlenecks by analysing the flam graph
+- Test offscoping controller calls
 
 
 ## Contributing
