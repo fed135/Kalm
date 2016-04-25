@@ -47,11 +47,8 @@ function send(socket, payload) {
  */
 function stop(server, callback) {
 	server.connections.forEach(disconnect);
-	
-	process.nextTick(() => {
-		server.connections.length = 0;
-		server.listener.close(callback || function() {});
-	});
+	server.connections.length = 0;
+	server.listener.close(callback || function(err) {});
 }
 
 /**
@@ -66,9 +63,16 @@ function createSocket(client, socket) {
 		socket = net.connect(client.options.port, client.options.hostname);
 	}
 	socket.on('data', client._handleRequest.bind(client));
+
+	// Emit on error
 	socket.on('error', (err) => {
 		debug('error: ' + err);
 		client.emit('error', err);
+	});
+
+	// Emit on connect
+	socket.on('connect', () => {
+		client.emit('connect');
 	});
 
 	// Will auto-reconnect
@@ -87,6 +91,7 @@ function createSocket(client, socket) {
 function disconnect(client) {
 	if (client.socket && client.socket.destroy) {
 		client.socket.destroy();
+		client.socket = null;
 	}
 }
 

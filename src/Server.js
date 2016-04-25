@@ -49,13 +49,12 @@ class Server extends EventEmitter {
 	 */
 	listen(callback) {
 		var adapter = adapters.resolve(this.options.adapter);
-		let _self = this;
 
 		if (adapter) {
 			debug('log: listening ' + this.options.adapter + '://0.0.0.0:' + this.options.port);
-			adapter.listen(this, function _handleLift() {
-				process.nextTick(function _deferredLift() {
-					_self.emit('ready');
+			adapter.listen(this, () => {
+				process.nextTick(() => {
+					this.emit('ready');
 				});
 			});
 		}
@@ -138,6 +137,19 @@ class Server extends EventEmitter {
 	}
 
 	/**
+	 * Creates a new client with the provided arguments
+	 * @private
+	 * @method _createClient
+	 * @memberof Server
+	 * @param {Socket} socket The received connection socket
+	 * @param {object} options The options for the client
+	 * @returns {Client} The newly created client
+	 */
+	_createClient(socket, options) {
+		return new Client(socket, options);
+	}
+
+	/**
 	 * Handler for receiving a new connection
 	 * @private
 	 * @method _handleRequest
@@ -145,7 +157,7 @@ class Server extends EventEmitter {
 	 * @param {Socket} socket The received connection socket
 	 */
 	_handleRequest(socket) {
-		var client = new Client(socket, {
+		var client = this._createClient(socket, {
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
 			channels: this.channels
