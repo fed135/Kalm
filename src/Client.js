@@ -127,6 +127,22 @@ class Client extends EventEmitter{
 	}
 
 	/**
+	 * Trumps other packets on the given channel, will only send the latest
+	 * @method sendOnce
+	 * @memberof Client
+	 * @param {string} name The channel to send to data through
+	 * @param {string|object} payload The payload to send 
+	 * @returns {Client} The client, for chaining
+	 */
+	sendOnce(name, payload) {
+		if (!this.channels.hasOwnProperty(name)) {
+			this.channel(name);
+		}
+		this.channels[name].sendOnce(payload);
+		return this;
+	}
+
+	/**
 	 * Creates or attaches a socket for the appropriate adapter
 	 * @private
 	 * @method _createSocket

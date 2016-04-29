@@ -51,6 +51,20 @@ class Channel {
 	}
 
 	/**
+	 * Sends the latest payload only
+	 * @method sendOnce
+	 * @memberof Channel
+	 * @param {object|string} payload The payload to send
+	 */
+	sendOnce(payload) {
+		this._packets = [payload];
+
+		if (this._timer === null) {
+			this._timer = setTimeout(this._emit.bind(this), this.options.delay);
+		}
+	}
+
+	/**
 	 * Alerts the client to emit the packets for this channel
 	 * @private
 	 * @method _emit
@@ -97,17 +111,13 @@ class Channel {
 		if (this.splitBatches) {
 			for (i = 0; i<_reqs; i++) {
 				for (c = 0; c<_listeners; c++) {
-					((_c, _i) => {
-						process.nextTick(() => {
-							this._handlers[_c](payload[_i], this.send, this);
-						});
-					})(c, i);
+					this._handlers[c](payload[i], this.send.bind(this), this);
 				}
 			}
 		}
 		else {
 			for (c = 0; c<_listeners; c++) {
-				this._handlers[c](payload, this.send, this);
+				this._handlers[c](payload, this.send.bind(this), this);
 			}
 		}
 	};

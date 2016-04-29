@@ -110,7 +110,7 @@ class Server extends EventEmitter {
 	 */
 	whisper(channel, payload) {
 		for (var i = this.connections.length - 1; i >= 0; i--) {
-			for (var u = this.connections[i].channels.length -1; u >= 0; u--) {
+			for (var u in this.connections[i].channels) {
 				if (this.connections[i].channels[u].name === channel) {
 					this.connections[i].channels[u].send(payload);
 				}
