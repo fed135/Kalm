@@ -1,0 +1,5 @@
+tests
+README.md
+.travis.yml
+webpack.config
+.jshintrc
