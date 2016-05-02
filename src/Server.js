@@ -145,8 +145,19 @@ class Server extends EventEmitter {
 	 * @param {object} options The options for the client
 	 * @returns {Client} The newly created client
 	 */
-	_createClient(socket, options) {
+	createClient(socket, options) {
 		return new Client(socket, options);
+	}
+
+	/**
+	 * Server error handler
+	 * @method handleError
+	 * @memberof Server
+	 * @param {Error} err The triggered error
+	 */
+	handleError(err) {
+		debug('error: ' + err);
+		this.emit('error', err);
 	}
 
 	/**
@@ -156,14 +167,19 @@ class Server extends EventEmitter {
 	 * @memberof Server
 	 * @param {Socket} socket The received connection socket
 	 */
-	_handleRequest(socket) {
-		var client = this._createClient(socket, {
+	handleRequest(socket) {
+		var client = this.createClient(socket, {
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
 			channels: this.channels
 		});
 		this.connections.push(client);
+		client.on('disconnect', (socket) => {
+			this.emit('disconnect', socket);
+			this.emit('disconnection', socket);
+		});
 		this.emit('connection', client);
+		this.emit('connect', client);
 		return client;
 	}
 }

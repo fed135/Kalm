@@ -27,12 +27,9 @@ const _path = '/tmp/app.socket-';
  */
 function listen(server, callback) {
 	fs.unlink(_path + server.options.port, () => {
-		server.listener = net.createServer(server._handleRequest.bind(server));
+		server.listener = net.createServer(server.handleRequest.bind(server));
 		server.listener.listen(_path + server.options.port, callback);
-		server.listener.on('error', (err) => {
-			debug('error: ' + err);
-			server.emit('error', err);
-		});
+		server.listener.on('error', server.handleError.bind(server));
 	});
 };
 
@@ -69,23 +66,16 @@ function createSocket(client, socket) {
 	if (!socket) {
 		socket = net.connect(_path + client.options.port);
 	}
-	socket.on('data', client._handleRequest.bind(client));
+	socket.on('data', client.handleRequest.bind(client));
 
 	// Emit on error
-	socket.on('error', (err) => {
-		debug('error: ' + err);
-		client.emit('error', err);
-	});
+	socket.on('error', client.handleError.bind(client));
 
 	// Emit on connect
-	socket.on('connect', () => {
-		client.emit('connect');
-	});
+	socket.on('connect', client.handleConnect.bind(client));
 
 	// Will auto-reconnect
-	socket.on('close', () => {
-		client.socket = null;
-	});
+	socket.on('close', client.handleDisconnect.bind(client));
 
 	return socket;
 };

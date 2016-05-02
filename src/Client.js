@@ -106,8 +106,42 @@ class Client extends EventEmitter{
 			adapters.resolve(this.options.adapter).disconnect(this);
 		}
 
-		this.socket = this._createSocket(socket);
+		this.socket = this.createSocket(socket);
 		return this;
+	}
+
+	/**
+	 * Socket error handler
+	 * @method handleError
+	 * @memberof Client
+	 * @param {Error} err The socket triggered error
+	 */
+	handleError(err) {
+		debug('error: ' + err);
+		this.emit('error', err);
+	}
+
+	/**
+	 * New socket connection handler
+	 * @method handleConnect
+	 * @memberof Client
+	 * @param {Socket} socket The newly connected socket
+	 */
+	handleConnect(socket) {
+		this.emit('connect', socket);
+		this.emit('connection', socket);
+	}
+
+	/**
+	 * Socket connection lost handler
+	 * @method handleDisconnect
+	 * @memberof Client
+	 * @param {Socket} socket The disconnected socket
+	 */
+	handleDisconnect(socket) {
+		this.emit('disconnect', socket);
+		this.emit('disconnection', socket);
+		this.socket = null;
 	}
 
 	/**
@@ -150,7 +184,7 @@ class Client extends EventEmitter{
 	 * @param {Socket} socket The socket to use
 	 * @returns {Socket} The created or attached socket for the client
 	 */
-	_createSocket(socket) {
+	createSocket(socket) {
 		return adapters.resolve(this.options.adapter).createSocket(this, socket);
 	}
 
@@ -174,11 +208,11 @@ class Client extends EventEmitter{
 	/**
 	 * Handler for receiving data through the listener
 	 * @private
-	 * @method _handleRequest
+	 * @method handleRequest
 	 * @memberof Client
 	 * @param {Buffer} evt The data received
 	 */
-	_handleRequest(evt) {
+	handleRequest(evt) {
 		var raw = encoders.resolve(this.options.encoder).decode(evt);
 
 		if (raw && raw.c) {

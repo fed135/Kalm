@@ -22,7 +22,7 @@ function _handleNewSocket(data, origin) {
 
 	if (!this.__clients) this.__clients = {};
 	if (!(key in this.__clients)) {
-		this.__clients[key] = this._createClient({}, {
+		this.__clients[key] = this.createClient({}, {
 			hostname: origin.address,
 			port: origin.port,
 			adapter: 'udp',
@@ -31,7 +31,7 @@ function _handleNewSocket(data, origin) {
 		});
 	}
 
-	this.__clients[key]._handleRequest(data);
+	this.__clients[key].handleRequest(data);
 }
 
 /* Methods -------------------------------------------------------------------*/
@@ -45,10 +45,7 @@ function _handleNewSocket(data, origin) {
 function listen(server, callback) {
 	server.listener = dgram.createSocket('udp4');
 	server.listener.on('message', _handleNewSocket.bind(server));
-	server.listener.on('error', (err) => {
-		debug('error: ' + err);
-		server.emit('error', err);
-	});
+	server.listener.on('error', server.handleError.bind(server));
 	server.listener.bind(server.options.port, '127.0.0.1');
 	
 	callback();
@@ -99,15 +96,10 @@ function createSocket(client, soc) {
 	socket.__hostname = client.options.hostname;
 
 	// Emit on error
-	socket.on('error', (err) => {
-		debug('error: ' + err);
-		client.emit('error', err);
-	});
+	socket.on('error', client.handleError.bind(client));
 
 	// Emit on connect
-	process.nextTick(() => {
-		client.emit('connect');
-	});
+	process.nextTick(client.handleConnect.bind(client));
 
 	return socket;
 };
