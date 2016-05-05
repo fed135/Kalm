@@ -214,10 +214,10 @@ class Client extends EventEmitter{
 	_emit(channel, packets) {
 		adapters.resolve(this.options.adapter).send(
 			this.socket, 
-			encoders.resolve(this.options.encoder).encode({
-				c: channel,
-				d: packets
-			})
+			encoders.resolve(this.options.encoder).encode([
+				channel,
+				packets
+			])
 		);
 	}
 
@@ -231,9 +231,9 @@ class Client extends EventEmitter{
 	handleRequest(evt) {
 		var raw = encoders.resolve(this.options.encoder).decode(evt);
 
-		if (raw && raw.c) {
-			if (this.channels.hasOwnProperty(raw.c)) {
-				this.channels[raw.c].handleData(raw.d);
+		if (raw && raw.length) {
+			if (this.channels.hasOwnProperty(raw[0])) {
+				this.channels[raw[0]].handleData(raw[1]);
 			}
 		}
 	}
@@ -246,6 +246,9 @@ class Client extends EventEmitter{
 	destroy() {
 		adapters.resolve(this.options.adapter).disconnect(this);
 		this.socket = null;
+		for (var channel in this.channels) {
+			this.channels[channel].resetBundler();
+		}
 	}
 }
 

@@ -158,6 +158,7 @@ class Server extends EventEmitter {
 			this.connections.forEach(adapter.disconnect);
 			this.connections.length = 0;
 			adapter.stop(this, callback);
+			this.listener = null;
 		}
 		else {
 			return callback();

@@ -81,6 +81,15 @@ class Channel {
 	_emit() {
 		this._emitter(this.name, this._packets);
 		this._packets.length = 0;
+		this.resetBundler();
+	}
+
+	/**
+	 * Clears the bundler timer
+	 * @method resetBundler
+	 * @memberof Channel
+	 */
+	resetBundler() {
 		clearTimeout(this._timer);
 		this._timer = null;
 	}

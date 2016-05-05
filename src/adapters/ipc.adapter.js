@@ -83,7 +83,6 @@ function createSocket(client, socket) {
  */
 function disconnect(client) {
 	if (client.socket && client.socket.destroy) {
-		// Destroy connections before closing
 		client.socket.destroy();
 	}
 }

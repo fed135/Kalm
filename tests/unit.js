@@ -1,5 +1,5 @@
 /**
- * Kalm test suite
+ * Kalm unit test suite
  */
 
 'use strict';
@@ -11,7 +11,7 @@ var Kalm = require('../index');
 var Channel = require('../src/Channel');
 var EventEmitter = require('events').EventEmitter;
 
-/* Models --------------------------------------------------------------------*/
+/* Suite --------------------------------------------------------------------*/
 
 var adapterFormat = {
 	listen: function() {},
@@ -199,6 +199,7 @@ describe('Client', () => {
 	var testHandler = function() {};
 	var client = new Kalm.Client(testSocket, {
 		adapter: 'ipc', 
+		port: 9000,
 		channels: { 
 			test: testHandler
 		}
@@ -207,150 +208,178 @@ describe('Client', () => {
 	it('constructor', () => {
 		assert.deepEqual(client.options, {
 			hostname: Kalm.defaults.hostname,
-			port: Kalm.defaults.port,
+			port: 9000,
 			adapter: 'ipc',
 			bundler: Kalm.defaults.bundler,
 			encoder: Kalm.defaults.encoder
 		});
 
 		assert.property(client.channels, 'test');
-		assert.instanceOf(client.channels.test, Channel)
+		assert.instanceOf(client.channels.test, Channel);
 
 		assert.isNotNull(client.socket);
 	});
 
 	it('subscribe', () => {
-		client.subscribe('foo', function bar() {});
+		var testHandler = function bar() {};
+		client.subscribe('test-subscribe', testHandler);
+		assert.instanceOf(client.channels['test-subscribe'], Channel);
+		assert.include(client.channels['test-subscribe']._handlers, testHandler);
 	});
 
 	it('unsubscribe', () => {
-		client.unsubscribe('foo', function bar() {});
+		var testHandler = function unbar() {};
+		client.subscribe('test-unsubscribe', testHandler);
+		client.unsubscribe('test-unsubscribe', testHandler);
+		assert.notInclude(client.channels['test-unsubscribe']._handlers, testHandler);
 	});
 
-	it('use', () => {});
+	it('use', () => {
+		var socketReplacement = new EventEmitter();
+		client.use(socketReplacement);
+		assert.isNotNull(client.socket);
+	});
 
-	it('handleError', () => {});
+	it('handleError', (done) => {
+		client.once('error', () => {
+			done();
+		});
 
-	it('handleConnect', () => {});
+		client.handleError('test');
+	});
 
-	it('handleDisconnect', () => {});
+	it('handleConnect', (done) => {
+		client.once('connect', () => {
+			client.once('connection', () => {
+				done();
+			});
 
-	it('send', () => {});
+			client.handleConnect();
+		});
 
-	it('sendOnce', () => {});
+		client.handleConnect();
+	});
 
-	it('createSocket', () => {});
+	it('handleDisconnect', (done) => {
+		client.once('disconnect', () => {
+			client.once('disconnection', () => {
+				done();
+			});
 
-	it('handleRequest', () => {});
+			client.handleDisconnect();
+		});
 
-	it('destroy', () => {});
+		client.handleDisconnect();
+	});
+
+	it('send', () => {
+		client.send('test-send', 'test1');
+		client.send('test-send', 'test2');
+		assert.instanceOf(client.channels['test-send'], Channel);
+		assert.equal(client.channels['test-send']._packets.length, 2);
+	});
+
+	it('sendOnce', () => {
+		client.sendOnce('test-sendOnce', 'test1');
+		client.sendOnce('test-sendOnce', 'test2');
+		assert.instanceOf(client.channels['test-sendOnce'], Channel);
+		assert.equal(client.channels['test-sendOnce']._packets.length, 1);
+	});
+
+	it('handleRequest', (done) => {
+		var testPayload = ['test-handleRequest', [{foo: 'bar'}]];
+
+		client.subscribe('test-handleRequest', (data) => {
+			assert.deepEqual(data, testPayload[1][0]);
+			done();
+		});
+
+		client.handleRequest(Kalm.encoders.resolve('msg-pack').encode(testPayload));
+	});
+
+	it('destroy', () => {
+		client.destroy();
+		assert.isNull(client.socket);
+	});
 });
 
 describe('Server', () => {
-	var server = new Kalm.Server({adapter: 'ipc'});
-
-	it('constructor', () => {
-
-	});
-
-	it('listen', () => {});
-
-	it('subscribe', () => {});
-
-	it('unsubscribe', () => {});
-
-	it('broadcast', () => {});
-
-	it('whisper', () => {});
-
-	it('createClient', () => {});
-
-	it('handleError', () => {});
-
-	it('handleRequest', () => {});
-
-	it('stop', () => {});
-});
-
-describe('Smoke test', () => {
+	var fooHandler = function() {};
 	var server;
-	var client;
 
-	it('run ipc + json', (done) => {
-		server = new Kalm.Server({adapter:'ipc', encoder:'json'});
-		server.subscribe('test', (data) => {
-			assert.deepEqual(data, {foo:'bar'});
-			server.stop(done);
+	it('constructor', (done) => {
+		server = new Kalm.Server({
+			adapter: 'ipc',
+			port: 9000,
+			channels: {
+				'foo': fooHandler
+			}
 		});
 
 		server.on('ready', () => {
-			client = new Kalm.Client({adapter:'ipc', encoder:'json'});
-			client.send('test', {foo:'bar'});
+			assert.isNotNull(server.listener);
+			assert.deepEqual(server.options, {
+				adapter: 'ipc',
+				encoder: Kalm.defaults.encoder,
+				port: 9000
+			});
+			assert.isArray(server.connections);
+			assert.isObject(server.channels);
+			assert.equal(server.channels.foo, fooHandler);
+			done();
 		});
 	});
 
-	it('run ipc + msg-pack', (done) => {
-		server = new Kalm.Server({adapter:'ipc', encoder: 'msg-pack'});
-		server.subscribe('test', (data) => {
-			assert.deepEqual(data, {foo:'bar'});
-			server.stop(done);
-		});
-
-		server.on('ready', () => {
-			client = new Kalm.Client({adapter:'ipc', encoder: 'msg-pack'});
-			client.send('test', {foo:'bar'});
-		});
+	it('handleRequest', () => {
+		var testSocket = new EventEmitter();
+		server.handleRequest(testSocket);
+		assert.equal(server.connections.length, 1);
+		assert.instanceOf(server.connections[0], Kalm.Client);
 	});
 
-	it('run tcp + json', (done) => {
-		server = new Kalm.Server({adapter:'tcp', encoder:'json'});
-		server.subscribe('test', (data) => {
-			assert.deepEqual(data, {foo:'bar'});
-			server.stop(done);
-		});
-
-		server.on('ready', () => {
-	 		client = new Kalm.Client({adapter:'tcp', encoder:'json'});
-			client.send('test', {foo:'bar'});
-		});
+	it('subscribe', () => {
+		var testHandler = function bar() {};
+		server.subscribe('test-subscribe', testHandler);
+		assert.instanceOf(server.connections[0].channels['test-subscribe'], Channel);
+		assert.include(server.connections[0].channels['test-subscribe']._handlers, testHandler);
 	});
 
-	it('run tcp + msg-pack', (done) => {
-		server = new Kalm.Server({encoder: 'msg-pack', adapter:'tcp'});
-		server.subscribe('test', (data) => {
-			assert.deepEqual(data, {foo:'bar'});
-			server.stop(done);
-		});
-
-		server.on('ready', () => {
-	 		client = new Kalm.Client({encoder: 'msg-pack', adapter:'tcp'});
-			client.send('test', {foo:'bar'});
-		});
+	it('unsubscribe', () => {
+		var testHandler = function unbar() {};
+		server.subscribe('test-unsubscribe', testHandler);
+		server.unsubscribe('test-unsubscribe', testHandler);
+		assert.notInclude(server.connections[0].channels['test-unsubscribe']._handlers, testHandler);
 	});
 
-	it('run udp + json', (done) => {
-		server = new Kalm.Server({adapter:'udp', encoder:'json'});
-		server.subscribe('test', (data) => {
-			assert.deepEqual(data, {foo:'bar'});
-			server.stop(done);
-		});
-
-		server.on('ready', () => {
-	 		client = new Kalm.Client({adapter:'udp', encoder:'json'});
-			client.send('test', {foo:'bar'});
-		});
+	it('broadcast', () => {
+		var testSocket = new EventEmitter();
+		server.handleRequest(testSocket);
+		assert.equal(server.connections.length, 2);
+		server.broadcast('test-broadcast', 'test');
+		assert.include(server.connections[0].channels['test-broadcast']._packets, 'test');
+		assert.include(server.connections[1].channels['test-broadcast']._packets, 'test');
 	});
 
-	it('run udp + msg-pack', (done) => {
-		server = new Kalm.Server({encoder: 'msg-pack', adapter:'udp'});
-		server.subscribe('test', (data) => {
-			assert.deepEqual(data, {foo:'bar'});
-			server.stop(done);
+	it('whisper', () => {
+		server.connections[0].subscribe('test-whisper');
+		server.whisper('test-whisper', 'test');
+		assert.include(server.connections[0].channels['test-whisper']._packets, 'test');
+		assert.isUndefined(server.connections[1].channels['test-whisper']);
+	});
+
+	it('handleError', (done) => {
+		server.once('error', () => {
+			done();
 		});
 
-		server.on('ready', () => {
-			client = new Kalm.Client({encoder: 'msg-pack', adapter:'udp'});
-			client.send('test', {foo:'bar'});
+		server.handleError('test');
+	});
+
+	it('stop', (done) => {
+		server.stop(() => {
+			assert.isNull(server.listener);
+			assert.equal(server.connections.length, 0);
+			done();
 		});
 	});
 });
