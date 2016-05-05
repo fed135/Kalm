@@ -1,11 +1,12 @@
-<img align="left" src="http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo.png">
+<img align="left" src="http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo_bolded.png">
 # Kalm
 *The Socket Optimizer*
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
-[![Current Stage](https://img.shields.io/badge/stage-beta-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Current API Stability](https://img.shields.io/badge/stability-stable-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
 
 ---
 

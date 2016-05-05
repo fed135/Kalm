@@ -10,8 +10,6 @@
 
 const dgram = require('dgram');
 
-const debug = require('debug')('kalm');
-
 /* Helpers -------------------------------------------------------------------*/
 
 /**
@@ -48,8 +46,8 @@ function listen(server, callback) {
 	server.listener.on('error', server.handleError.bind(server));
 	server.listener.bind(server.options.port, '127.0.0.1');
 	
-	callback();
-};
+	return callback();
+}
 
 /**
  * Sends a message with a socket client
@@ -65,7 +63,7 @@ function send(socket, payload) {
 		socket.__port, 
 		socket.__hostname
 	);
-};
+}
 
 /**
  * Stops the server.
@@ -78,7 +76,7 @@ function stop(server, callback) {
 	if (server.listener && server.listener.close) {
 		server.listener.close(callback);
 	}
-	else callback();
+	else return callback();
 }
 
 /**
@@ -102,17 +100,15 @@ function createSocket(client, soc) {
 	process.nextTick(client.handleConnect.bind(client));
 
 	return socket;
-};
+}
 
 /**
  * Attempts to disconnect the client's connection
  * @method disconnect
  * @param {Client} client The client to disconnect
  */
-function disconnect(client) {
-	if (client.socket) {
-		client.socket = null;
-	}
+function disconnect() {
+	// Nothing to do
 }
 
 /* Exports -------------------------------------------------------------------*/

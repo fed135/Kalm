@@ -11,8 +11,6 @@
 const net = require('net');
 const fs = require('fs');
 
-const debug = require('debug')('kalm');
-
 /* Local variables -----------------------------------------------------------*/
 
 const _path = '/tmp/app.socket-';
@@ -31,7 +29,7 @@ function listen(server, callback) {
 		server.listener.listen(_path + server.options.port, callback);
 		server.listener.on('error', server.handleError.bind(server));
 	});
-};
+}
 
 /**
  * Stops the server.
@@ -53,7 +51,7 @@ function stop(server, callback) {
  */
 function send(socket, payload) {
 	if (socket) socket.write(payload);
-};
+}
 
 /**
  * Creates a client and adds the data listener(s) to it
@@ -78,7 +76,7 @@ function createSocket(client, socket) {
 	socket.on('close', client.handleDisconnect.bind(client));
 
 	return socket;
-};
+}
 
 /**
  * Attempts to disconnect the client's connection
@@ -88,7 +86,6 @@ function createSocket(client, socket) {
 function disconnect(client) {
 	if (client.socket && client.socket.destroy) {
 		client.socket.destroy();
-		client.socket = null;
 	}
 }
 

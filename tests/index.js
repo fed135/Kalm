@@ -8,6 +8,8 @@
 
 var assert = require('chai').assert;
 var Kalm = require('../index');
+var Channel = require('../src/Channel');
+var EventEmitter = require('events').EventEmitter;
 
 /* Models --------------------------------------------------------------------*/
 
@@ -26,49 +28,50 @@ var encoderFormat = {
 
 /* Suite ---------------------------------------------------------------------*/
 
-describe('Index', function() {
-	it('Kalm', function() {
+describe('Index', () => {
+	it('Kalm', () => {
 		assert.property(Kalm, 'Client', 'Client not exposed in Kalm index');
 		assert.property(Kalm, 'Server', 'Server not exposed in Kalm index');
 		assert.property(Kalm, 'adapters', 'adapters not exposed in Kalm index');
 		assert.property(Kalm, 'encoders', 'encoders not exposed in Kalm index');
+		assert.property(Kalm, 'defaults', 'defaults not exposed in Kalm index');
 	});
 });
 
-describe('Adapters', function() {
+describe('Adapters', () => {
 
-	it('index', function() {
+	it('index', () => {
 		assert.isFunction(Kalm.adapters.register, 'register method not valid in Kalm adapters');
 		assert.isFunction(Kalm.adapters.resolve, 'resolve method not valid in Kalm adapters');
 	});
 
-	describe('bundled', function() {
-		it('ipc', function() {
+	describe('bundled', () => {
+		it('ipc', () => {
 			var ipc_test = Kalm.adapters.resolve('ipc');
 			assert.isObject(ipc_test, 'ipc is not a valid adapter object');
 			allMembersTypeMatch(ipc_test, adapterFormat);
 		});
 
-		it('tcp', function() {
+		it('tcp', () => {
 			var tcp_test = Kalm.adapters.resolve('tcp');
 			assert.isObject(tcp_test, 'tcp is not a valid adapter object');
 			allMembersTypeMatch(tcp_test, adapterFormat);
 		});
 
-		it('udp', function() {
+		it('udp', () => {
 			var udp_test = Kalm.adapters.resolve('udp');
 			assert.isObject(udp_test, 'udp is not a valid adapter object');
 			allMembersTypeMatch(udp_test, adapterFormat);
 		});
 	});
 
-	describe('methods', function() {
-		it('register', function() {
+	describe('methods', () => {
+		it('register', () => {
 			Kalm.adapters.register('test', adapterFormat);
 			Kalm.adapters.register('test2', null);
 		});
 
-		it('resolve', function() {
+		it('resolve', () => {
 			assert.deepEqual(Kalm.adapters.resolve('test'), adapterFormat);
 			assert.equal(Kalm.adapters.resolve('test2'), null);
 			assert.equal(Kalm.adapters.resolve('test3'), null);
@@ -76,18 +79,18 @@ describe('Adapters', function() {
 	});
 });
 
-describe('Encoders', function() {
+describe('Encoders', () => {
 
-	it('index', function() {
+	it('index', () => {
 		assert.isFunction(Kalm.encoders.register, 'register method not valid in Kalm encoders');
 		assert.isFunction(Kalm.encoders.resolve, 'resolve method not valid in Kalm encoders');
 	});
 
-	describe('bundled', function() {
+	describe('bundled', () => {
 		var objTest = {foo: 'bar'};
 		var strTest = '{"foo":"bar}';
 
-		it('json', function() {
+		it('json', () => {
 			var json_test = Kalm.encoders.resolve('json');
 			assert.isObject(json_test, 'json is not a valid encoder object');
 			allMembersTypeMatch(json_test, encoderFormat);
@@ -96,7 +99,7 @@ describe('Encoders', function() {
 			assert.deepEqual(json_test.decode(json_test.encode(objTest)), objTest, 'Object is not the same after json decoding.');
 		});
 
-		it('msg-pack', function() {
+		it('msg-pack', () => {
 			var msg_test = Kalm.encoders.resolve('msg-pack');
 			assert.isObject(msg_test, 'msg-pack is not a valid encoder object');
 			allMembersTypeMatch(msg_test, encoderFormat);
@@ -106,13 +109,13 @@ describe('Encoders', function() {
 		});
 	});
 
-	describe('methods', function() {
-		it('register', function() {
+	describe('methods', () => {
+		it('register', () => {
 			Kalm.encoders.register('test', encoderFormat);
 			Kalm.encoders.register('test2', null);
 		});
 
-		it('resolve', function() {
+		it('resolve', () => {
 			assert.deepEqual(Kalm.encoders.resolve('test'), encoderFormat);
 			assert.equal(Kalm.encoders.resolve('test2'), null);
 			assert.equal(Kalm.encoders.resolve('test3'), null);
@@ -120,83 +123,232 @@ describe('Encoders', function() {
 	});
 });
 
-describe('Smoke test', function() {
+describe('Channel', () => {
+	
+	var channel = new Channel('test', Kalm.defaults.bundler, {
+		_emit: function() {},
+		destroy: function() {}
+	});
+
+	it('constructor', () => {
+		assert.equal(channel.name, 'test');
+		assert.deepEqual(channel.options, Kalm.defaults.bundler);
+		assert.equal(channel.splitBatches, true);
+	});
+
+	it('send', (done) => {
+		channel.send('foo');
+		assert.isNotNull(channel._timer);
+		channel.send('foo2');
+		assert.include(channel._packets, 'foo');
+		assert.include(channel._packets, 'foo2');
+
+		setTimeout(() => {
+			assert.equal(channel._packets.length, 0);
+			assert.isNull(channel._timer);
+			done();
+		}, Kalm.defaults.bundler.delay + 1);
+	});
+
+	it('sendOnce', (done) => {
+		channel.sendOnce('foo');
+		assert.isNotNull(channel._timer);
+		assert.include(channel._packets, 'foo');
+		channel.sendOnce('foo2');
+		assert.notInclude(channel._packets, 'foo');
+		assert.include(channel._packets, 'foo2');
+
+		setTimeout(() => {
+			assert.equal(channel._packets.length, 0);
+			assert.isNull(channel._timer);
+			done();
+		}, Kalm.defaults.bundler.delay + 1);
+	});
+
+	it('addHandler', () => {
+		var testHandler = function foo() {};
+
+		channel.addHandler(testHandler);
+		assert.include(channel._handlers, testHandler);
+	});
+
+	it('removeHandler', () => {
+		var testHandler = function foobar() {};
+
+		channel.addHandler(testHandler);
+		channel.removeHandler(testHandler);
+		assert.notInclude(channel._handlers, testHandler);
+	});
+
+	it('handleData', (done) => {
+		var testHandler = function(data) {
+			done();
+		};
+
+		channel.addHandler(testHandler);
+		channel.handleData(['callDone']);
+	});
+
+	it('destroy', () => {
+		channel.destroy();
+	});
+});
+
+describe('Client', () => {
+	var testSocket = new EventEmitter();
+	var testHandler = function() {};
+	var client = new Kalm.Client(testSocket, {
+		adapter: 'ipc', 
+		channels: { 
+			test: testHandler
+		}
+	});
+
+	it('constructor', () => {
+		assert.deepEqual(client.options, {
+			hostname: Kalm.defaults.hostname,
+			port: Kalm.defaults.port,
+			adapter: 'ipc',
+			bundler: Kalm.defaults.bundler,
+			encoder: Kalm.defaults.encoder
+		});
+
+		assert.property(client.channels, 'test');
+		assert.instanceOf(client.channels.test, Channel)
+
+		assert.isNotNull(client.socket);
+	});
+
+	it('subscribe', () => {
+		client.subscribe('foo', function bar() {});
+	});
+
+	it('unsubscribe', () => {
+		client.unsubscribe('foo', function bar() {});
+	});
+
+	it('use', () => {});
+
+	it('handleError', () => {});
+
+	it('handleConnect', () => {});
+
+	it('handleDisconnect', () => {});
+
+	it('send', () => {});
+
+	it('sendOnce', () => {});
+
+	it('createSocket', () => {});
+
+	it('handleRequest', () => {});
+
+	it('destroy', () => {});
+});
+
+describe('Server', () => {
+	var server = new Kalm.Server({adapter: 'ipc'});
+
+	it('constructor', () => {
+
+	});
+
+	it('listen', () => {});
+
+	it('subscribe', () => {});
+
+	it('unsubscribe', () => {});
+
+	it('broadcast', () => {});
+
+	it('whisper', () => {});
+
+	it('createClient', () => {});
+
+	it('handleError', () => {});
+
+	it('handleRequest', () => {});
+
+	it('stop', () => {});
+});
+
+describe('Smoke test', () => {
 	var server;
 	var client;
 
-	it('run ipc + json', function(done) {
+	it('run ipc + json', (done) => {
 		server = new Kalm.Server({adapter:'ipc', encoder:'json'});
-		server.channel('test', function(data) {
+		server.subscribe('test', (data) => {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
-		server.on('ready', function() {
+		server.on('ready', () => {
 			client = new Kalm.Client({adapter:'ipc', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
-	it('run ipc + msg-pack', function(done) {
+	it('run ipc + msg-pack', (done) => {
 		server = new Kalm.Server({adapter:'ipc', encoder: 'msg-pack'});
-		server.channel('test', function(data) {
+		server.subscribe('test', (data) => {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
-		server.on('ready', function() {
+		server.on('ready', () => {
 			client = new Kalm.Client({adapter:'ipc', encoder: 'msg-pack'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
-	it('run tcp + json', function(done) {
+	it('run tcp + json', (done) => {
 		server = new Kalm.Server({adapter:'tcp', encoder:'json'});
-		server.channel('test', function(data) {
+		server.subscribe('test', (data) => {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
-		server.on('ready', function() {
-			client = new Kalm.Client({adapter:'tcp', encoder:'json'});
+		server.on('ready', () => {
+	 		client = new Kalm.Client({adapter:'tcp', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
-	it('run tcp + msg-pack', function(done) {
+	it('run tcp + msg-pack', (done) => {
 		server = new Kalm.Server({encoder: 'msg-pack', adapter:'tcp'});
-		server.channel('test', function(data) {
+		server.subscribe('test', (data) => {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
-		server.on('ready', function() {
-			client = new Kalm.Client({encoder: 'msg-pack', adapter:'tcp'});
+		server.on('ready', () => {
+	 		client = new Kalm.Client({encoder: 'msg-pack', adapter:'tcp'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
-	it('run udp + json', function(done) {
+	it('run udp + json', (done) => {
 		server = new Kalm.Server({adapter:'udp', encoder:'json'});
-		server.channel('test', function(data) {
+		server.subscribe('test', (data) => {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
-		server.on('ready', function() {
-			client = new Kalm.Client({adapter:'udp', encoder:'json'});
+		server.on('ready', () => {
+	 		client = new Kalm.Client({adapter:'udp', encoder:'json'});
 			client.send('test', {foo:'bar'});
 		});
 	});
 
-	it('run udp + msg-pack', function(done) {
+	it('run udp + msg-pack', (done) => {
 		server = new Kalm.Server({encoder: 'msg-pack', adapter:'udp'});
-		server.channel('test', function(data) {
+		server.subscribe('test', (data) => {
 			assert.deepEqual(data, {foo:'bar'});
 			server.stop(done);
 		});
 
-		server.on('ready', function() {
+		server.on('ready', () => {
 			client = new Kalm.Client({encoder: 'msg-pack', adapter:'udp'});
 			client.send('test', {foo:'bar'});
 		});

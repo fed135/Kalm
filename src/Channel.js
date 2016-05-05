@@ -83,8 +83,19 @@ class Channel {
 	 * @memberof Channel
 	 * @param {function} method The method to bind
 	 */
-	addHandler(method) {
+	addHandler(method, bindOnce) {
 		this._handlers.push(method);
+	}
+
+	/**
+	 * Removes a handler from this channel 
+	 * @method removeHandler
+	 * @memberof Channel
+	 * @param {function} method The method to bind
+	 */
+	removeHandler(method) {
+		var index = this._handlers.indexOf(method);
+		if (index > -1) this._handlers.splice(index, 1);
 	}
 
 	/**
@@ -102,25 +113,26 @@ class Channel {
 	 * @memberof Channel
 	 * @param {array} payload The received payload
 	 */
-	handleData(channel, payload) {
+	handleData(payload) {
 		var _reqs = payload.length;
 		var _listeners = this._handlers.length;
+		var reply = this.send.bind(this);
 		var i;
 		var c;
 
 		if (this.splitBatches) {
-			for (i = 0; i<_reqs; i++) {
-				for (c = 0; c<_listeners; c++) {
-					this._handlers[c](payload[i], this.send.bind(this), this);
+			for (i = 0; i < _reqs; i++) {
+				for (c = 0; c <_listeners; c++) {
+					this._handlers[c](payload[i], reply, this);
 				}
 			}
 		}
 		else {
-			for (c = 0; c<_listeners; c++) {
-				this._handlers[c](payload, this.send.bind(this), this);
+			for (c = 0; c < _listeners; c++) {
+				this._handlers[c](payload, reply, this);
 			}
 		}
-	};
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/

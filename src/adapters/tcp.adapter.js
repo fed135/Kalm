@@ -10,8 +10,6 @@
 
 const net = require('net');
 
-const debug = require('debug')('kalm');
-
 /* Methods -------------------------------------------------------------------*/
 
 /**
@@ -45,7 +43,7 @@ function send(socket, payload) {
 function stop(server, callback) {
 	server.connections.forEach(disconnect);
 	server.connections.length = 0;
-	server.listener.close(callback || function(err) {});
+	server.listener.close(callback || function() {});
 }
 
 /**
@@ -81,7 +79,6 @@ function createSocket(client, socket) {
 function disconnect(client) {
 	if (client.socket && client.socket.destroy) {
 		client.socket.destroy();
-		client.socket = null;
 	}
 }
 

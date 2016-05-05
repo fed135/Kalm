@@ -54,24 +54,25 @@ class Client extends EventEmitter{
 		// Populate channels
 		if (options.channels) {
 			for (var c in options.channels) {
-				this.channel(c, options.channels[c]);
+				this.subscribe(c, options.channels[c]);
 			}
 		}
 
 		// Socket object
+		this.socket = null;
 		this.use(socket);
 	}
 
 	/**
 	 * Creates a channel for the client
-	 * @method channel
+	 * @method subscribe
 	 * @memberof Client
 	 * @param {string} name The name of the channel.
 	 * @param {function} handler The handler to add to the channel
 	 * @returns {Client} The client, for chaining
 	 */
-	channel(name, handler) {
-		name = name + '';
+	subscribe(name, handler) {
+		name = name + '';	// Stringification
 
 		if (!this.channels.hasOwnProperty(name)) {
 			debug(
@@ -90,6 +91,23 @@ class Client extends EventEmitter{
 			this.channels[name].addHandler(handler);
 		}
 
+		return this;
+	}
+
+	/**
+	 * Removes a handler from a channel
+	 * @method unsubscribe
+	 * @memberof Client
+	 * @param {string} name The name of the channel.
+	 * @param {function} handler The handler to remove from the channel
+	 * @returns {Client} The client, for chaining
+	 */
+	unsubscribe(name, handler) {
+		name = name + '';	// Stringification
+
+		if (!this.channels.hasOwnProperty(name)) return this;
+
+		this.channels[name].removeHandler(handler);
 		return this;
 	}
 
@@ -154,7 +172,7 @@ class Client extends EventEmitter{
 	 */
 	send(name, payload) {
 		if (!this.channels.hasOwnProperty(name)) {
-			this.channel(name);
+			this.subscribe(name);
 		}
 		this.channels[name].send(payload);
 		return this;
@@ -217,7 +235,7 @@ class Client extends EventEmitter{
 
 		if (raw && raw.c) {
 			if (this.channels.hasOwnProperty(raw.c)) {
-				this.channels[raw.c].handleData(raw.c, raw.d);
+				this.channels[raw.c].handleData(raw.d);
 			}
 		}
 	}
@@ -228,7 +246,8 @@ class Client extends EventEmitter{
 	 * @memberof Client
 	 */
 	destroy() {
-		adapters.resolve(this.options.adapter).disconnect(this)
+		adapters.resolve(this.options.adapter).disconnect(this);
+		this.socket = null;
 	}
 }
 

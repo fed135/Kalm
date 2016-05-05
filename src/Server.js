@@ -29,6 +29,8 @@ class Server extends EventEmitter {
 		super();
 		options = options || {};
 
+		this.listener = null;
+
 		this.options = {
 			adapter: options.adapter || defaults.adapter,
 			encoder: options.encoder || defaults.encoder,
@@ -45,13 +47,18 @@ class Server extends EventEmitter {
 	 * Server lift method
 	 * @method listen
 	 * @memberof Server
-	 * @param {function} callback The callback method for server lift
 	 */
-	listen(callback) {
+	listen() {
 		var adapter = adapters.resolve(this.options.adapter);
 
 		if (adapter) {
-			debug('log: listening ' + this.options.adapter + '://0.0.0.0:' + this.options.port);
+			debug(
+				'log: listening ' + 
+				this.options.adapter + 
+				'://0.0.0.0:' + 
+				this.options.port
+			);
+			
 			adapter.listen(this, () => {
 				process.nextTick(() => {
 					this.emit('ready');
@@ -65,18 +72,37 @@ class Server extends EventEmitter {
 
 	/**
 	 * Adds a channel to listen for on attached clients
-	 * @method channel
+	 * @method subscribe
 	 * @memberof Server
 	 * @param {string} name The name of the channel to attach
 	 * @param {function} handler The handler to attach to the channel
 	 * @returns {Server} Returns itself for chaining
 	 */
-	channel(name, handler) {
+	subscribe(name, handler) {
+		name = name + '';	// Stringify
+		this.channels[name] = handler;
+
+		for (var i = this.connections.length - 1; i >= 0; i--) {
+			this.connections[i].subscribe(name, handler);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Removes a handler on attached clients
+	 * @method subscribe
+	 * @memberof Server
+	 * @param {string} name The name of the channel
+	 * @param {function} handler The handler to remove from the channel
+	 * @returns {Server} Returns itself for chaining
+	 */
+	unsubscribe(name, handler) {
 		name = name + '';
 		this.channels[name] = handler;
 
 		for (var i = this.connections.length - 1; i >= 0; i--) {
-			this.connections[i].channel(name, handler);
+			this.connections[i].unsubscribe(name, handler);
 		}
 
 		return this;
@@ -132,7 +158,7 @@ class Server extends EventEmitter {
 			adapters.resolve(this.options.adapter).stop(this, callback);
 		}
 		else {
-			callback();
+			return callback();
 		}
 	}
 
