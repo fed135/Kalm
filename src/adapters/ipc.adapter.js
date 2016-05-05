@@ -38,9 +38,7 @@ function listen(server, callback) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
-	server.connections.forEach(disconnect);
-	server.connections.length = 0;
-	server.listener.close(callback || function stopIPCServer() {});
+	server.listener.close(callback);
 }
 
 /**

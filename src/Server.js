@@ -79,12 +79,11 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	subscribe(name, handler) {
-		name = name + '';	// Stringify
-		this.channels[name] = handler;
+		this.channels[name + ''] = handler;
 
-		for (var i = this.connections.length - 1; i >= 0; i--) {
-			this.connections[i].subscribe(name, handler);
-		}
+		this.connections.forEach((client) => {
+			client.subscribe(name, handler);
+		});
 
 		return this;
 	}
@@ -98,12 +97,9 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	unsubscribe(name, handler) {
-		name = name + '';
-		this.channels[name] = handler;
-
-		for (var i = this.connections.length - 1; i >= 0; i--) {
-			this.connections[i].unsubscribe(name, handler);
-		}
+		this.connections.forEach((client) => {
+			client.unsubscribe(name, handler);
+		});
 
 		return this;
 	}
@@ -153,9 +149,15 @@ class Server extends EventEmitter {
 	 * @param {function} callback The callback method for the operation
 	 */
 	stop(callback) {
+		callback = callback || function() {};
+
+		var adapter = adapters.resolve(this.options.adapter);
+
 		debug('warn: stopping server');
 		if (this.listener) {
-			adapters.resolve(this.options.adapter).stop(this, callback);
+			this.connections.forEach(adapter.disconnect);
+			this.connections.length = 0;
+			adapter.stop(this, callback);
 		}
 		else {
 			return callback();
