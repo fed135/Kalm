@@ -171,9 +171,8 @@ class Client extends EventEmitter{
 	 * @returns {Client} The client, for chaining
 	 */
 	send(name, payload) {
-		if (!this.channels.hasOwnProperty(name)) {
-			this.subscribe(name);
-		}
+		this.subscribe(name);
+		
 		this.channels[name].send(payload);
 		return this;
 	}
@@ -187,9 +186,8 @@ class Client extends EventEmitter{
 	 * @returns {Client} The client, for chaining
 	 */
 	sendOnce(name, payload) {
-		if (!this.channels.hasOwnProperty(name)) {
-			this.channel(name);
-		}
+		this.subscribe(name);
+		
 		this.channels[name].sendOnce(payload);
 		return this;
 	}

@@ -45,9 +45,7 @@ class Channel {
 			return;
 		}
 
-		if (this._timer === null) {
-			this._timer = setTimeout(this._emit.bind(this), this.options.delay);
-		}
+		this._startBundler();
 	}
 
 	/**
@@ -59,6 +57,16 @@ class Channel {
 	sendOnce(payload) {
 		this._packets = [payload];
 
+		this._startBundler();
+	}
+
+	/**
+	 * Initializes the bundler timer
+	 * @private
+	 * @method _startBundler
+	 * @memberof Channel
+	 */
+	_startBundler() {
 		if (this._timer === null) {
 			this._timer = setTimeout(this._emit.bind(this), this.options.delay);
 		}

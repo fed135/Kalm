@@ -40,7 +40,7 @@ function listen(server, callback) {
 function stop(server, callback) {
 	server.connections.forEach(disconnect);
 	server.connections.length = 0;
-	server.listener.close(callback || function() {});
+	server.listener.close(callback || function stopIPCServer() {});
 }
 
 /**
@@ -85,6 +85,7 @@ function createSocket(client, socket) {
  */
 function disconnect(client) {
 	if (client.socket && client.socket.destroy) {
+		// Destroy connections before closing
 		client.socket.destroy();
 	}
 }

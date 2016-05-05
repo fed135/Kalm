@@ -43,7 +43,7 @@ function send(socket, payload) {
 function stop(server, callback) {
 	server.connections.forEach(disconnect);
 	server.connections.length = 0;
-	server.listener.close(callback || function() {});
+	server.listener.close(callback || function stopTCPServer() {});
 }
 
 /**
