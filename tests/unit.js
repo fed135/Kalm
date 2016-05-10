@@ -211,7 +211,8 @@ describe('Client', () => {
 			port: 9000,
 			adapter: 'ipc',
 			bundler: Kalm.defaults.bundler,
-			encoder: Kalm.defaults.encoder
+			encoder: Kalm.defaults.encoder,
+			stats: Kalm.defaults.stats
 		});
 
 		assert.property(client.channels, 'test');
