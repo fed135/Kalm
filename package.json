@@ -1,10 +1,10 @@
 {
   "name": "kalm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
-    "test": "mocha tests/index.js",
+    "test": "mocha tests/unit.js && mocha tests/smoke.js",
     "build": "webpack  -p -d -j --define process.env.NODE_ENV='\"browser\"' --config ./webpack.config"
   },
   "repository": {

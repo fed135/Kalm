@@ -11,8 +11,6 @@
 const net = require('net');
 const fs = require('fs');
 
-const debug = require('debug')('kalm');
-
 /* Local variables -----------------------------------------------------------*/
 
 const _path = '/tmp/app.socket-';
@@ -27,14 +25,11 @@ const _path = '/tmp/app.socket-';
  */
 function listen(server, callback) {
 	fs.unlink(_path + server.options.port, () => {
-		server.listener = net.createServer(server._handleRequest.bind(server));
+		server.listener = net.createServer(server.handleRequest.bind(server));
 		server.listener.listen(_path + server.options.port, callback);
-		server.listener.on('error', (err) => {
-			debug('error: ' + err);
-			server.emit('error', err);
-		});
+		server.listener.on('error', server.handleError.bind(server));
 	});
-};
+}
 
 /**
  * Stops the server.
@@ -43,14 +38,7 @@ function listen(server, callback) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
-	server.connections.forEach((e) => {
-		e.socket.destroy();
-	});
-	
-	process.nextTick(() => {
-		server.connections.length = 0;
-		server.listener.close(callback || function() {});
-	});
+	server.listener.close(callback);
 }
 
 /**
@@ -61,7 +49,7 @@ function stop(server, callback) {
  */
 function send(socket, payload) {
 	if (socket) socket.write(payload);
-};
+}
 
 /**
  * Creates a client and adds the data listener(s) to it
@@ -74,27 +62,29 @@ function createSocket(client, socket) {
 	if (!socket) {
 		socket = net.connect(_path + client.options.port);
 	}
-	socket.on('data', client._handleRequest.bind(client));
-	socket.on('error', (err) => {
-		debug('error: ' + err);
-		client.emit('error', err);
-	});
+	socket.on('data', client.handleRequest.bind(client));
+
+	// Emit on error
+	socket.on('error', client.handleError.bind(client));
+
+	// Emit on connect
+	socket.on('connect', client.handleConnect.bind(client));
 
 	// Will auto-reconnect
-	socket.on('close', () => {
-		client.socket = null;
-	});
+	socket.on('close', client.handleDisconnect.bind(client));
 
 	return socket;
-};
+}
 
 /**
- * Attempts to disconnect the socket
+ * Attempts to disconnect the client's connection
  * @method disconnect
- * @param {Socket} socket The socket to disconnect
+ * @param {Client} client The client to disconnect
  */
-function disconnect(socket) {
-	if (socket.disconnect) socket.disconnect();
+function disconnect(client) {
+	if (client.socket && client.socket.destroy) {
+		client.socket.destroy();
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/

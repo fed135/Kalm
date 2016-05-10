@@ -26,7 +26,7 @@ function setup(resolve) {
 		encoder: settings.encoder,
 	});
 
-	server.channel(settings.testChannel, function() {
+	server.subscribe(settings.testChannel, function() {
 		count++;
 	});
 

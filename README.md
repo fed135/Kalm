@@ -1,11 +1,12 @@
-<img align="left" src="http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo.png">
+<img align="left" src="http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo_bolded.png">
 # Kalm
 *The Socket Optimizer*
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
-[![Current Stage](https://img.shields.io/badge/stage-beta-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Current API Stability](https://img.shields.io/badge/stability-stable-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
 
 ---
 
@@ -75,13 +76,13 @@ Simplify and optimize your Socket communications with:
 
 **Requests per minute**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v03.png">
 
 *Benchmarks based on a single-thread queue test with Kalm default bundling settings AND msg-pack enabled*
 
 **Bytes transfered**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v03.png">
 
 *Number of bytes transfered per 1000 requests*
 
@@ -138,7 +139,6 @@ By default, all Kalm logs are hidden. They can be enabled through the DEBUG envi
 ## Roadmap
 
 [Milestones](https://github.com/fed135/Kalm/milestones)
-
 
 ## Contributing
 

@@ -26,6 +26,8 @@ class Channel {
 		this._timer = null;
 		this._packets = [];
 		this._handlers = [];
+
+		this.splitBatches = true;
 	}
 
 	/**
@@ -38,16 +40,33 @@ class Channel {
 		this._packets.push(payload);
 
 		// Bundling process
-		if (this._packets.length >= this.options.maxPackets) {
-			if (this._timer !== null) {
-				clearTimeout(this._timer);
-				this._timer = null;
-			}
-			
+		if (this._packets.length >= this.options.maxPackets) {			
 			this._emit();
 			return;
 		}
 
+		this._startBundler();
+	}
+
+	/**
+	 * Sends the latest payload only
+	 * @method sendOnce
+	 * @memberof Channel
+	 * @param {object|string} payload The payload to send
+	 */
+	sendOnce(payload) {
+		this._packets = [payload];
+
+		this._startBundler();
+	}
+
+	/**
+	 * Initializes the bundler timer
+	 * @private
+	 * @method _startBundler
+	 * @memberof Channel
+	 */
+	_startBundler() {
 		if (this._timer === null) {
 			this._timer = setTimeout(this._emit.bind(this), this.options.delay);
 		}
@@ -62,6 +81,17 @@ class Channel {
 	_emit() {
 		this._emitter(this.name, this._packets);
 		this._packets.length = 0;
+		this.resetBundler();
+	}
+
+	/**
+	 * Clears the bundler timer
+	 * @method resetBundler
+	 * @memberof Channel
+	 */
+	resetBundler() {
+		clearTimeout(this._timer);
+		this._timer = null;
 	}
 
 	/**
@@ -70,8 +100,28 @@ class Channel {
 	 * @memberof Channel
 	 * @param {function} method The method to bind
 	 */
-	addHandler(method) {
+	addHandler(method, bindOnce) {
 		this._handlers.push(method);
+	}
+
+	/**
+	 * Removes a handler from this channel 
+	 * @method removeHandler
+	 * @memberof Channel
+	 * @param {function} method The method to bind
+	 */
+	removeHandler(method) {
+		var index = this._handlers.indexOf(method);
+		if (index > -1) this._handlers.splice(index, 1);
+	}
+
+	/**
+	 * Destroys the client and connection
+	 * @method destroy
+	 * @memberof Client
+	 */
+	destroy() {
+		this._client.destroy();
 	}
 
 	/**
@@ -83,15 +133,23 @@ class Channel {
 	handleData(payload) {
 		var _reqs = payload.length;
 		var _listeners = this._handlers.length;
+		var reply = this.send.bind(this);
 		var i;
 		var c;
 
-		for (i = 0; i<_reqs; i++) {
-			for (c = 0; c<_listeners; c++) {
-				this._handlers[c](payload[i], this._client);
+		if (this.splitBatches) {
+			for (i = 0; i < _reqs; i++) {
+				for (c = 0; c <_listeners; c++) {
+					this._handlers[c](payload[i], reply, this);
+				}
 			}
 		}
-	};
+		else {
+			for (c = 0; c < _listeners; c++) {
+				this._handlers[c](payload, reply, this);
+			}
+		}
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/

@@ -18,10 +18,6 @@ var encoders = require('./encoders');
 
 var Channel = require('./Channel');
 
-/* Local variables -----------------------------------------------------------*/
-
-const _channelBase = '/';
-
 /* Methods -------------------------------------------------------------------*/
 
 class Client extends EventEmitter{
@@ -49,7 +45,9 @@ class Client extends EventEmitter{
 			// Encoding
 			encoder: options.encoder || defaults.encoder,
 			// Transformations (middleware)
-			bundler: options.bundler || defaults.bundler
+			bundler: options.bundler || defaults.bundler,
+			// Wether to output statistics in stdout
+			stats: options.stats || defaults.stats
 		};
 
 		// List of channels 
@@ -58,24 +56,27 @@ class Client extends EventEmitter{
 		// Populate channels
 		if (options.channels) {
 			for (var c in options.channels) {
-				this.channel(c, options.channels[c]);
+				this.subscribe(c, options.channels[c]);
 			}
 		}
 
 		// Socket object
+		this.socket = null;
 		this.use(socket);
 	}
 
 	/**
 	 * Creates a channel for the client
-	 * @method channel
+	 * @method subscribe
 	 * @memberof Client
 	 * @param {string} name The name of the channel.
 	 * @param {function} handler The handler to add to the channel
+	 * @params {object} options The options object for the channel
 	 * @returns {Client} The client, for chaining
 	 */
-	channel(name, handler) {
-		name = name || _channelBase;
+	subscribe(name, handler, options) {
+		name = name + '';	// Stringification
+		options = options || {};
 
 		if (!this.channels.hasOwnProperty(name)) {
 			debug(
@@ -85,7 +86,7 @@ class Client extends EventEmitter{
 			);
 			this.channels[name] = new Channel(
 				name, 
-				this.options.bundler, 
+				Object.assign(this.options.bundler, options),
 				this
 			);
 		}
@@ -94,6 +95,23 @@ class Client extends EventEmitter{
 			this.channels[name].addHandler(handler);
 		}
 
+		return this;
+	}
+
+	/**
+	 * Removes a handler from a channel
+	 * @method unsubscribe
+	 * @memberof Client
+	 * @param {string} name The name of the channel.
+	 * @param {function} handler The handler to remove from the channel
+	 * @returns {Client} The client, for chaining
+	 */
+	unsubscribe(name, handler) {
+		name = name + '';	// Stringification
+
+		if (!this.channels.hasOwnProperty(name)) return this;
+
+		this.channels[name].removeHandler(handler);
 		return this;
 	}
 
@@ -107,11 +125,45 @@ class Client extends EventEmitter{
 	use(socket) {
 		if (this.socket) {
 			debug('log: disconnecting current socket');
-			adapters.resolve(this.options.adapter).disconnect(this.socket);
+			adapters.resolve(this.options.adapter).disconnect(this);
 		}
 
-		this.socket = this._createSocket(socket);
+		this.socket = this.createSocket(socket);
 		return this;
+	}
+
+	/**
+	 * Socket error handler
+	 * @method handleError
+	 * @memberof Client
+	 * @param {Error} err The socket triggered error
+	 */
+	handleError(err) {
+		debug('error: ' + err);
+		this.emit('error', err);
+	}
+
+	/**
+	 * New socket connection handler
+	 * @method handleConnect
+	 * @memberof Client
+	 * @param {Socket} socket The newly connected socket
+	 */
+	handleConnect(socket) {
+		this.emit('connect', socket);
+		this.emit('connection', socket);
+	}
+
+	/**
+	 * Socket connection lost handler
+	 * @method handleDisconnect
+	 * @memberof Client
+	 * @param {Socket} socket The disconnected socket
+	 */
+	handleDisconnect(socket) {
+		this.emit('disconnect', socket);
+		this.emit('disconnection', socket);
+		this.socket = null;
 	}
 
 	/**
@@ -123,10 +175,24 @@ class Client extends EventEmitter{
 	 * @returns {Client} The client, for chaining
 	 */
 	send(name, payload) {
-		if (!this.channels.hasOwnProperty(name)) {
-			this.channel(name);
-		}
+		this.subscribe(name);
+		
 		this.channels[name].send(payload);
+		return this;
+	}
+
+	/**
+	 * Trumps other packets on the given channel, will only send the latest
+	 * @method sendOnce
+	 * @memberof Client
+	 * @param {string} name The channel to send to data through
+	 * @param {string|object} payload The payload to send 
+	 * @returns {Client} The client, for chaining
+	 */
+	sendOnce(name, payload) {
+		this.subscribe(name);
+		
+		this.channels[name].sendOnce(payload);
 		return this;
 	}
 
@@ -138,7 +204,7 @@ class Client extends EventEmitter{
 	 * @param {Socket} socket The socket to use
 	 * @returns {Socket} The created or attached socket for the client
 	 */
-	_createSocket(socket) {
+	createSocket(socket) {
 		return adapters.resolve(this.options.adapter).createSocket(this, socket);
 	}
 
@@ -150,29 +216,51 @@ class Client extends EventEmitter{
 	 * @param {string} channel The channel targeted for transfer
 	 */
 	_emit(channel, packets) {
+		var payload = encoders.resolve(this.options.encoder).encode([
+			channel,
+			packets
+		]);
+
 		adapters.resolve(this.options.adapter).send(
 			this.socket, 
-			encoders.resolve(this.options.encoder).encode({
-				c: channel,
-				d: packets
-			})
+			payload
 		);
+
+		if (this.options.stats) {
+			process.stdout.write(JSON.stringify({
+				packets: packets.length, 
+				bytes: payload.length 
+			}));
+		}
 	}
 
 	/**
 	 * Handler for receiving data through the listener
 	 * @private
-	 * @method _handleRequest
+	 * @method handleRequest
 	 * @memberof Client
 	 * @param {Buffer} evt The data received
 	 */
-	_handleRequest(evt) {
+	handleRequest(evt) {
 		var raw = encoders.resolve(this.options.encoder).decode(evt);
 
-		if (raw && raw.c) {
-			if (this.channels.hasOwnProperty(raw.c)) {
-				this.channels[raw.c].handleData(raw.d);
+		if (raw && raw.length) {
+			if (this.channels.hasOwnProperty(raw[0])) {
+				this.channels[raw[0]].handleData(raw[1]);
 			}
+		}
+	}
+
+	/**
+	 * Destroys the client and connection
+	 * @method destroy
+	 * @memberof Client
+	 */
+	destroy() {
+		adapters.resolve(this.options.adapter).disconnect(this);
+		this.socket = null;
+		for (var channel in this.channels) {
+			this.channels[channel].resetBundler();
 		}
 	}
 }

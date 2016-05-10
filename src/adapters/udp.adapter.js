@@ -10,8 +10,6 @@
 
 const dgram = require('dgram');
 
-const debug = require('debug')('kalm');
-
 /* Helpers -------------------------------------------------------------------*/
 
 /**
@@ -22,15 +20,16 @@ function _handleNewSocket(data, origin) {
 
 	if (!this.__clients) this.__clients = {};
 	if (!(key in this.__clients)) {
-		this.__clients[key] = this._handleRequest(createSocket({
-			options: {
-				hostname: origin.address,
-				port: origin.port
-			}
-		}));
+		this.__clients[key] = this.createClient({}, {
+			hostname: origin.address,
+			port: origin.port,
+			adapter: 'udp',
+			encoder: this.options.encoder,
+			channels: this.channels
+		});
 	}
 
-	this.__clients[key]._handleRequest(data);
+	this.__clients[key].handleRequest(data);
 }
 
 /* Methods -------------------------------------------------------------------*/
@@ -44,14 +43,11 @@ function _handleNewSocket(data, origin) {
 function listen(server, callback) {
 	server.listener = dgram.createSocket('udp4');
 	server.listener.on('message', _handleNewSocket.bind(server));
-	server.listener.on('error', (err) => {
-		debug('error: ' + err);
-		server.emit('error', err);
-	});
+	server.listener.on('error', server.handleError.bind(server));
 	server.listener.bind(server.options.port, '127.0.0.1');
 	
-	callback();
-};
+	return callback();
+}
 
 /**
  * Sends a message with a socket client
@@ -67,7 +63,7 @@ function send(socket, payload) {
 		socket.__port, 
 		socket.__hostname
 	);
-};
+}
 
 /**
  * Stops the server.
@@ -76,11 +72,7 @@ function send(socket, payload) {
  * @param {function} callback The success callback for the operation
  */
 function stop(server, callback) {
-	server.connections.length = 0;
-	if (server.listener && server.listener.close) {
-		server.listener.close(callback);
-	}
-	else callback();
+	server.listener.close(callback);
 }
 
 /**
@@ -96,20 +88,22 @@ function createSocket(client, soc) {
 	var socket = dgram.createSocket('udp4');
 	socket.__port = client.options.port;
 	socket.__hostname = client.options.hostname;
-	socket.on('error', (err) => {
-		debug('error: ' + err);
-		client.emit('error', err);
-	});
+
+	// Emit on error
+	socket.on('error', client.handleError.bind(client));
+
+	// Emit on connect
+	process.nextTick(client.handleConnect.bind(client));
 
 	return socket;
-};
+}
 
 /**
- * Attempts to disconnect the socket
+ * Attempts to disconnect the client's connection
  * @method disconnect
- * @param {Socket} socket The socket to disconnect
+ * @param {Client} client The client to disconnect
  */
-function disconnect(socket) {
+function disconnect() {
 	// Nothing to do
 }
 
