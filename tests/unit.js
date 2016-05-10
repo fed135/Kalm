@@ -225,6 +225,8 @@ describe('Client', () => {
 		client.subscribe('test-subscribe', testHandler);
 		assert.instanceOf(client.channels['test-subscribe'], Channel);
 		assert.include(client.channels['test-subscribe']._handlers, testHandler);
+		client.subscribe('test-subscribe-delay', testHandler, {delay:1});
+		assert.equal(client.channels['test-subscribe-delay'].options.delay, 1);
 	});
 
 	it('unsubscribe', () => {
@@ -342,6 +344,8 @@ describe('Server', () => {
 		server.subscribe('test-subscribe', testHandler);
 		assert.instanceOf(server.connections[0].channels['test-subscribe'], Channel);
 		assert.include(server.connections[0].channels['test-subscribe']._handlers, testHandler);
+		server.subscribe('test-subscribe-delay', testHandler, {delay:1});
+		assert.equal(server.connections[0].channels['test-subscribe-delay'].options.delay, 1);
 	});
 
 	it('unsubscribe', () => {

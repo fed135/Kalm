@@ -45,7 +45,9 @@ class Client extends EventEmitter{
 			// Encoding
 			encoder: options.encoder || defaults.encoder,
 			// Transformations (middleware)
-			bundler: options.bundler || defaults.bundler
+			bundler: options.bundler || defaults.bundler,
+			// Wether to output statistics in stdout
+			stats: options.stats || defaults.stats
 		};
 
 		// List of channels 
@@ -69,10 +71,12 @@ class Client extends EventEmitter{
 	 * @memberof Client
 	 * @param {string} name The name of the channel.
 	 * @param {function} handler The handler to add to the channel
+	 * @params {object} options The options object for the channel
 	 * @returns {Client} The client, for chaining
 	 */
-	subscribe(name, handler) {
+	subscribe(name, handler, options) {
 		name = name + '';	// Stringification
+		options = options || {};
 
 		if (!this.channels.hasOwnProperty(name)) {
 			debug(
@@ -82,7 +86,7 @@ class Client extends EventEmitter{
 			);
 			this.channels[name] = new Channel(
 				name, 
-				this.options.bundler, 
+				Object.assign(this.options.bundler, options),
 				this
 			);
 		}
@@ -212,13 +216,22 @@ class Client extends EventEmitter{
 	 * @param {string} channel The channel targeted for transfer
 	 */
 	_emit(channel, packets) {
+		var payload = encoders.resolve(this.options.encoder).encode([
+			channel,
+			packets
+		]);
+
 		adapters.resolve(this.options.adapter).send(
 			this.socket, 
-			encoders.resolve(this.options.encoder).encode([
-				channel,
-				packets
-			])
+			payload
 		);
+
+		if (this.options.stats) {
+			process.stdout.write(JSON.stringify({
+				packets: packets.length, 
+				bytes: payload.length 
+			}));
+		}
 	}
 
 	/**

@@ -11,6 +11,7 @@ module.exports = {
 	port: 3000,
 	adapter: 'tcp',
 	encoder: 'msg-pack',
+	stats: false,
 	bundler: {
 		maxPackets: 2048,
 		delay: 16

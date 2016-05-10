@@ -76,13 +76,14 @@ class Server extends EventEmitter {
 	 * @memberof Server
 	 * @param {string} name The name of the channel to attach
 	 * @param {function} handler The handler to attach to the channel
+	 * @params {object} options The options object for the channel
 	 * @returns {Server} Returns itself for chaining
 	 */
-	subscribe(name, handler) {
+	subscribe(name, handler, options) {
 		this.channels[name + ''] = handler;
 
 		this.connections.forEach((client) => {
-			client.subscribe(name, handler);
+			client.subscribe(name, handler, options);
 		});
 
 		return this;
