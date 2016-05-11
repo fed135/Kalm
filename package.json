@@ -1,6 +1,6 @@
 {
   "name": "kalm",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
-    "chai": "3.4.x",
+    "chai": "3.5.x",
     "mocha": "2.4.x"
   },
   "dependencies": {

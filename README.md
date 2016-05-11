@@ -6,7 +6,7 @@
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
-[![Current API Stability](https://img.shields.io/badge/stability-stable-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Gitter](https://img.shields.io/gitter/room/fed135/kalm.svg)](https://gitter.im/fed135/Kalm)
 
 ---
 
@@ -71,6 +71,10 @@ Simplify and optimize your Socket communications with:
     client.channel('someOtherEvent', function() {}); // Can add other handlers dynamically 
 
 ```
+## Documentation
+
+[API docs](https://fed135.github.io/kalm.github.io)
+
 
 ## Performance analysis
 
