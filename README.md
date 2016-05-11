@@ -1,5 +1,7 @@
 <img align="left" src="http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo_bolded.png">
 # Kalm
+
+[![Join the chat at https://gitter.im/fed135/Kalm](https://badges.gitter.im/fed135/Kalm.svg)](https://gitter.im/fed135/Kalm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 *The Socket Optimizer*
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
