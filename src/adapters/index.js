@@ -1,6 +1,5 @@
 /**
  * Adapters 
- * @exports {object}
  */
 
 'use strict';
@@ -9,47 +8,50 @@
 
 const debug = require('debug')('kalm');
 
-var list = {};
-
-// If running in the browser, do not load net adapters
-if (process.env.NODE_ENV !== 'browser') {
-	list.ipc = require('./ipc.adapter');
-	list.tcp = require('./tcp.adapter');
-	list.udp = require('./udp.adapter');
-}
-
 /* Methods -------------------------------------------------------------------*/
 
-/**
- * Returns the selected adapter
- * @method resolve
- * @param {string} name The name of the adapter to return
- * @returns {object|undefined} The adapter
- */
-function resolve(name) {
-	if (list.hasOwnProperty(name)) {
-		return list[name];
-	}
-	else {
-		debug('error: no adapter "' + name + '" found');
-		return;
-	}
-}
+class Adapters {
 
-/**
- * Registers a new adapter
- * @method register
- * @param {string} name The name of the adapter
- * @param {object} mod The body of the adapter
- */
-function register(name, mod) {
-	debug('log: registering new adapter "' + name + '":');
-	list[name] = mod;
+	/**
+	 * Adapters constructor
+	 */
+	constructor() {
+		this.list = {};
+
+		// If running in the browser, do not load net adapters
+		if (process.env.NODE_ENV !== 'browser') {
+			this.list.ipc = require('./ipc.adapter');
+			this.list.tcp = require('./tcp.adapter');
+			this.list.udp = require('./udp.adapter');
+		}
+	}
+
+	/**
+	 * Returns the selected adapter
+	 * @param {string} name The name of the adapter to return
+	 * @returns {object|undefined} The adapter
+	 */
+	resolve(name) {
+		if (this.list.hasOwnProperty(name)) {
+			return this.list[name];
+		}
+		else {
+			debug('error: no adapter "' + name + '" found');
+			return;
+		}
+	}
+
+	/**
+	 * Registers a new adapter
+	 * @param {string} name The name of the adapter
+	 * @param {object} mod The body of the adapter
+	 */
+	register(name, mod) {
+		debug('log: registering new adapter "' + name + '":');
+		this.list[name] = mod;
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	resolve: resolve,
-	register: register
-};
+module.exports = new Adapters;

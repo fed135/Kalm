@@ -1,7 +1,6 @@
 /**
  * MSGPACK Encoder 
- * @encoder msg-pack
- * @exports {object}
+ * @module encoders/msg-pack
  */
 
 'use strict';
@@ -15,7 +14,6 @@ const msgPack = require('msgpack-lite');
 
 /**
  * Encodes a payload
- * @method encode
  * @param {object} payload The payload to encode
  * @returns {Buffer} The encoded payload
  */
@@ -25,7 +23,6 @@ function encode(payload) {
 
 /**
  * Decodes a payload
- * @method decode
  * @param {Buffer} payload The payload to decode
  * @returns {object} The decoded payload
  */

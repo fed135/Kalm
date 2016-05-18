@@ -1,7 +1,5 @@
 /**
  * Channel class
- * @class Channel
- * @exports {Channel}
  */
 
 'use strict';
@@ -12,7 +10,6 @@ class Channel {
 
 	/**
 	 * Channel constructor
-	 * @constructor
 	 * @param {Socket} socket An optionnal socket object to use for communication
 	 * @param {object} options The configuration options for the client
 	 */
@@ -32,8 +29,6 @@ class Channel {
 
 	/**
 	 * Tells the channel to process the payload to send
-	 * @method send
-	 * @memberof Channel
 	 * @param {object|string} payload The payload to process
 	 */
 	send(payload) {
@@ -50,8 +45,6 @@ class Channel {
 
 	/**
 	 * Sends the latest payload only
-	 * @method sendOnce
-	 * @memberof Channel
 	 * @param {object|string} payload The payload to send
 	 */
 	sendOnce(payload) {
@@ -63,8 +56,6 @@ class Channel {
 	/**
 	 * Initializes the bundler timer
 	 * @private
-	 * @method _startBundler
-	 * @memberof Channel
 	 */
 	_startBundler() {
 		if (this._timer === null) {
@@ -75,8 +66,6 @@ class Channel {
 	/**
 	 * Alerts the client to emit the packets for this channel
 	 * @private
-	 * @method _emit
-	 * @memberof Channel
 	 */
 	_emit() {
 		this._emitter(this.name, this._packets);
@@ -86,8 +75,6 @@ class Channel {
 
 	/**
 	 * Clears the bundler timer
-	 * @method resetBundler
-	 * @memberof Channel
 	 */
 	resetBundler() {
 		clearTimeout(this._timer);
@@ -96,8 +83,6 @@ class Channel {
 
 	/**
 	 * Adds a method that listens to this channel
-	 * @method addHandler
-	 * @memberof Channel
 	 * @param {function} method The method to bind
 	 */
 	addHandler(method, bindOnce) {
@@ -106,8 +91,6 @@ class Channel {
 
 	/**
 	 * Removes a handler from this channel 
-	 * @method removeHandler
-	 * @memberof Channel
 	 * @param {function} method The method to bind
 	 */
 	removeHandler(method) {
@@ -117,8 +100,6 @@ class Channel {
 
 	/**
 	 * Destroys the client and connection
-	 * @method destroy
-	 * @memberof Client
 	 */
 	destroy() {
 		this._client.destroy();
@@ -126,8 +107,6 @@ class Channel {
 
 	/**
 	 * Handles channel data
-	 * @method handleData
-	 * @memberof Channel
 	 * @param {array} payload The received payload
 	 */
 	handleData(payload) {

@@ -1,6 +1,5 @@
 /**
  * Kalm bootstraper
- * @exports {object}
  */
 
 'use strict';

@@ -1,7 +1,6 @@
 /**
  * UDP connector methods
- * @adapter udp
- * @exports {object}
+ * @module adapters/udp
  */
 
 'use strict';
@@ -14,9 +13,12 @@ const dgram = require('dgram');
 
 /**
  * Creates a socket + Client on UDP data
+ * @private
+ * @param {array} data Payload from an incomming request
+ * @param {object} origin The call origin info
  */ 
 function _handleNewSocket(data, origin) {
-	var key = origin.address+':'+origin.port;
+	var key = origin.address + ':' + origin.port;
 
 	if (!this.__clients) this.__clients = {};
 	if (!(key in this.__clients)) {
@@ -36,7 +38,6 @@ function _handleNewSocket(data, origin) {
 
 /**
  * Listens for udp connections, updates the 'listener' property of the server
- * @method listen
  * @param {Server} server The server object
  * @param {function} callback The success callback for the operation
  */
@@ -51,7 +52,6 @@ function listen(server, callback) {
 
 /**
  * Sends a message with a socket client
- * @method send
  * @param {Socket} socket The socket to use
  * @param {Buffer} payload The body of the request
  */
@@ -67,7 +67,6 @@ function send(socket, payload) {
 
 /**
  * Stops the server.
- * @method stop
  * @param {Server} server The server object
  * @param {function} callback The success callback for the operation
  */
@@ -77,7 +76,6 @@ function stop(server, callback) {
 
 /**
  * Creates a client
- * @method createSocket
  * @param {Client} client The client to create the socket for
  * @param {Socket} soc Optionnal existing socket object. - Not used for UPC
  * @returns {Socket} The created tcp client
@@ -100,7 +98,6 @@ function createSocket(client, soc) {
 
 /**
  * Attempts to disconnect the client's connection
- * @method disconnect
  * @param {Client} client The client to disconnect
  */
 function disconnect() {

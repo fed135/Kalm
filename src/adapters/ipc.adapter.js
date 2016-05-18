@@ -1,7 +1,6 @@
 /**
  * InterProcessCall connector methods
- * @adapter ipc
- * @exports {object}
+ * @module adapters/ipc
  */
 
 'use strict';
@@ -19,7 +18,6 @@ const _path = '/tmp/app.socket-';
 
 /**
  * Listens for ipc connections, updates the 'listener' property of the server
- * @method listen
  * @param {Server} server The server object
  * @param {function} callback The callback for the operation
  */
@@ -33,7 +31,6 @@ function listen(server, callback) {
 
 /**
  * Stops the server.
- * @method stop
  * @param {Server} server The server object
  * @param {function} callback The success callback for the operation
  */
@@ -43,7 +40,6 @@ function stop(server, callback) {
 
 /**
  * Sends a message with a socket client
- * @method send
  * @param {Socket} socket The socket to use
  * @param {Buffer} payload The body of the request
  */
@@ -53,7 +49,6 @@ function send(socket, payload) {
 
 /**
  * Creates a client and adds the data listener(s) to it
- * @method createSocket
  * @param {Client} client The client to create the socket for
  * @param {Socket} socket Optionnal existing socket object.
  * @returns {Socket} The created ipc socket
@@ -78,7 +73,6 @@ function createSocket(client, socket) {
 
 /**
  * Attempts to disconnect the client's connection
- * @method disconnect
  * @param {Client} client The client to disconnect
  */
 function disconnect(client) {

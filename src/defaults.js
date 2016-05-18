@@ -14,6 +14,7 @@ module.exports = {
 	stats: false,
 	bundler: {
 		maxPackets: 2048,
+		heartbeat: false,
 		delay: 16
 	}
 };

@@ -212,7 +212,8 @@ describe('Client', () => {
 			adapter: 'ipc',
 			bundler: Kalm.defaults.bundler,
 			encoder: Kalm.defaults.encoder,
-			stats: Kalm.defaults.stats
+			stats: Kalm.defaults.stats,
+			heartbeat: null
 		});
 
 		assert.property(client.channels, 'test');
@@ -324,7 +325,8 @@ describe('Server', () => {
 			assert.deepEqual(server.options, {
 				adapter: 'ipc',
 				encoder: Kalm.defaults.encoder,
-				port: 9000
+				port: 9000,
+				heartbeat: Kalm.defaults.heartbeat
 			});
 			assert.isArray(server.connections);
 			assert.isObject(server.channels);

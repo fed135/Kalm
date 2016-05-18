@@ -1,7 +1,5 @@
 /**
  * Client class
- * @class Client
- * @exports {Client}
  */
 
 'use strict';
@@ -24,7 +22,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Client constructor
-	 * @constructor
 	 * @param {Socket} socket An optionnal socket object to use for communication
 	 * @param {object} options The configuration options for the client
 	 */
@@ -47,7 +44,9 @@ class Client extends EventEmitter{
 			// Transformations (middleware)
 			bundler: options.bundler || defaults.bundler,
 			// Wether to output statistics in stdout
-			stats: options.stats || defaults.stats
+			stats: options.stats || defaults.stats,
+			// Heartbeat - takes a parent timer or creates it's own
+			heartbeat: options.heartbeat || null
 		};
 
 		// List of channels 
@@ -67,8 +66,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Creates a channel for the client
-	 * @method subscribe
-	 * @memberof Client
 	 * @param {string} name The name of the channel.
 	 * @param {function} handler The handler to add to the channel
 	 * @params {object} options The options object for the channel
@@ -100,8 +97,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Removes a handler from a channel
-	 * @method unsubscribe
-	 * @memberof Client
 	 * @param {string} name The name of the channel.
 	 * @param {function} handler The handler to remove from the channel
 	 * @returns {Client} The client, for chaining
@@ -117,8 +112,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Defines a socket to use for communication, disconnects previous connection
-	 * @method use
-	 * @memberof Client
 	 * @param {Socket} socket The socket to use
 	 * @returns {Client} The client, for chaining
 	 */
@@ -134,8 +127,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Socket error handler
-	 * @method handleError
-	 * @memberof Client
 	 * @param {Error} err The socket triggered error
 	 */
 	handleError(err) {
@@ -145,8 +136,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * New socket connection handler
-	 * @method handleConnect
-	 * @memberof Client
 	 * @param {Socket} socket The newly connected socket
 	 */
 	handleConnect(socket) {
@@ -156,8 +145,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Socket connection lost handler
-	 * @method handleDisconnect
-	 * @memberof Client
 	 * @param {Socket} socket The disconnected socket
 	 */
 	handleDisconnect(socket) {
@@ -168,8 +155,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Queues a packet for transfer on the given channel
-	 * @method send
-	 * @memberof Client
 	 * @param {string} name The channel to send to data through
 	 * @param {string|object} payload The payload to send 
 	 * @returns {Client} The client, for chaining
@@ -183,8 +168,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Trumps other packets on the given channel, will only send the latest
-	 * @method sendOnce
-	 * @memberof Client
 	 * @param {string} name The channel to send to data through
 	 * @param {string|object} payload The payload to send 
 	 * @returns {Client} The client, for chaining
@@ -199,8 +182,6 @@ class Client extends EventEmitter{
 	/**
 	 * Creates or attaches a socket for the appropriate adapter
 	 * @private
-	 * @method _createSocket
-	 * @memberof Client
 	 * @param {Socket} socket The socket to use
 	 * @returns {Socket} The created or attached socket for the client
 	 */
@@ -211,8 +192,6 @@ class Client extends EventEmitter{
 	/**
 	 * Sends a packet - triggered by middlewares
 	 * @private
-	 * @method _emit
-	 * @memberof Client
 	 * @param {string} channel The channel targeted for transfer
 	 */
 	_emit(channel, packets) {
@@ -237,8 +216,6 @@ class Client extends EventEmitter{
 	/**
 	 * Handler for receiving data through the listener
 	 * @private
-	 * @method handleRequest
-	 * @memberof Client
 	 * @param {Buffer} evt The data received
 	 */
 	handleRequest(evt) {
@@ -253,8 +230,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Destroys the client and connection
-	 * @method destroy
-	 * @memberof Client
 	 */
 	destroy() {
 		adapters.resolve(this.options.adapter).disconnect(this);
