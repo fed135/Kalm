@@ -9,6 +9,7 @@
 const EventEmitter = require('events').EventEmitter;
 
 const debug = require('debug')('kalm');
+const statsOut = require('debug')('kalm:stats');
 
 var defaults = require('./defaults');
 var adapters = require('./adapters');
@@ -78,7 +79,7 @@ class Client extends EventEmitter{
 
 		if (!this.channels.hasOwnProperty(name)) {
 			debug(
-				'log: new channel ' + 
+				'log: new connection ' + 
 				this.options.adapter + '://' + this.options.hostname + ':' + 
 				this.options.port + '/' + name
 			);
@@ -207,7 +208,7 @@ class Client extends EventEmitter{
 		);
 
 		if (this.options.stats) {
-			process.stdout.write(JSON.stringify({
+			statsOut(JSON.stringify({
 				packets: packets.length, 
 				bytes: payload.length 
 			}));
