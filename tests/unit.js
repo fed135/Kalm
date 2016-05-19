@@ -140,11 +140,11 @@ describe('Channel', () => {
 		channel.send('foo');
 		assert.isNotNull(channel._timer);
 		channel.send('foo2');
-		assert.include(channel._packets, 'foo');
-		assert.include(channel._packets, 'foo2');
+		assert.include(channel.packets, 'foo');
+		assert.include(channel.packets, 'foo2');
 
 		setTimeout(() => {
-			assert.equal(channel._packets.length, 0);
+			assert.equal(channel.packets.length, 0);
 			assert.isNull(channel._timer);
 			done();
 		}, Kalm.defaults.bundler.delay + 1);
@@ -153,13 +153,13 @@ describe('Channel', () => {
 	it('sendOnce', (done) => {
 		channel.sendOnce('foo');
 		assert.isNotNull(channel._timer);
-		assert.include(channel._packets, 'foo');
+		assert.include(channel.packets, 'foo');
 		channel.sendOnce('foo2');
-		assert.notInclude(channel._packets, 'foo');
-		assert.include(channel._packets, 'foo2');
+		assert.notInclude(channel.packets, 'foo');
+		assert.include(channel.packets, 'foo2');
 
 		setTimeout(() => {
-			assert.equal(channel._packets.length, 0);
+			assert.equal(channel.packets.length, 0);
 			assert.isNull(channel._timer);
 			done();
 		}, Kalm.defaults.bundler.delay + 1);
@@ -169,7 +169,7 @@ describe('Channel', () => {
 		var testHandler = function foo() {};
 
 		channel.addHandler(testHandler);
-		assert.include(channel._handlers, testHandler);
+		assert.include(channel.handlers, testHandler);
 	});
 
 	it('removeHandler', () => {
@@ -177,7 +177,7 @@ describe('Channel', () => {
 
 		channel.addHandler(testHandler);
 		channel.removeHandler(testHandler);
-		assert.notInclude(channel._handlers, testHandler);
+		assert.notInclude(channel.handlers, testHandler);
 	});
 
 	it('handleData', (done) => {
@@ -226,7 +226,7 @@ describe('Client', () => {
 		var testHandler = function bar() {};
 		client.subscribe('test-subscribe', testHandler);
 		assert.instanceOf(client.channels['test-subscribe'], Channel);
-		assert.include(client.channels['test-subscribe']._handlers, testHandler);
+		assert.include(client.channels['test-subscribe'].handlers, testHandler);
 		client.subscribe('test-subscribe-delay', testHandler, {delay:1});
 		assert.equal(client.channels['test-subscribe-delay'].options.delay, 1);
 	});
@@ -235,7 +235,7 @@ describe('Client', () => {
 		var testHandler = function unbar() {};
 		client.subscribe('test-unsubscribe', testHandler);
 		client.unsubscribe('test-unsubscribe', testHandler);
-		assert.notInclude(client.channels['test-unsubscribe']._handlers, testHandler);
+		assert.notInclude(client.channels['test-unsubscribe'].handlers, testHandler);
 	});
 
 	it('use', () => {
@@ -280,14 +280,14 @@ describe('Client', () => {
 		client.send('test-send', 'test1');
 		client.send('test-send', 'test2');
 		assert.instanceOf(client.channels['test-send'], Channel);
-		assert.equal(client.channels['test-send']._packets.length, 2);
+		assert.equal(client.channels['test-send'].packets.length, 2);
 	});
 
 	it('sendOnce', () => {
 		client.sendOnce('test-sendOnce', 'test1');
 		client.sendOnce('test-sendOnce', 'test2');
 		assert.instanceOf(client.channels['test-sendOnce'], Channel);
-		assert.equal(client.channels['test-sendOnce']._packets.length, 1);
+		assert.equal(client.channels['test-sendOnce'].packets.length, 1);
 	});
 
 	it('handleRequest', (done) => {
@@ -346,7 +346,7 @@ describe('Server', () => {
 		var testHandler = function bar() {};
 		server.subscribe('test-subscribe', testHandler);
 		assert.instanceOf(server.connections[0].channels['test-subscribe'], Channel);
-		assert.include(server.connections[0].channels['test-subscribe']._handlers, testHandler);
+		assert.include(server.connections[0].channels['test-subscribe'].handlers, testHandler);
 		server.subscribe('test-subscribe-delay', testHandler, {delay:1});
 		assert.equal(server.connections[0].channels['test-subscribe-delay'].options.delay, 1);
 	});
@@ -355,7 +355,7 @@ describe('Server', () => {
 		var testHandler = function unbar() {};
 		server.subscribe('test-unsubscribe', testHandler);
 		server.unsubscribe('test-unsubscribe', testHandler);
-		assert.notInclude(server.connections[0].channels['test-unsubscribe']._handlers, testHandler);
+		assert.notInclude(server.connections[0].channels['test-unsubscribe'].handlers, testHandler);
 	});
 
 	it('broadcast', () => {
@@ -363,14 +363,14 @@ describe('Server', () => {
 		server.handleRequest(testSocket);
 		assert.equal(server.connections.length, 2);
 		server.broadcast('test-broadcast', 'test');
-		assert.include(server.connections[0].channels['test-broadcast']._packets, 'test');
-		assert.include(server.connections[1].channels['test-broadcast']._packets, 'test');
+		assert.include(server.connections[0].channels['test-broadcast'].packets, 'test');
+		assert.include(server.connections[1].channels['test-broadcast'].packets, 'test');
 	});
 
 	it('whisper', () => {
 		server.connections[0].subscribe('test-whisper');
 		server.whisper('test-whisper', 'test');
-		assert.include(server.connections[0].channels['test-whisper']._packets, 'test');
+		assert.include(server.connections[0].channels['test-whisper'].packets, 'test');
 		assert.isUndefined(server.connections[1].channels['test-whisper']);
 	});
 

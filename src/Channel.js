@@ -25,8 +25,8 @@ class Channel {
 		this._emitter = client._emit.bind(client);
 
 		this._timer = null;
-		this._packets = [];
-		this._handlers = [];
+		this.packets = [];
+		this.handlers = [];
 
 		this.splitBatches = true;
 
@@ -47,15 +47,15 @@ class Channel {
 	 * @param {object|string} payload The payload to process
 	 */
 	send(payload) {
-		this._packets.push(payload);
+		this.packets.push(payload);
 
 		// Bundling process
-		if (this._packets.length >= this.options.maxPackets) {			
+		if (this.packets.length >= this.options.maxPackets) {			
 			this._emit();
 			return;
 		}
 
-		this._startBundler();
+		this.startBundler();
 	}
 
 	/**
@@ -63,16 +63,15 @@ class Channel {
 	 * @param {object|string} payload The payload to send
 	 */
 	sendOnce(payload) {
-		this._packets = [payload];
+		this.packets = [payload];
 
-		this._startBundler();
+		this.startBundler();
 	}
 
 	/**
 	 * Initializes the bundler timer
-	 * @private
 	 */
-	_startBundler() {
+	startBundler() {
 		if (!this.options.serverTick) {
 			if (this._timer === null) {
 				this._timer = setTimeout(this._emit.bind(this), this.options.delay);
@@ -85,8 +84,8 @@ class Channel {
 	 * @private
 	 */
 	_emit() {
-		this._emitter(this.name, this._packets);
-		this._packets.length = 0;
+		this._emitter(this.name, this.packets);
+		this.packets.length = 0;
 		this.resetBundler();
 	}
 
@@ -103,7 +102,7 @@ class Channel {
 	 * @param {function} method The method to bind
 	 */
 	addHandler(method, bindOnce) {
-		this._handlers.push(method);
+		this.handlers.push(method);
 	}
 
 	/**
@@ -111,8 +110,8 @@ class Channel {
 	 * @param {function} method The method to bind
 	 */
 	removeHandler(method) {
-		var index = this._handlers.indexOf(method);
-		if (index > -1) this._handlers.splice(index, 1);
+		var index = this.handlers.indexOf(method);
+		if (index > -1) this.handlers.splice(index, 1);
 	}
 
 	/**
@@ -128,7 +127,7 @@ class Channel {
 	 */
 	handleData(payload) {
 		var _reqs = payload.length;
-		var _listeners = this._handlers.length;
+		var _listeners = this.handlers.length;
 		var reply = this.send.bind(this);
 		var i;
 		var c;
@@ -136,13 +135,13 @@ class Channel {
 		if (this.splitBatches) {
 			for (i = 0; i < _reqs; i++) {
 				for (c = 0; c <_listeners; c++) {
-					this._handlers[c](payload[i], reply, this);
+					this.handlers[c](payload[i], reply, this);
 				}
 			}
 		}
 		else {
 			for (c = 0; c < _listeners; c++) {
-				this._handlers[c](payload, reply, this);
+				this.handlers[c](payload, reply, this);
 			}
 		}
 	}

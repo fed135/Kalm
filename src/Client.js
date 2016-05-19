@@ -143,6 +143,13 @@ class Client extends EventEmitter{
 	handleConnect(socket) {
 		this.emit('connect', socket);
 		this.emit('connection', socket);
+
+		// In the case of a reconnection, we want to resume channel bundlers
+		for (var channel in this.channels) {
+			if (this.channels[channel].packets.length) {
+				this.channels[channel].startBundler();
+			}
+		}
 	}
 
 	/**
