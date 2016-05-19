@@ -12,9 +12,10 @@ module.exports = {
 	adapter: 'tcp',
 	encoder: 'msg-pack',
 	stats: false,
+	tick: null,
 	bundler: {
 		maxPackets: 2048,
-		heartbeat: false,
+		serverTick: false,
 		delay: 16
 	}
 };

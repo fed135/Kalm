@@ -44,13 +44,14 @@ class Client extends EventEmitter{
 			// Transformations (middleware)
 			bundler: options.bundler || defaults.bundler,
 			// Wether to output statistics in stdout
-			stats: options.stats || defaults.stats,
-			// Heartbeat - takes a parent timer or creates it's own
-			heartbeat: options.heartbeat || null
+			stats: options.stats || defaults.stats
 		};
 
 		// List of channels 
 		this.channels = {};
+		
+		// Server tick reference
+		this.tick = options.tick || null;
 
 		// Populate channels
 		if (options.channels) {

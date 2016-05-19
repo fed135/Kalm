@@ -18,7 +18,7 @@ class Timer extends EventEmitter {
 	 */
 	constructor(delay) {
 		super();
-		
+
 		this.delay = delay;
 		this.timer;
 
@@ -30,7 +30,7 @@ class Timer extends EventEmitter {
 	 * @returns {Timer} Returns itself for chaining
 	 */
 	start() {
-		this.timer = setInterval(e => this.emit('tick'), this.delay);
+		this.timer = setInterval(e => this.emit('step'), this.delay);
 		return this;
 	}
 

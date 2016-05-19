@@ -213,9 +213,9 @@ describe('Client', () => {
 			bundler: Kalm.defaults.bundler,
 			encoder: Kalm.defaults.encoder,
 			stats: Kalm.defaults.stats,
-			heartbeat: null
 		});
 
+		assert.isNull(client.tick);
 		assert.property(client.channels, 'test');
 		assert.instanceOf(client.channels.test, Channel);
 
@@ -326,7 +326,7 @@ describe('Server', () => {
 				adapter: 'ipc',
 				encoder: Kalm.defaults.encoder,
 				port: 9000,
-				heartbeat: Kalm.defaults.heartbeat
+				tick: Kalm.defaults.tick
 			});
 			assert.isArray(server.connections);
 			assert.isObject(server.channels);

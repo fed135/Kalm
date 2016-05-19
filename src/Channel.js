@@ -4,6 +4,10 @@
 
 'use strict';
 
+/* Requires ------------------------------------------------------------------*/
+
+const debug = require('debug')('kalm');
+
 /* Methods -------------------------------------------------------------------*/
 
 class Channel {
@@ -25,6 +29,17 @@ class Channel {
 		this._handlers = [];
 
 		this.splitBatches = true;
+
+		// Bind to server tick 
+		if (this.options.serverTick) {
+			if (client.options.tick) {
+				client.options.tick.on('step', this._emit);
+			}
+			else {
+				debug('warn: no server heartbeat, ignoring serverTick config');
+				this.options.serverTick = false;
+			}
+		}
 	}
 
 	/**
@@ -58,8 +73,10 @@ class Channel {
 	 * @private
 	 */
 	_startBundler() {
-		if (this._timer === null) {
-			this._timer = setTimeout(this._emit.bind(this), this.options.delay);
+		if (!this.options.serverTick) {
+			if (this._timer === null) {
+				this._timer = setTimeout(this._emit.bind(this), this.options.delay);
+			}
 		}
 	}
 

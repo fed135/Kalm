@@ -12,6 +12,7 @@ const debug = require('debug')('kalm');
 
 var defaults = require('./defaults');
 var Client = require('./Client');
+var Timer = require('./Timer');
 var adapters = require('./adapters');
 
 /* Methods -------------------------------------------------------------------*/
@@ -27,18 +28,20 @@ class Server extends EventEmitter {
 		options = options || {};
 
 		this.listener = null;
+		this._timer = null;
 
 		this.options = {
 			adapter: options.adapter || defaults.adapter,
 			encoder: options.encoder || defaults.encoder,
 			port: options.port || defaults.port,
-			heartbeat: options.heartbeat || defaults.heartbeat
+			tick: defaults.tick
 		};
 
 		this.connections = [];
 		this.channels = options.channels || {};
 
 		this.listen();
+		this.setTick(this.options.tick);
 	}
 
 	/**
@@ -67,10 +70,29 @@ class Server extends EventEmitter {
 	}
 
 	/**
+	 * Updates the server Timer delay
+	 * @param {integer} delay The new delay for the server tick
+	 * @returns {Server} Returns itself for chaining
+	 */
+	setTick(delay) {
+		this.options.tick = delay;
+		
+		// Reset timer
+		if (this._timer) {
+				this._timer.stop();
+				this._timer = null;
+		}
+
+		if (delay) this._timer = new Timer(delay);
+
+		return this;
+	}
+
+	/**
 	 * Adds a channel to listen for on attached clients
 	 * @param {string} name The name of the channel to attach
 	 * @param {function} handler The handler to attach to the channel
-	 * @params {object} options The options object for the channel
+	 * @param {object} options The options object for the channel
 	 * @returns {Server} Returns itself for chaining
 	 */
 	subscribe(name, handler, options) {
@@ -181,7 +203,8 @@ class Server extends EventEmitter {
 		var client = this.createClient(socket, {
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
-			channels: this.channels
+			channels: this.channels,
+			tick: this._timer
 		});
 		this.connections.push(client);
 		client.on('disconnect', (socket) => {
