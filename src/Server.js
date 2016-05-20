@@ -7,6 +7,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 const EventEmitter = require('events').EventEmitter;
+const crypto = require('crypto');
 
 const debug = require('debug')('kalm');
 
@@ -26,6 +27,8 @@ class Server extends EventEmitter {
 	constructor(options) {
 		super();
 		options = options || {};
+
+		this.id = crypto.randomBytes(20).toString('hex');
 
 		this.listener = null;
 		this._timer = null;
@@ -117,6 +120,21 @@ class Server extends EventEmitter {
 		});
 
 		return this;
+	}
+
+	/**
+	 * Returns all the currently unsent packets from clients
+	 * @returns {array} The unset packets
+	 */
+	dump() {
+		return this.connections.map((client) => {
+			return Object.keys(client.channels).map((channel) => {
+				return {
+					channel: channel,
+					packets: client.channels[channel].packets
+				}
+			});
+		});
 	}
 
 	/**

@@ -7,6 +7,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 const EventEmitter = require('events').EventEmitter;
+const crypto = require('crypto');
 
 const debug = require('debug')('kalm');
 const statsOut = require('debug')('kalm:stats');
@@ -33,6 +34,8 @@ class Client extends EventEmitter{
 			socket = null;
 		}
 		options = options || {};
+
+		this.id = crypto.randomBytes(20).toString('hex');
 
 		this.options = {
 			// Basic info

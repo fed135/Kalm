@@ -8,6 +8,8 @@
 
 const debug = require('debug')('kalm');
 
+const crypto = require('crypto');
+
 /* Methods -------------------------------------------------------------------*/
 
 class Channel {
@@ -18,6 +20,7 @@ class Channel {
 	 * @param {object} options The configuration options for the client
 	 */
 	constructor(name, options, client) {
+		this.id = crypto.randomBytes(20).toString('hex');
 		this.name = name;
 		this.options = options;
 
