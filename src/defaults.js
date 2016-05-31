@@ -10,7 +10,7 @@ module.exports = {
 	hostname: '0.0.0.0',
 	port: 3000,
 	adapter: 'tcp',
-	encoder: 'msg-pack',
+	encoder: 'json',
 	stats: false,
 	tick: null,
 	bundler: {

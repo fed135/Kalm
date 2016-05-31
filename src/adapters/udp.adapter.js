@@ -100,8 +100,9 @@ function createSocket(client, soc) {
  * Attempts to disconnect the client's connection
  * @param {Client} client The client to disconnect
  */
-function disconnect() {
+function disconnect(client) {
 	// Nothing to do
+	client.handleDisconnect();
 }
 
 /* Exports -------------------------------------------------------------------*/

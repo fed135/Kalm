@@ -7,7 +7,6 @@
 /* Requires ------------------------------------------------------------------*/
 
 var json = require('./json');
-var msgPack = require('./msg-pack');
 
 const debug = require('debug')('kalm');
 
@@ -20,8 +19,7 @@ class Encoders {
 	 */
 	constructor() {
 		this.list = {
-			json: json,
-			'msg-pack': msgPack
+			json: json
 		};
 	}
 

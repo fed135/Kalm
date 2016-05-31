@@ -12,12 +12,16 @@
 
 Simplify and optimize your Socket communications with:
 
-- Packet bundling and minification
 - Easy-to-use single syntax for all protocols
-- Event channels for all protocols
-- Ultra-flexible and extensible adapters
+- Configurable packet bundling (High-level Naggle's algorith implementation)
+- Multiplexing for all protocols
+- Ultra-flexible and extensible, load your own adapters and encoders
 
 ---
+
+## Compatibility
+
+ * NODE >= 6.0.0
 
 
 ## Installation
@@ -36,7 +40,7 @@ Simplify and optimize your Socket communications with:
     var server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
-      encoder: 'msg-pack',
+      encoder: 'json',
       channels: {
         messageEvent: function(data) {               // Handler - new connections will register to these events
           console.log('User sent message ' + data.body);
@@ -59,7 +63,7 @@ Simplify and optimize your Socket communications with:
       hostname: '0.0.0.0', // Server's IP
       port: 6000, // Server's port
       adapter: 'udp', // Server's adapter
-      encoder: 'msg-pack', // Server's encoder
+      encoder: 'json', // Server's encoder
       channels: {
         'userEvent': function(data) {
           console.log('Server: ' + data);
@@ -68,7 +72,7 @@ Simplify and optimize your Socket communications with:
     });
 
     client.send('messageEvent', {body: 'This is an object!'});	// Can send Objects, Strings or Buffers 
-    client.channel('someOtherEvent', function() {}); // Can add other handlers dynamically 
+    client.subscribe('someOtherEvent', function() {}); // Can add other handlers dynamically 
 
 ```
 ## Documentation
@@ -99,6 +103,7 @@ Allow you to easily use different socket types, hassle-free
 - tcp (bundled)
 - udp (bundled)
 - [kalm-websocket](https://github.com/fed135/kalm-websocket)
+- [kalm-webrtc](https://github.com/fed135/kalm-webrtc)
 
 
 ## Encoders
@@ -106,7 +111,9 @@ Allow you to easily use different socket types, hassle-free
 Encodes/Decodes the payloads
 
 - json (bundled)
-- msg-pack (bundled)
+- [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
+- [kalm-snappy](https://github.com/fed135/kalm-snappy)
+- [kalm-protocol-buffer](https://github.com/fed135/kalm-msgpack)
 
 
 ## Loading custom adapters
@@ -116,13 +123,15 @@ The framework is flexible enough so that you can load your own custom adapters, 
 ```node
     // Custom adapter loading example
     var Kalm = require('Kalm');
-    var MyCustomAdapter = require('my-custom-adapter');
+    var WebRTC = require('kalm-webrtc');
+    var msgpack = require('kalm-msgpack');
 
-    Kalm.adapters.register('my-custom-adapter', MyCustomAdapter);
+    Kalm.adapters.register('webrtc', WebRTC);
+    Kalm.encoders.register('msg-pack', msgpack);
 
     var server = new Kalm.Server({
       port: 3000,
-      adapter: 'my-custom-adapter',
+      adapter: 'webrtc',
       encoder: 'msg-pack'
     });
 ```
@@ -133,18 +142,34 @@ The framework is flexible enough so that you can load your own custom adapters, 
     npm test
 
 
-## Debugging
+## Logging
 
 By default, all Kalm logs are hidden. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
 
     export DEBUG=kalm
+
+You can dump the unsent packets for recovery purposes by calling
+
+    <Server>.dump();
+
+You can also gather Naggling optimization statistics by piping `kalm:stats`
+
+    export DEBUG=kalm:stats myApp.js > stats.log
+
+To calculate Naggling gains alone in bytes, you can multiply the `packets` property by the full protocol header.
 
 
 ## Roadmap
 
 [Milestones](https://github.com/fed135/Kalm/milestones)
 
+
 ## Contributing
 
 I am looking for contributors to help improve the codebase and create adapters, encoders and middleware.
 Email me for details.
+
+
+## Presentations
+
+- [JS Montreal](http://www.meetup.com/js-montreal/events/224538913/) - June 14th 2016

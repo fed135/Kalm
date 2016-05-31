@@ -50,6 +50,7 @@ function createSocket(client, socket) {
 	if (!socket) {
 		socket = net.connect(client.options.port, client.options.hostname);
 	}
+	console.log(client);
 	socket.on('data', client.handleRequest.bind(client));
 
 	// Emit on error
@@ -61,6 +62,12 @@ function createSocket(client, socket) {
 	// Will auto-reconnect
 	socket.on('close', client.handleDisconnect.bind(client));
 
+	// Add timeout listener, sever connection
+	socket.on('timeout', () => disconnect(client));
+
+	// Set timeout
+	socket.setTimeout(client.options.socketTimeout);
+
 	return socket;
 }
 
@@ -71,6 +78,7 @@ function createSocket(client, socket) {
 function disconnect(client) {
 	if (client.socket && client.socket.destroy) {
 		client.socket.destroy();
+		client.handleDisconnect();
 	}
 }
 

@@ -27,13 +27,8 @@ class Client extends EventEmitter{
 	 * @param {Socket} socket An optionnal socket object to use for communication
 	 * @param {object} options The configuration options for the client
 	 */
-	constructor(socket, options) {
+	constructor(options={}, socket=null) {
 		super();
-		if (options === undefined) {
-			options = socket;
-			socket = null;
-		}
-		options = options || {};
 
 		this.id = crypto.randomBytes(20).toString('hex');
 
@@ -76,9 +71,8 @@ class Client extends EventEmitter{
 	 * @params {object} options The options object for the channel
 	 * @returns {Client} The client, for chaining
 	 */
-	subscribe(name, handler, options) {
+	subscribe(name, handler, options={}) {
 		name = name + '';	// Stringification
-		options = options || {};
 
 		if (!this.channels.hasOwnProperty(name)) {
 			debug(
@@ -220,7 +214,7 @@ class Client extends EventEmitter{
 		if (this.options.stats) {
 			statsOut(JSON.stringify({
 				packets: packets.length, 
-				bytes: payload.length 
+				bytes: payload.length
 			}));
 		}
 	}

@@ -37,8 +37,6 @@
     "mocha": "2.4.x"
   },
   "dependencies": {
-    "debug": "2.2.x",
-    "msgpack-decode": "1.0.x",
-    "msgpack-lite": "0.1.x"
+    "debug": "2.2.x"
   }
 }

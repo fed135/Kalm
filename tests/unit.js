@@ -98,15 +98,6 @@ describe('Encoders', () => {
 			assert.instanceOf(json_test.encode(objTest), Buffer, 'json encoder does not output a buffer');
 			assert.deepEqual(json_test.decode(json_test.encode(objTest)), objTest, 'Object is not the same after json decoding.');
 		});
-
-		it('msg-pack', () => {
-			var msg_test = Kalm.encoders.resolve('msg-pack');
-			assert.isObject(msg_test, 'msg-pack is not a valid encoder object');
-			allMembersTypeMatch(msg_test, encoderFormat);
-
-			assert.instanceOf(msg_test.encode(objTest), Buffer, 'msg-pack encoder does not output a buffer');
-			assert.deepEqual(msg_test.decode(msg_test.encode(objTest)), objTest, 'Object is not the same after msg-pack decoding.');
-		});
 	});
 
 	describe('methods', () => {
@@ -197,13 +188,13 @@ describe('Channel', () => {
 describe('Client', () => {
 	var testSocket = new EventEmitter();
 	var testHandler = function() {};
-	var client = new Kalm.Client(testSocket, {
+	var client = new Kalm.Client({
 		adapter: 'ipc', 
 		port: 9000,
 		channels: { 
 			test: testHandler
 		}
-	});
+	}, testSocket);
 
 	it('constructor', () => {
 		assert.deepEqual(client.options, {
@@ -298,7 +289,7 @@ describe('Client', () => {
 			done();
 		});
 
-		client.handleRequest(Kalm.encoders.resolve('msg-pack').encode(testPayload));
+		client.handleRequest(Kalm.encoders.resolve('json').encode(testPayload));
 	});
 
 	it('destroy', () => {

@@ -24,9 +24,8 @@ class Server extends EventEmitter {
 	 * Server constructor
 	 * @param {object} options The configuration options for the server
 	 */
-	constructor(options) {
+	constructor(options={}) {
 		super();
-		options = options || {};
 
 		this.id = crypto.randomBytes(20).toString('hex');
 
@@ -199,8 +198,8 @@ class Server extends EventEmitter {
 	 * @param {object} options The options for the client
 	 * @returns {Client} The newly created client
 	 */
-	createClient(socket, options) {
-		return new Client(socket, options);
+	createClient(options, socket) {
+		return new Client(options, socket);
 	}
 
 	/**
@@ -218,12 +217,12 @@ class Server extends EventEmitter {
 	 * @param {Socket} socket The received connection socket
 	 */
 	handleRequest(socket) {
-		var client = this.createClient(socket, {
+		var client = this.createClient({
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
 			channels: this.channels,
 			tick: this._timer
-		});
+		}, socket);
 		this.connections.push(client);
 		client.on('disconnect', (socket) => {
 			this.emit('disconnect', socket);
