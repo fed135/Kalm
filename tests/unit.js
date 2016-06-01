@@ -201,6 +201,7 @@ describe('Client', () => {
 			hostname: Kalm.defaults.hostname,
 			port: 9000,
 			adapter: 'ipc',
+			socketTimeout: 30000,
 			bundler: Kalm.defaults.bundler,
 			encoder: Kalm.defaults.encoder,
 			stats: Kalm.defaults.stats,
@@ -317,7 +318,8 @@ describe('Server', () => {
 				adapter: 'ipc',
 				encoder: Kalm.defaults.encoder,
 				port: 9000,
-				tick: Kalm.defaults.tick
+				tick: Kalm.defaults.tick,
+				socketTimeout: 30000
 			});
 			assert.isArray(server.connections);
 			assert.isObject(server.channels);

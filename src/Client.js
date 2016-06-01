@@ -43,7 +43,9 @@ class Client extends EventEmitter{
 			// Transformations (middleware)
 			bundler: options.bundler || defaults.bundler,
 			// Wether to output statistics in stdout
-			stats: options.stats || defaults.stats
+			stats: options.stats || defaults.stats,
+			// Socket timeout
+			socketTimeout: options.socketTimeout || defaults.socketTimeout
 		};
 
 		// List of channels 
@@ -182,6 +184,19 @@ class Client extends EventEmitter{
 		this.subscribe(name);
 		
 		this.channels[name].sendOnce(payload);
+		return this;
+	}
+
+	/**
+	 * Trumps other packets on the given channel, will only send the latest
+	 * @param {string} name The channel to send to data through
+	 * @param {string|object} payload The payload to send 
+	 * @returns {Client} The client, for chaining
+	 */
+	sendNow(name, payload) {
+		this.subscribe(name);
+		
+		this._emit(name, [payload]);
 		return this;
 	}
 

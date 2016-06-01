@@ -28,7 +28,7 @@ function listen(server, callback) {
  * @param {Buffer} payload The body of the request
  */
 function send(socket, payload) {
-	if (socket) socket.write(payload);
+	if (socket) socket.end(payload);
 }
 
 /**
@@ -50,9 +50,9 @@ function createSocket(client, socket) {
 	if (!socket) {
 		socket = net.connect(client.options.port, client.options.hostname);
 	}
-	console.log(client);
-	socket.on('data', client.handleRequest.bind(client));
 
+	socket.on('data', client.handleRequest.bind(client));
+	
 	// Emit on error
 	socket.on('error', client.handleError.bind(client));
 

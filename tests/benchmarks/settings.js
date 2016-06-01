@@ -1,6 +1,6 @@
 module.exports = {
 	adapter: 'tcp',
-	encoder: 'msg-pack',
+	encoder: 'json',
 	port: 3000,
 	bundlerDelay: 16,
 	bundlerMaxPackets: 2048,

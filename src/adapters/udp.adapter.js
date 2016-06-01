@@ -22,13 +22,13 @@ function _handleNewSocket(data, origin) {
 
 	if (!this.__clients) this.__clients = {};
 	if (!(key in this.__clients)) {
-		this.__clients[key] = this.createClient({}, {
+		this.__clients[key] = this.createClient({
 			hostname: origin.address,
 			port: origin.port,
 			adapter: 'udp',
 			encoder: this.options.encoder,
 			channels: this.channels
-		});
+		}, {});
 	}
 
 	this.__clients[key].handleRequest(data);
