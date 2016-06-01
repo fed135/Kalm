@@ -9,6 +9,12 @@
 
 const dgram = require('dgram');
 
+/* Local variables -----------------------------------------------------------*/
+
+const _socketType = 'udp4';
+const _startByte = 0;
+const _keySeparator = ':';
+
 /* Helpers -------------------------------------------------------------------*/
 
 /**
@@ -18,7 +24,7 @@ const dgram = require('dgram');
  * @param {object} origin The call origin info
  */ 
 function _handleNewSocket(data, origin) {
-	var key = origin.address + ':' + origin.port;
+	var key = [origin.address, _keySeparator, origin.port].join();
 
 	if (!this.__clients) this.__clients = {};
 	if (!(key in this.__clients)) {
@@ -28,7 +34,7 @@ function _handleNewSocket(data, origin) {
 			adapter: 'udp',
 			encoder: this.options.encoder,
 			channels: this.channels
-		}, {});
+		});
 	}
 
 	this.__clients[key].handleRequest(data);
@@ -42,7 +48,10 @@ function _handleNewSocket(data, origin) {
  * @param {function} callback The success callback for the operation
  */
 function listen(server, callback) {
-	server.listener = dgram.createSocket('udp4');
+	server.listener = dgram.createSocket({
+		type: _socketType,
+		reuseAddr: true
+	});
 	server.listener.on('message', _handleNewSocket.bind(server));
 	server.listener.on('error', server.handleError.bind(server));
 	server.listener.bind(server.options.port, '127.0.0.1');
@@ -56,13 +65,15 @@ function listen(server, callback) {
  * @param {Buffer} payload The body of the request
  */
 function send(socket, payload) {
-	socket.send(
-		payload, 
-		0, 
-		payload.length, 
-		socket.__port, 
-		socket.__hostname
-	);
+	if (socket) {
+		socket.send(
+			payload, 
+			_startByte, 
+			payload.length, 
+			socket.__port, 
+			socket.__hostname
+		);
+	}
 }
 
 /**
@@ -83,7 +94,7 @@ function stop(server, callback) {
 function createSocket(client, soc) {
 	if (soc) return soc;
 
-	var socket = dgram.createSocket('udp4');
+	var socket = dgram.createSocket(_socketType);
 	socket.__port = client.options.port;
 	socket.__hostname = client.options.hostname;
 

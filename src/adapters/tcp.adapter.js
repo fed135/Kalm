@@ -48,7 +48,8 @@ function stop(server, callback) {
  */
 function createSocket(client, socket) {
 	if (!socket) {
-		socket = net.connect(client.options.port, client.options.hostname);
+		socket = new net.Socket({ allowHalfOpen: true });
+		socket.connect(client.options.port, client.options.hostname);
 	}
 
 	socket.on('data', client.handleRequest.bind(client));
