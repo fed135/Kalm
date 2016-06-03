@@ -172,15 +172,12 @@ describe('Channel', () => {
 	});
 
 	it('handleData', (done) => {
-		var testHandler = function(data) {
-			done();
-		};
-
-		channel.addHandler(testHandler);
+		channel.addHandler(() => done());
 		channel.handleData(['callDone']);
 	});
 
-	it('destroy', () => {
+	it('destroy', (done) => {
+		channel._client.on('disconnect', () => done);
 		channel.destroy();
 	});
 });
@@ -280,6 +277,12 @@ describe('Client', () => {
 		client.sendOnce('test-sendOnce', 'test2');
 		assert.instanceOf(client.channels['test-sendOnce'], Channel);
 		assert.equal(client.channels['test-sendOnce'].packets.length, 1);
+	});
+
+	it('sendNow', () => {
+		client.send('test-sendNow', 'test1');
+		client.sendNow('test-sendNow', 'test2');
+		assert.equal(client.channels['test-sendNow'].packets.length, 1);
 	});
 
 	it('handleRequest', (done) => {

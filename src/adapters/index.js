@@ -20,9 +20,9 @@ class Adapters {
 
 		// If running in the browser, do not load net adapters
 		if (process.env.NODE_ENV !== 'browser') {
-			this.list.ipc = require('./ipc.adapter');
-			this.list.tcp = require('./tcp.adapter');
-			this.list.udp = require('./udp.adapter');
+			this.list.ipc = require('./ipc');
+			this.list.tcp = require('./tcp');
+			this.list.udp = require('./udp');
 		}
 	}
 

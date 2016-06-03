@@ -4,7 +4,7 @@
   "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
-    "test": "mocha tests/unit.js && mocha tests/smoke.js",
+    "test": "mocha tests/unit --recursive && mocha tests/integration",
     "build": "webpack  -p -d -j --define process.env.NODE_ENV='\"browser\"' --config ./webpack.config"
   },
   "repository": {
@@ -34,7 +34,8 @@
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
     "chai": "3.5.x",
-    "mocha": "2.4.x"
+    "mocha": "2.5.x",
+    "sinon": "1.17.x"
   },
   "dependencies": {
     "debug": "2.2.x"
