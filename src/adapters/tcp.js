@@ -9,86 +9,63 @@
 
 const net = require('net');
 
+const Adapter = require('./common');
+
 /* Methods -------------------------------------------------------------------*/
 
-/**
- * Listens for tcp connections, updates the 'listener' property of the server
- * @param {Server} server The server object
- * @param {function} callback The success callback for the operation
- */
-function listen(server, callback) {
-	server.listener = net.createServer(server.handleRequest.bind(server));
-	server.listener.listen(server.options.port, callback);
-	server.listener.on('error', server.handleError.bind(server));
-}
+class TCP extends Adapter {
 
-/**
- * Sends a message with a socket client
- * @param {Socket} socket The socket to use
- * @param {Buffer} payload The body of the request
- */
-function send(socket, payload) {
-	if (socket) socket.end(payload);
-}
-
-/**
- * Stops the server.
- * @param {Server} server The server object
- * @param {function} callback The success callback for the operation
- */
-function stop(server, callback) {
-	server.listener.close(callback);
-}
-
-/**
- * Creates a client
- * @param {Client} client The client to create the socket for
- * @param {Socket} socket Optionnal existing socket object.
- * @returns {Socket} The created tcp client
- */
-function createSocket(client, socket) {
-	if (!socket) {
-		socket = new net.Socket({ allowHalfOpen: true });
-		socket.connect(client.options.port, client.options.hostname);
+	/**
+	 * TCP adapter constructor
+	 */
+	constructor() {
+		super('tcp');
 	}
 
-	socket.on('data', client.handleRequest.bind(client));
-	
-	// Emit on error
-	socket.on('error', client.handleError.bind(client));
+	/**
+	 * Listens for tcp connections, updates the 'listener' property of the server
+	 * @param {Server} server The server object
+	 * @param {function} callback The success callback for the operation
+	 */
+	listen(server, callback) {
+		server.listener = net.createServer(server.handleRequest.bind(server));
+		server.listener.listen(server.options.port, callback);
+		server.listener.on('error', server.handleError.bind(server));
+	}
 
-	// Emit on connect
-	socket.on('connect', client.handleConnect.bind(client));
+	/**
+	 * Creates a client
+	 * @param {Client} client The client to create the socket for
+	 * @param {Socket} socket Optionnal existing socket object.
+	 * @returns {Socket} The created tcp client
+	 */
+	createSocket(client, socket) {
+		if (!socket) {
+			socket = new net.Socket({ allowHalfOpen: true });
+			socket.connect(client.options.port, client.options.hostname);
+		}
 
-	// Will auto-reconnect
-	socket.on('close', client.handleDisconnect.bind(client));
+		socket.on('data', client.handleRequest.bind(client));
+		
+		// Emit on error
+		socket.on('error', client.handleError.bind(client));
 
-	// Add timeout listener, sever connection
-	socket.on('timeout', () => disconnect(client));
+		// Emit on connect
+		socket.on('connect', client.handleConnect.bind(client));
 
-	// Set timeout
-	socket.setTimeout(client.options.socketTimeout);
+		// Will auto-reconnect
+		socket.on('close', client.handleDisconnect.bind(client));
 
-	return socket;
-}
+		// Add timeout listener, sever connection
+		socket.on('timeout', () => this.disconnect(client));
 
-/**
- * Attempts to disconnect the client's connection
- * @param {Client} client The client to disconnect
- */
-function disconnect(client) {
-	if (client.socket && client.socket.destroy) {
-		client.socket.destroy();
-		client.handleDisconnect();
+		// Set timeout
+		socket.setTimeout(client.options.socketTimeout);
+
+		return socket;
 	}
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	listen: listen,
-	send: send,
-	createSocket: createSocket,
-	stop: stop,
-	disconnect: disconnect
-};
+module.exports = new TCP;

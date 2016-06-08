@@ -153,11 +153,10 @@ class Client extends EventEmitter{
 
 	/**
 	 * Socket connection lost handler
-	 * @param {Socket} socket The disconnected socket
 	 */
-	handleDisconnect(socket) {
-		this.emit('disconnect', socket);
-		this.emit('disconnection', socket);
+	handleDisconnect() {
+		this.emit('disconnect');
+		this.emit('disconnection');
 		this.socket = null;
 	}
 

@@ -11,6 +11,8 @@ var Server = require('./Server');
 var adapters = require('./adapters');
 var encoders = require('./encoders');
 var defaults = require('./defaults');
+var Adapter = require('./adapters/common');
+var Encoder = require('./encoders/common');
 
 /* Exports -------------------------------------------------------------------*/
 
@@ -19,5 +21,7 @@ module.exports = {
 	Server: Server,
 	adapters: adapters,
 	encoders: encoders,
-	defaults: defaults
+	defaults: defaults,
+	Adapter: Adapter,
+	Encoder: Encoder
 };
