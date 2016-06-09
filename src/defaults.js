@@ -17,6 +17,7 @@ module.exports = {
 	bundler: {
 		maxPackets: 2048,
 		serverTick: false,
-		delay: 16
+		delay: 16,
+		splitBatches: true
 	}
 };

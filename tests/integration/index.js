@@ -37,21 +37,29 @@ describe('Integration tests', () => {
 			/* --- Tests --- */
 
 			it('should work with ' + adapter, (done) => {
+				var payload = {foo:'bar'};
 				server.subscribe('test', (data) => {
-					expect(data).to.eql({foo:'bar'});
+					expect(data).to.eql(payload);
 					done();
 				});
 
 				var client = new Kalm.Client({adapter:adapter});
-				client.send('test', {foo:'bar'});
-			});
-
-			it('should handle reconnection with ' + adapter, (done) => {
-				done();
+				client.send('test', payload);
 			});
 
 			it('should handle large payloads with ' + adapter, (done) => {
-				done();
+				var largePayload = [];
+				while(largePayload.length < 1024) {
+					largePayload.push({foo: 'bar'});
+				}
+
+				server.subscribe('test', (data) => {
+					expect(data).to.eql(largePayload);
+					done();
+				});
+
+				var client = new Kalm.Client({adapter:adapter});
+				client.send('test', largePayload);
 			});
 		});
 	});

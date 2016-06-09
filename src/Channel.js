@@ -31,12 +31,12 @@ class Channel {
 		this.packets = [];
 		this.handlers = [];
 
-		this.splitBatches = true;
+		this.splitBatches = options.splitBatches;
 
 		// Bind to server tick 
 		if (this.options.serverTick) {
 			if (client.options.tick) {
-				client.options.tick.on('step', this._emit);
+				client.options.tick.on('step', this._emit.bind(this));
 			}
 			else {
 				debug('warn: no server heartbeat, ignoring serverTick config');

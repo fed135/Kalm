@@ -50,6 +50,9 @@ class Client extends EventEmitter{
 
 		// List of channels 
 		this.channels = {};
+
+		// Determines if the socket is server generated
+		this.fromServer = (options.tick !== undefined);
 		
 		// Server tick reference
 		this.tick = options.tick || null;
@@ -78,8 +81,8 @@ class Client extends EventEmitter{
 
 		if (!this.channels.hasOwnProperty(name)) {
 			debug(
-				'log: new connection ' + 
-				this.options.adapter + '://' + this.options.hostname + ':' + 
+				'log: new ' + ((this.fromServer)?'server':'client') + ' connection ' +
+				this.options.adapter + '://' + this.options.hostname + ':' +
 				this.options.port + '/' + name
 			);
 			this.channels[name] = new Channel(
@@ -131,7 +134,8 @@ class Client extends EventEmitter{
 	 * @param {Error} err The socket triggered error
 	 */
 	handleError(err) {
-		debug('error: ' + err);
+		debug('error: ' + err.message);
+		debug(err.stack);
 		this.emit('error', err);
 	}
 
@@ -140,6 +144,10 @@ class Client extends EventEmitter{
 	 * @param {Socket} socket The newly connected socket
 	 */
 	handleConnect(socket) {
+		debug(
+			'log: ' + ((this.fromServer)?'server':'client') + 
+			' connection established'
+		);
 		this.emit('connect', socket);
 		this.emit('connection', socket);
 
@@ -155,6 +163,10 @@ class Client extends EventEmitter{
 	 * Socket connection lost handler
 	 */
 	handleDisconnect() {
+		debug(
+			'warn: ' + ((this.fromServer)?'server':'client') + 
+			' connection lost'
+		);
 		this.emit('disconnect');
 		this.emit('disconnection');
 		this.socket = null;
@@ -201,7 +213,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Creates or attaches a socket for the appropriate adapter
-	 * @private
 	 * @param {Socket} socket The socket to use
 	 * @returns {Socket} The created or attached socket for the client
 	 */
@@ -211,7 +222,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Sends a packet - triggered by middlewares
-	 * @private
 	 * @param {string} channel The channel targeted for transfer
 	 */
 	_emit(channel, packets) {
@@ -235,7 +245,6 @@ class Client extends EventEmitter{
 
 	/**
 	 * Handler for receiving data through the listener
-	 * @private
 	 * @param {Buffer} evt The data received
 	 */
 	handleRequest(evt) {
