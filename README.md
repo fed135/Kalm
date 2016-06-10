@@ -84,13 +84,13 @@ Simplify and optimize your Socket communications with:
 
 **Requests per minute**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v1?v=1.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v100.png">
 
 *Benchmarks based on a single-thread queue test with Kalm default bundling settings*
 
 **Bytes transfered**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v1?v=1.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v100.png">
 
 *Number of protocol overhead bytes saved per request*
 
