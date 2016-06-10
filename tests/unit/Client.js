@@ -9,69 +9,100 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 var testModule = require('../../src/Client');
+var defaults = require('../../src/defaults');
 
 /* Tests ---------------------------------------------------------------------*/
 
-/*constructor(options={}, socket=null) {
-		super();
+describe('Client', () => {
+	describe('#constructor(options, socket)', () => {
+		it('should create a valid Client', () => {
+			var result = new testModule();
+			expect(result.id).to.be.string;
+			expect(result.options).to.deep.equal({
+				hostname: defaults.hostname,
+				port: defaults.port,
+				adapter: defaults.adapter,
+				encoder: defaults.encoder,
+				bundler: defaults.bundler,
+				stats: defaults.stats,
+				socketTimeout: defaults.socketTimeout
+			});
+			expect(result.channels).to.not.be.object;
+			expect(result.fromServer).to.be.false;
+			expect(result.tick).to.be.null;
+			expect(result.socket).to.not.be.null;
+		});
+	});
 
-		this.id = crypto.randomBytes(20).toString('hex');
+	describe('#subscribe(name, handler, options)', () => {
+		it('should use/create a channel and add the handler to it', () => {
 
-		this.options = {
-			// Basic info
-			hostname: options.hostname || defaults.hostname,
-			port: options.port || defaults.port,
-			// Adapter
-			adapter: options.adapter || defaults.adapter,
-			// Encoding
-			encoder: options.encoder || defaults.encoder,
-			// Transformations (middleware)
-			bundler: options.bundler || defaults.bundler,
-			// Wether to output statistics in stdout
-			stats: options.stats || defaults.stats,
-			// Socket timeout
-			socketTimeout: options.socketTimeout || defaults.socketTimeout
-		};
+		});
+	});
 
-		// List of channels 
-		this.channels = {};
-		
-		// Server tick reference
-		this.tick = options.tick || null;
+	describe('#unsubscribe(name, handler)', () => {
+		it('should remove a handler from a channel', () => {
 
-		// Populate channels
-		if (options.channels) {
-			for (var c in options.channels) {
-				this.subscribe(c, options.channels[c]);
-			}
-		}
+		});
+	});
 
-		// Socket object
-		this.socket = null;
-		this.use(socket);
-	}
+	describe('#use(socket)', () => {
+		it('should replace the client\'s socket object', () => {
 
-subscribe(name, handler, options={}) {}
+		});
+	});
 
-unsubscribe(name, handler) {}
+	describe('#handleError(err)', () => {
+		it('should print and dispatch the error', () => {
 
-use(socket) {}
+		});
+	});
 
-handleError(err) {}
+	describe('#handleConnect(socket)', () => {
+		it('should print and dispatch the event', () => {
 
-handleConnect(socket) {}
+		});
+	});
 
-handleDisconnect(socket) {}
+	describe('#handleDisconnect(socket)', () => {
+		it('should print and dispatch the event', () => {
 
-send(name, payload) {}
+		});
+	});
 
-sendOnce(name, payload) {}
+	describe('#send(name, payload)', () => {
+		it('should call send on the proper channel', () => {
 
-sendNow(name, payload) {}
+		});
+	});
 
-createSocket(socket) {}
+	describe('#sendOnce(name, payload)', () => {
+		it('should call sendOnce on the proper channel', () => {
 
-handleRequest(evt) {}
+		});
+	});
 
-destroy() {}
-*/
+	describe('#sendNow(name, payload)', () => {
+		it('should call _emit directly', () => {
+
+		});
+	});
+
+	describe('#createSocket(socket)', () => {
+		it('should call the appropriate adapter\'s createSocket', () => {
+
+		});
+	});
+
+	describe('#handleRequest(evt)', () => {
+		it('should call handleData on the appropriate channels', () => {
+
+		});
+	});
+
+	describe('#destroy()', () => {
+		it('should call the appropriate adapter\'s disconnect', () => {
+
+		});
+	});
+});

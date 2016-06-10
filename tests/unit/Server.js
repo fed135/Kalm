@@ -9,51 +9,90 @@
 var expect = require('chai').expect;
 var sinon = require('sinon');
 var testModule = require('../../src/Server');
+var defaults = require('../../src/defaults');
 
 /* Tests ---------------------------------------------------------------------*/
-/*
-	constructor(options={}) {
-		super();
 
-		this.id = crypto.randomBytes(20).toString('hex');
+describe('Server', () => {
+	describe('#constructor(options)', () => {
+		it('should create a valid Server', () => {
+			var result = new testModule();
+			expect(result.id).to.be.string;
+			expect(result.options).to.deep.equal({
+				adapter: defaults.adapter,
+				encoder: defaults.encoder,
+				port: defaults.port,
+				tick: defaults.tick,
+				socketTimeout: defaults.socketTimeout
+			});
+			expect(result.connections).to.be.array;
+			expect(result.channels).to.be.object;
+		});
+	});
 
-		this.listener = null;
-		this._timer = null;
+	describe('#listen()', () => {
+		it('should call the appropriate adapter\'s listen', () => {
 
-		this.options = {
-			adapter: options.adapter || defaults.adapter,
-			encoder: options.encoder || defaults.encoder,
-			port: options.port || defaults.port,
-			tick: defaults.tick,
-			socketTimeout: options.socketTimeout || defaults.socketTimeout
-		};
+		});
+	});
 
-		this.connections = [];
-		this.channels = options.channels || {};
+	describe('#setTick(delay)', () => {
+		it('should setup the server heartbeat', () => {
 
-		this.listen();
-		this.setTick(this.options.tick);
-	}
+		});
+	});
 
-listen() {}
+	describe('#subscribe(name, handler, options)', () => {
+		it('new and existing connections subscribe to the channel and add the handler', () => {
 
-setTick(delay) {}
+		});
+	});
 
-subscribe(name, handler, options) {}
+	describe('#unsubscribe(name, handler)', () => {
+		it('new and existing connections remove the handler from their channel', () => {
 
-unsubscribe(name, handler) {}
+		});
+	});
 
-dump() {}
+	describe('#dump()', () => {
+		it('should dump a map of all the open sockets and pending payloads', () => {
 
-broadcast(channel, payload) {}
+		});
+	});
 
-whisper(channel, payload) {}
+	describe('#broadcast(channel, payload)', () => {
+		it('should call send on all connections', () => {
 
-stop(callback) {}
+		});
+	});
 
-createClient(options, socket) {}
+	describe('#whisper(channel, payload)', () => {
+		it('should call send on all connections that have the specified channel', () => {
 
-handleError(err) {}
+		});
+	});
 
-handleRequest(socket) {}
-*/
+	describe('#stop(callback)', () => {
+		it('should call the appropriate adapter\'s stop', () => {
+
+		});
+	});
+
+	describe('#createClient(options, socket)', () => {
+		it('should create a new server client', () => {
+
+		});
+	});
+
+	describe('#handleError(err)', () => {
+		it('should print and dispatch the error', () => {
+
+		});
+	});
+
+	describe('#handleRequest(socket)', () => {
+		it('should push the new connection and dispatch connection events', () => {
+
+		});
+	});
+});

@@ -20,7 +20,7 @@ class Timer extends EventEmitter {
 		super();
 
 		this.delay = delay;
-		this.timer;
+		this.timer = null;
 
 		this.start();
 	}
@@ -30,6 +30,7 @@ class Timer extends EventEmitter {
 	 * @returns {Timer} Returns itself for chaining
 	 */
 	start() {
+		if (this.timer) this.stop();
 		this.timer = setInterval(e => this.emit('step'), this.delay);
 		return this;
 	}
@@ -40,6 +41,7 @@ class Timer extends EventEmitter {
 	 */
 	stop() {
 		clearInterval(this.timer);
+		this.timer = null;
 	}
 }
 
