@@ -24,6 +24,21 @@ Simplify and optimize your Socket communications with:
  * NODE >= 6.0.0
 
 
+## Performance analysis
+
+**Requests per minute**
+
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v100.png">
+
+*Benchmarks based on a single-thread queue test with Kalm default bundling settings*
+
+**Bytes transfered**
+
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v100.png">
+
+*Number of protocol overhead bytes saved per request*
+
+
 ## Installation
 
     npm install kalm
@@ -34,9 +49,9 @@ Simplify and optimize your Socket communications with:
 **Server**
 
 ```node
-    var Kalm = require('Kalm');
+    var Kalm = require('kalm');
 
-    // Create a server, a listener for incomming connections
+    // Create a server, listening for incomming connections
     var server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
@@ -58,7 +73,7 @@ Simplify and optimize your Socket communications with:
 **Client**
 
 ```node
-    // Create a connection to the server
+    // Opens a connection to the server
     var client = new Kalm.Client({
       hostname: '0.0.0.0', // Server's IP
       port: 6000, // Server's port
@@ -71,8 +86,8 @@ Simplify and optimize your Socket communications with:
       }
     });
 
-    client.send('messageEvent', {body: 'This is an object!'});	// Can send Objects, Strings or Buffers 
-    client.subscribe('someOtherEvent', function() {}); // Can add other handlers dynamically 
+    client.send('messageEvent', {body: 'This is an object!'}); 
+    client.subscribe('someOtherEvent', function() {});
 
 ```
 ## Documentation
@@ -80,24 +95,7 @@ Simplify and optimize your Socket communications with:
 [API docs](https://fed135.github.io/kalm.github.io)
 
 
-## Performance analysis
-
-**Requests per minute**
-
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v100.png">
-
-*Benchmarks based on a single-thread queue test with Kalm default bundling settings*
-
-**Bytes transfered**
-
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v100.png">
-
-*Number of protocol overhead bytes saved per request*
-
-
 ## Adapters
-
-Allow you to easily use different socket types, hassle-free
 
 - ipc (bundled)
 - tcp (bundled)
@@ -108,8 +106,6 @@ Allow you to easily use different socket types, hassle-free
 
 ## Encoders
 
-Encodes/Decodes the payloads
-
 - json (bundled)
 - [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
 - [kalm-snappy](https://github.com/fed135/kalm-snappy)
@@ -118,11 +114,11 @@ Encodes/Decodes the payloads
 
 ## Loading custom adapters
 
-The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq, WebSockets or have yaml encoding.
+The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares
 
 ```node
     // Custom adapter loading example
-    var Kalm = require('Kalm');
+    var Kalm = require('kalm');
     var WebRTC = require('kalm-webrtc');
     var msgpack = require('kalm-msgpack');
 
@@ -144,7 +140,7 @@ The framework is flexible enough so that you can load your own custom adapters, 
 
 ## Logging
 
-By default, all Kalm logs are hidden. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
+Kalm uses [debug](https://github.com/visionmedia/debug)
 
     export DEBUG=kalm
 
@@ -156,18 +152,10 @@ You can also gather Naggling optimization statistics by piping `kalm:stats`
 
     export DEBUG=kalm:stats myApp.js > stats.log
 
-To calculate Naggling gains alone in bytes, you can multiply the `packets` property by the full protocol header.
-
 
 ## Roadmap
 
 [Milestones](https://github.com/fed135/Kalm/milestones)
-
-
-## Contributing
-
-I am looking for contributors to help improve the codebase and create adapters, encoders and middleware.
-Email me for details.
 
 
 ## Presentations
