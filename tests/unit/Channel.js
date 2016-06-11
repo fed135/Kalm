@@ -66,6 +66,7 @@ describe('Channel', () => {
 			}, mockClient);
 
 			mockTimer.verify();
+			sinon.mock.restore();
 		});
 	});
 

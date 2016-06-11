@@ -23,14 +23,23 @@ describe('Timer', () => {
 	});
 
 	describe('#start()', () => {
-		it('should start the Timer', () => {
-
+		it('should start the Timer', (done) => {
+			var testDelay = 30;
+			var result = new testModule(testDelay);
+			result.start();
+			result.on('step', () => {
+				result.stop();
+				done();
+			});
 		});
 	});
 
 	describe('#stop()', () => {
 		it('should stop the Timer', () => {
-
+			var testDelay = 30;
+			var result = new testModule(testDelay);
+			result.stop();
+			expect(result.timer).to.be.null;
 		});
 	});
 });

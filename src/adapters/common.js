@@ -60,7 +60,7 @@ class Adapter {
 	disconnect(client) {
 		if (client.socket && client.socket.destroy) {
 			client.socket.destroy();
-			client.handleDisconnect();
+			process.nextTick(client.handleDisconnect.bind(client));
 		}
 	}
 }

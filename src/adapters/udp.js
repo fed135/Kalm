@@ -129,7 +129,7 @@ class UDP extends Adapter {
 	 */
 	disconnect(client) {
 		// Nothing to do
-		client.handleDisconnect();
+		process.nextTick(client.handleDisconnect.bind(client));
 	}
 }
 

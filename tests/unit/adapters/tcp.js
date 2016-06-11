@@ -137,7 +137,11 @@ describe('TCP', () => {
 				.once();
 
 			testModule.disconnect(clientMock.object);
-			clientMock.verify();
+			
+			setTimeout(() => {
+				clientMock.verify();
+				done();
+			}, 10);
 		});
 	});
 });

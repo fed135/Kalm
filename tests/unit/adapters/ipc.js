@@ -134,7 +134,7 @@ describe('IPC', () => {
 	});
 
 	describe('#disconnect(client)', () => {
-		it('should call the client\'s disconnect method', () => {
+		it('should call the client\'s disconnect method', (done) => {
 			var testSocket = {
 				destroy: function() {}
 			};
@@ -147,7 +147,11 @@ describe('IPC', () => {
 				.once();
 
 			testModule.disconnect(clientMock.object);
-			clientMock.verify();
+			
+			setTimeout(() => {
+				clientMock.verify();
+				done();
+			}, 10);
 		});
 	});
 });

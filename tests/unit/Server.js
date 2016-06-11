@@ -32,7 +32,7 @@ describe('Server', () => {
 
 	describe('#listen()', () => {
 		it('should call the appropriate adapter\'s listen', () => {
-
+			
 		});
 	});
 
