@@ -1,10 +1,14 @@
 /**
  * Channel class
- * @class Channel
- * @exports {Channel}
  */
 
 'use strict';
+
+/* Requires ------------------------------------------------------------------*/
+
+const debug = require('debug')('kalm');
+
+const crypto = require('crypto');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -12,11 +16,11 @@ class Channel {
 
 	/**
 	 * Channel constructor
-	 * @constructor
 	 * @param {Socket} socket An optionnal socket object to use for communication
 	 * @param {object} options The configuration options for the client
 	 */
 	constructor(name, options, client) {
+		this.id = crypto.randomBytes(20).toString('hex');
 		this.name = name;
 		this.options = options;
 
@@ -24,101 +28,109 @@ class Channel {
 		this._emitter = client._emit.bind(client);
 
 		this._timer = null;
-		this._packets = [];
-		this._handlers = [];
+		this._bound = false;	// For serverTick
+		this.packets = [];
+		this.handlers = [];
 
-		this.splitBatches = true;
+		this.splitBatches = options.splitBatches;
+
+		// Bind to server tick 
+		if (this.options.serverTick) {
+			if (!client.tick) {
+				debug('warn: no server heartbeat, ignoring serverTick config');
+				this.options.serverTick = false;
+			}
+		}
 	}
 
 	/**
 	 * Tells the channel to process the payload to send
-	 * @method send
-	 * @memberof Channel
 	 * @param {object|string} payload The payload to process
 	 */
 	send(payload) {
-		this._packets.push(payload);
+		this.packets.push(payload);
 
 		// Bundling process
-		if (this._packets.length >= this.options.maxPackets) {			
+		if (this.packets.length >= this.options.maxPackets) {		
 			this._emit();
 			return;
 		}
 
-		this._startBundler();
+		this.startBundler();
 	}
 
 	/**
 	 * Sends the latest payload only
-	 * @method sendOnce
-	 * @memberof Channel
 	 * @param {object|string} payload The payload to send
 	 */
 	sendOnce(payload) {
-		this._packets = [payload];
+		this.packets = [payload];
 
-		this._startBundler();
+		this.startBundler();
 	}
 
 	/**
 	 * Initializes the bundler timer
-	 * @private
-	 * @method _startBundler
-	 * @memberof Channel
 	 */
-	_startBundler() {
-		if (this._timer === null) {
-			this._timer = setTimeout(this._emit.bind(this), this.options.delay);
+	startBundler() {
+		if (this.options.serverTick) {
+			if (!this._bound) {
+				this._bound = true;
+				this._client.tick.once('step', this._emit.bind(this));
+			}
+		}
+		else {
+			if (this._timer === null) {
+				this._timer = setTimeout(this._emit.bind(this), this.options.delay);
+			}
 		}
 	}
 
 	/**
 	 * Alerts the client to emit the packets for this channel
 	 * @private
-	 * @method _emit
-	 * @memberof Channel
 	 */
 	_emit() {
-		this._emitter(this.name, this._packets);
-		this._packets.length = 0;
+		if (this.packets.length > 0) {
+			this._emitter(this.name, this.packets);
+			this.packets.length = 0;
+		}
+
 		this.resetBundler();
 	}
 
 	/**
 	 * Clears the bundler timer
-	 * @method resetBundler
-	 * @memberof Channel
 	 */
 	resetBundler() {
-		clearTimeout(this._timer);
-		this._timer = null;
+		if (this.options.serverTick) {
+			this._bound = false;
+		}
+		else {
+			clearTimeout(this._timer);
+			this._timer = null;
+		}
 	}
 
 	/**
 	 * Adds a method that listens to this channel
-	 * @method addHandler
-	 * @memberof Channel
 	 * @param {function} method The method to bind
 	 */
 	addHandler(method, bindOnce) {
-		this._handlers.push(method);
+		this.handlers.push(method);
 	}
 
 	/**
 	 * Removes a handler from this channel 
-	 * @method removeHandler
-	 * @memberof Channel
 	 * @param {function} method The method to bind
 	 */
 	removeHandler(method) {
-		var index = this._handlers.indexOf(method);
-		if (index > -1) this._handlers.splice(index, 1);
+		let index = this.handlers.indexOf(method);
+		if (index > -1) this.handlers.splice(index, 1);
 	}
 
 	/**
 	 * Destroys the client and connection
-	 * @method destroy
-	 * @memberof Client
 	 */
 	destroy() {
 		this._client.destroy();
@@ -126,27 +138,25 @@ class Channel {
 
 	/**
 	 * Handles channel data
-	 * @method handleData
-	 * @memberof Channel
 	 * @param {array} payload The received payload
 	 */
 	handleData(payload) {
-		var _reqs = payload.length;
-		var _listeners = this._handlers.length;
-		var reply = this.send.bind(this);
-		var i;
-		var c;
+		let _reqs = payload.length;
+		let _listeners = this.handlers.length;
+		let reply = this.send.bind(this);
+		let i;
+		let c;
 
 		if (this.splitBatches) {
 			for (i = 0; i < _reqs; i++) {
 				for (c = 0; c <_listeners; c++) {
-					this._handlers[c](payload[i], reply, this);
+					this.handlers[c](payload[i], reply, this);
 				}
 			}
 		}
 		else {
 			for (c = 0; c < _listeners; c++) {
-				this._handlers[c](payload, reply, this);
+				this.handlers[c](payload, reply, this);
 			}
 		}
 	}

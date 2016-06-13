@@ -1,7 +1,5 @@
 /**
  * Server class
- * @class Server
- * @exports {Server}
  */
 
 'use strict';
@@ -9,11 +7,13 @@
 /* Requires ------------------------------------------------------------------*/
 
 const EventEmitter = require('events').EventEmitter;
+const crypto = require('crypto');
 
 const debug = require('debug')('kalm');
 
 var defaults = require('./defaults');
 var Client = require('./Client');
+var Timer = require('./Timer');
 var adapters = require('./adapters');
 
 /* Methods -------------------------------------------------------------------*/
@@ -22,34 +22,36 @@ class Server extends EventEmitter {
 
 	/**
 	 * Server constructor
-	 * @constructor
 	 * @param {object} options The configuration options for the server
 	 */
-	constructor(options) {
+	constructor(options={}) {
 		super();
-		options = options || {};
+
+		this.id = crypto.randomBytes(20).toString('hex');
 
 		this.listener = null;
+		this._timer = null;
 
 		this.options = {
 			adapter: options.adapter || defaults.adapter,
 			encoder: options.encoder || defaults.encoder,
-			port: options.port || defaults.port
+			port: options.port || defaults.port,
+			tick: options.tick || defaults.tick,
+			socketTimeout: options.socketTimeout || defaults.socketTimeout
 		};
 
 		this.connections = [];
 		this.channels = options.channels || {};
 
 		this.listen();
+		this.setTick(this.options.tick);
 	}
 
 	/**
 	 * Server lift method
-	 * @method listen
-	 * @memberof Server
 	 */
 	listen() {
-		var adapter = adapters.resolve(this.options.adapter);
+		let adapter = adapters.resolve(this.options.adapter);
 
 		if (adapter) {
 			debug(
@@ -71,12 +73,29 @@ class Server extends EventEmitter {
 	}
 
 	/**
+	 * Updates the server Timer delay
+	 * @param {integer} delay The new delay for the server tick
+	 * @returns {Server} Returns itself for chaining
+	 */
+	setTick(delay) {
+		this.options.tick = delay;
+		
+		// Reset timer
+		if (this._timer) {
+				this._timer.stop();
+				this._timer = null;
+		}
+
+		if (delay) this._timer = new Timer(delay);
+
+		return this;
+	}
+
+	/**
 	 * Adds a channel to listen for on attached clients
-	 * @method subscribe
-	 * @memberof Server
 	 * @param {string} name The name of the channel to attach
 	 * @param {function} handler The handler to attach to the channel
-	 * @params {object} options The options object for the channel
+	 * @param {object} options The options object for the channel
 	 * @returns {Server} Returns itself for chaining
 	 */
 	subscribe(name, handler, options) {
@@ -91,13 +110,13 @@ class Server extends EventEmitter {
 
 	/**
 	 * Removes a handler on attached clients
-	 * @method subscribe
-	 * @memberof Server
 	 * @param {string} name The name of the channel
 	 * @param {function} handler The handler to remove from the channel
 	 * @returns {Server} Returns itself for chaining
 	 */
 	unsubscribe(name, handler) {
+		this.channels[name + ''] = null;
+
 		this.connections.forEach((client) => {
 			client.unsubscribe(name, handler);
 		});
@@ -106,16 +125,31 @@ class Server extends EventEmitter {
 	}
 
 	/**
+	 * Returns all the currently unsent packets from clients
+	 * @returns {array} The unset packets
+	 */
+	dump() {
+		return this.connections.map((client) => {
+			let res = Object.assign({}, client.options);
+			res.channels = {};
+			for (let channel in client.channels) {
+				if (client.channels.hasOwnProperty(channel)) {
+					res.channels[channel] = client.channels[channel].packets;
+				}
+			}
+			return res;
+		});
+	}
+
+	/**
 	 * Sends data to all connected clients
-	 * !! Creates the channel if it has to !!
-	 * @method broadcast
-	 * @memberof Server
+	 * !! Creates the channel if it doesn't exist !!
 	 * @param {string} channel The name of the channel to send to
 	 * @param {string|object} payload The payload to send
 	 * @returns {Server} Returns itself for chaining
 	 */
 	broadcast(channel, payload) {
-		for (var i = this.connections.length - 1; i >= 0; i--) {
+		for (let i = this.connections.length - 1; i >= 0; i--) {
 			this.connections[i].send(channel, payload);
 		}
 
@@ -125,8 +159,6 @@ class Server extends EventEmitter {
 	/**
 	 * Sends data to all connected clients with a specific channel opened
 	 * !! Does not create new channels !!
-	 * @method whisper
-	 * @memberof Server
 	 * @param {string} channel The name of the channel to send to
 	 * @param {string|object} payload The payload to send
 	 * @returns {Server} Returns itself for chaining
@@ -145,16 +177,15 @@ class Server extends EventEmitter {
 
 	/**
 	 * Closes the server
-	 * @method stop
-	 * @memberof Server
 	 * @param {function} callback The callback method for the operation
 	 */
-	stop(callback) {
-		callback = callback || function() {};
-
-		var adapter = adapters.resolve(this.options.adapter);
+	stop(callback=()=>{}) {
+		let adapter = adapters.resolve(this.options.adapter);
 
 		debug('warn: stopping server');
+
+		if (this._timer) this._timer.stop();
+
 		if (this.listener) {
 			this.connections.forEach(adapter.disconnect);
 			this.connections.length = 0;
@@ -162,27 +193,24 @@ class Server extends EventEmitter {
 			this.listener = null;
 		}
 		else {
-			return callback();
+			this.listener = null;
+			process.nextTick(callback);
 		}
 	}
 
 	/**
 	 * Creates a new client with the provided arguments
 	 * @private
-	 * @method _createClient
-	 * @memberof Server
 	 * @param {Socket} socket The received connection socket
 	 * @param {object} options The options for the client
 	 * @returns {Client} The newly created client
 	 */
-	createClient(socket, options) {
-		return new Client(socket, options);
+	createClient(options, socket) {
+		return new Client(options, socket);
 	}
 
 	/**
 	 * Server error handler
-	 * @method handleError
-	 * @memberof Server
 	 * @param {Error} err The triggered error
 	 */
 	handleError(err) {
@@ -193,16 +221,15 @@ class Server extends EventEmitter {
 	/**
 	 * Handler for receiving a new connection
 	 * @private
-	 * @method _handleRequest
-	 * @memberof Server
 	 * @param {Socket} socket The received connection socket
 	 */
 	handleRequest(socket) {
-		var client = this.createClient(socket, {
+		let client = this.createClient({
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
-			channels: this.channels
-		});
+			channels: this.channels,
+			tick: this._timer
+		}, socket);
 		this.connections.push(client);
 		client.on('disconnect', (socket) => {
 			this.emit('disconnect', socket);

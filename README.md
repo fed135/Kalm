@@ -6,18 +6,39 @@
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
-[![Current API Stability](https://img.shields.io/badge/stability-stable-blue.svg)](https://codeclimate.com/github/fed135/Kalm)
+[![Gitter](https://img.shields.io/gitter/room/fed135/kalm.svg)](https://gitter.im/fed135/Kalm)
 
 ---
 
 Simplify and optimize your Socket communications with:
 
-- Packet bundling and minification
 - Easy-to-use single syntax for all protocols
-- Event channels for all protocols
-- Ultra-flexible and extensible adapters
+- Configurable packet bundling (High-level Naggle's algorithm implementation)
+- Multiplexing for all protocols
+- Ultra-flexible and extensible, load your own adapters and encoders
 
 ---
+
+## Compatibility
+
+ * NODE >= 6.0.0
+
+ * Webpack 1 || 2.1.x
+
+
+## Performance analysis
+
+**Requests per minute**
+
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v100.png">
+
+*Benchmarks based on a single-thread queue test with Kalm default bundling settings*
+
+**Bytes transfered**
+
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v100.png">
+
+*Number of protocol overhead bytes saved per request*
 
 
 ## Installation
@@ -30,13 +51,13 @@ Simplify and optimize your Socket communications with:
 **Server**
 
 ```node
-    var Kalm = require('Kalm');
+    var Kalm = require('kalm');
 
-    // Create a server, a listener for incomming connections
+    // Create a server, listening for incoming connections
     var server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
-      encoder: 'msg-pack',
+      encoder: 'json',
       channels: {
         messageEvent: function(data) {               // Handler - new connections will register to these events
           console.log('User sent message ' + data.body);
@@ -54,12 +75,12 @@ Simplify and optimize your Socket communications with:
 **Client**
 
 ```node
-    // Create a connection to the server
+    // Opens a connection to the server
     var client = new Kalm.Client({
       hostname: '0.0.0.0', // Server's IP
       port: 6000, // Server's port
       adapter: 'udp', // Server's adapter
-      encoder: 'msg-pack', // Server's encoder
+      encoder: 'json', // Server's encoder
       channels: {
         'userEvent': function(data) {
           console.log('Server: ' + data);
@@ -67,58 +88,48 @@ Simplify and optimize your Socket communications with:
       }
     });
 
-    client.send('messageEvent', {body: 'This is an object!'});	// Can send Objects, Strings or Buffers 
-    client.channel('someOtherEvent', function() {}); // Can add other handlers dynamically 
+    client.send('messageEvent', {body: 'This is an object!'}); 
+    client.subscribe('someOtherEvent', function() {});
 
 ```
+## Documentation
 
-## Performance analysis
-
-**Requests per minute**
-
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v03.png">
-
-*Benchmarks based on a single-thread queue test with Kalm default bundling settings AND msg-pack enabled*
-
-**Bytes transfered**
-
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v03.png">
-
-*Number of bytes transfered per 1000 requests*
+[API docs](https://fed135.github.io/kalm.github.io)
 
 
 ## Adapters
-
-Allow you to easily use different socket types, hassle-free
 
 - ipc (bundled)
 - tcp (bundled)
 - udp (bundled)
 - [kalm-websocket](https://github.com/fed135/kalm-websocket)
+- [kalm-webrtc](https://github.com/fed135/kalm-webrtc)
 
 
 ## Encoders
 
-Encodes/Decodes the payloads
-
 - json (bundled)
-- msg-pack (bundled)
+- [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
+- [kalm-snappy](https://github.com/fed135/kalm-snappy)
+- [kalm-protocol-buffer](https://github.com/fed135/kalm-msgpack)
 
 
 ## Loading custom adapters
 
-The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares - say you wanted support for protocols like zmq, WebSockets or have yaml encoding.
+The framework is flexible enough so that you can load your own custom adapters, encoders or middlewares
 
 ```node
     // Custom adapter loading example
-    var Kalm = require('Kalm');
-    var MyCustomAdapter = require('my-custom-adapter');
+    var Kalm = require('kalm');
+    var WebRTC = require('kalm-webrtc');
+    var msgpack = require('kalm-msgpack');
 
-    Kalm.adapters.register('my-custom-adapter', MyCustomAdapter);
+    Kalm.adapters.register('webrtc', WebRTC);
+    Kalm.encoders.register('msg-pack', msgpack);
 
     var server = new Kalm.Server({
       port: 3000,
-      adapter: 'my-custom-adapter',
+      adapter: 'webrtc',
       encoder: 'msg-pack'
     });
 ```
@@ -129,18 +140,22 @@ The framework is flexible enough so that you can load your own custom adapters, 
     npm test
 
 
-## Debugging
+## Logging
 
-By default, all Kalm logs are hidden. They can be enabled through the DEBUG environement variable. See [debug](https://github.com/visionmedia/debug) for more info.
+Kalm uses [debug](https://github.com/visionmedia/debug)
 
     export DEBUG=kalm
+
+You can also gather optimization statistics by piping `kalm:stats`
+
+    export DEBUG=kalm:stats myApp.js > stats.log
 
 
 ## Roadmap
 
 [Milestones](https://github.com/fed135/Kalm/milestones)
 
-## Contributing
 
-I am looking for contributors to help improve the codebase and create adapters, encoders and middleware.
-Email me for details.
+## Presentations
+
+- [JS Montreal](http://www.meetup.com/js-montreal/events/224538913/) - June 14th 2016

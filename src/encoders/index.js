@@ -1,6 +1,5 @@
 /**
  * Encoders 
- * @exports {object}
  */
 
 'use strict';
@@ -8,48 +7,22 @@
 /* Requires ------------------------------------------------------------------*/
 
 var json = require('./json');
-var msgPack = require('./msg-pack');
 
-const debug = require('debug')('kalm');
-
-/* Local variables -----------------------------------------------------------*/
-
-var list = {
-	json: json,
-	'msg-pack': msgPack
-};
+const Store = require('../Store');
 
 /* Methods -------------------------------------------------------------------*/
 
-/**
- * Returns the selected encoder
- * @method resolve
- * @param {string} name The name of the encoder to return
- * @returns {object|undefined} The encoder
- */
-function resolve(name) {
-	if (list.hasOwnProperty(name)) {
-		return list[name];
-	}
-	else {
-		debug('error: no encoder "' + name + '" found');
-		return;
-	}
-}
+class Encoders extends Store {
 
-/**
- * Registers a new encoder
- * @method register
- * @param {string} name The name of the encoder
- * @param {object} mod The body of the encoder
- */
-function register(name, mod) {
-	list[name] = mod;
+	/**
+	 * Encoders constructor
+	 */
+	constructor() {
+		super('encoder');
+		this.list.json = json;
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	resolve: resolve,
-	register: register
-};
+module.exports = new Encoders;
