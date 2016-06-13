@@ -28,6 +28,7 @@ class Channel {
 		this._emitter = client._emit.bind(client);
 
 		this._timer = null;
+		this._bound = false;	// For serverTick
 		this.packets = [];
 		this.handlers = [];
 
@@ -35,10 +36,7 @@ class Channel {
 
 		// Bind to server tick 
 		if (this.options.serverTick) {
-			if (client.tick) {
-				client.tick.on('step', this._emit.bind(this));
-			}
-			else {
+			if (!client.tick) {
 				debug('warn: no server heartbeat, ignoring serverTick config');
 				this.options.serverTick = false;
 			}
@@ -75,7 +73,13 @@ class Channel {
 	 * Initializes the bundler timer
 	 */
 	startBundler() {
-		if (!this.options.serverTick) {
+		if (this.options.serverTick) {
+			if (!this._bound) {
+				this._bound = true;
+				this._client.tick.once('step', this._emit.bind(this));
+			}
+		}
+		else {
 			if (this._timer === null) {
 				this._timer = setTimeout(this._emit.bind(this), this.options.delay);
 			}
@@ -92,17 +96,20 @@ class Channel {
 			this.packets.length = 0;
 		}
 
-		if (!this.options.serverTick) {
-			this.resetBundler();
-		}
+		this.resetBundler();
 	}
 
 	/**
 	 * Clears the bundler timer
 	 */
 	resetBundler() {
-		clearTimeout(this._timer);
-		this._timer = null;
+		if (this.options.serverTick) {
+			this._bound = false;
+		}
+		else {
+			clearTimeout(this._timer);
+			this._timer = null;
+		}
 	}
 
 	/**

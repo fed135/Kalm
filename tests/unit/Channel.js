@@ -42,30 +42,6 @@ describe('Channel', () => {
 			expect(result.handlers).to.be.array;
 			expect(result.splitBatches).to.be.true;
 		});
-
-		it('should create a valid Channel with server timer', () => {
-
-			var mockTimer = sinon.mock({
-				on: function() {}
-			});
-
-			var mockClient = {
-				tick: mockTimer.object,
-				_emit: function() {}
-			};
-
-			mockTimer.expects('on')
-				.once()
-				.withArgs('step');
-
-			var result = new testModule('test-servertimer', {
-				splitBatches: true,
-				serverTick: true
-			}, mockClient);
-
-			mockTimer.verify();
-			sinon.mock.restore();
-		});
 	});
 
 	describe('#send(payload)', () => {
