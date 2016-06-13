@@ -95,7 +95,9 @@ class UDP extends Adapter {
 	 */
 	stop(server, callback) {
 		for (let client in server.__clients) {
-			this.disconnect(server.__clients[client]);
+			if (server.__clients.hasOwnProperty(client)) {
+				this.disconnect(server.__clients[client]);
+			}
 		}
 		server.listener.close();
 		process.nextTick(callback);

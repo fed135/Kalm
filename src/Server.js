@@ -133,7 +133,9 @@ class Server extends EventEmitter {
 			let res = Object.assign({}, client.options);
 			res.channels = {};
 			for (let channel in client.channels) {
-				res.channels[channel] = client.channels[channel].packets;
+				if (client.channels.hasOwnProperty(channel)) {
+					res.channels[channel] = client.channels[channel].packets;
+				}
 			}
 			return res;
 		});

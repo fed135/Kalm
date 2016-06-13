@@ -28,15 +28,15 @@ class Adapters {
 
 	/**
 	 * Returns the selected adapter
-	 * @param {string} name The name of the adapter to return
+	 * @param {string} adapter The name of the adapter to return
 	 * @returns {object|undefined} The adapter
 	 */
-	resolve(name) {
-		if (this.list.hasOwnProperty(name)) {
-			return this.list[name];
+	resolve(adapter) {
+		if (this.list.hasOwnProperty(adapter)) {
+			return this.list[adapter];
 		}
 		else {
-			debug('error: no adapter "' + name + '" found');
+			debug('error: no adapter "' + adapter + '" found');
 			return;
 		}
 	}

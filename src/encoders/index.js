@@ -25,15 +25,15 @@ class Encoders {
 
 	/**
 	 * Returns the selected encoder
-	 * @param {string} name The name of the encoder to return
+	 * @param {string} encoder The name of the encoder to return
 	 * @returns {object|undefined} The encoder
 	 */
-	resolve(name) {
-		if (this.list.hasOwnProperty(name)) {
-			return this.list[name];
+	resolve(encoder) {
+		if (this.list.hasOwnProperty(encoder)) {
+			return this.list[encoder];
 		}
 		else {
-			debug('error: no encoder "' + name + '" found');
+			debug('error: no encoder "' + encoder + '" found');
 			return;
 		}
 	}
