@@ -87,9 +87,14 @@ class Channel {
 	 * @private
 	 */
 	_emit() {
-		this._emitter(this.name, this.packets);
-		this.packets.length = 0;
-		this.resetBundler();
+		if (this.packets.length > 0) {
+			this._emitter(this.name, this.packets);
+			this.packets.length = 0;
+		}
+
+		if (!this.options.serverTick) {
+			this.resetBundler();
+		}
 	}
 
 	/**
