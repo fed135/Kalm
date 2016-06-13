@@ -21,7 +21,9 @@ class Adapter {
 	 * @param {Server} server The server object
 	 * @param {function} callback The callback for the operation
 	 */
-	listen() {}
+	listen() {
+		throw new Error('not implemented');
+	}
 
 	/**
 	 * Stops the server
@@ -52,7 +54,9 @@ class Adapter {
 	 * @param {Socket} socket Optionnal existing socket object
 	 * @returns {Socket} The created socket
 	 */
-	createSocket() {}
+	createSocket() {
+		throw new Error('not implemented');
+	}
 
 	/**
 	 * @placeholder

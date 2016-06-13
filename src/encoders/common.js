@@ -13,7 +13,9 @@ class Encoder {
 	 * @param {object} payload The payload to encode
 	 * @returns {Buffer} The encoded payload
 	 */
-	encode() {}
+	encode() {
+		throw new Error('not implemented');
+	}
 
 	/**
 	 * Decodes a payload
@@ -21,7 +23,9 @@ class Encoder {
 	 * @param {Buffer} payload The payload to decode
 	 * @returns {object} The decoded payload
 	 */
-	decode() {}
+	decode() {
+		throw new Error('not implemented');
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/

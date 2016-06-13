@@ -13,7 +13,7 @@
 Simplify and optimize your Socket communications with:
 
 - Easy-to-use single syntax for all protocols
-- Configurable packet bundling (High-level Naggle's algorith implementation)
+- Configurable packet bundling (High-level Naggle's algorithm implementation)
 - Multiplexing for all protocols
 - Ultra-flexible and extensible, load your own adapters and encoders
 
@@ -53,7 +53,7 @@ Simplify and optimize your Socket communications with:
 ```node
     var Kalm = require('kalm');
 
-    // Create a server, listening for incomming connections
+    // Create a server, listening for incoming connections
     var server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
@@ -146,11 +146,7 @@ Kalm uses [debug](https://github.com/visionmedia/debug)
 
     export DEBUG=kalm
 
-You can dump the unsent packets for recovery purposes by calling
-
-    <Server>.dump();
-
-You can also gather Naggling optimization statistics by piping `kalm:stats`
+You can also gather optimization statistics by piping `kalm:stats`
 
     export DEBUG=kalm:stats myApp.js > stats.log
 
