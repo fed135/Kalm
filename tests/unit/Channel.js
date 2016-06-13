@@ -50,10 +50,8 @@ describe('Channel', () => {
 			});
 
 			var mockClient = {
-				options: {
-					tick: mockTimer.object
-				},
-				_emit: function(){}
+				tick: mockTimer.object,
+				_emit: function() {}
 			};
 
 			mockTimer.expects('on')
