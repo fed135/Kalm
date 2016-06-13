@@ -87,7 +87,7 @@ class Client extends EventEmitter{
 			);
 			this.channels[name] = new Channel(
 				name, 
-				Object.assign(this.options.bundler, options),
+				Object.assign({}, this.options.bundler, options),
 				this
 			);
 		}

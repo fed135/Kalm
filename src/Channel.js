@@ -35,8 +35,8 @@ class Channel {
 
 		// Bind to server tick 
 		if (this.options.serverTick) {
-			if (client.options.tick) {
-				client.options.tick.on('step', this._emit.bind(this));
+			if (client.tick) {
+				client.tick.on('step', this._emit.bind(this));
 			}
 			else {
 				debug('warn: no server heartbeat, ignoring serverTick config');

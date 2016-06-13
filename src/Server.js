@@ -36,7 +36,7 @@ class Server extends EventEmitter {
 			adapter: options.adapter || defaults.adapter,
 			encoder: options.encoder || defaults.encoder,
 			port: options.port || defaults.port,
-			tick: defaults.tick,
+			tick: options.tick || defaults.tick,
 			socketTimeout: options.socketTimeout || defaults.socketTimeout
 		};
 
