@@ -5,7 +5,7 @@
   "main": "./index.js",
   "scripts": {
     "test": "mocha tests/unit --recursive && mocha tests/integration",
-    "build": "webpack  -p -d -j --define process.env.NODE_ENV='\"browser\"' --config ./webpack.config"
+    "build": "webpack -p -d -j --define process.env.NODE_ENV='\"browser\"' --config ./webpack.config && babel --no-comments --compact \"true\" --minified --plugins transform-es2015-parameters -o ./bin/kalm.min.js < ./bin/kalm.js"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,8 @@
   },
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
+    "babel-cli": "6.10.x",
+    "babel-plugin-transform-es2015-parameters": "6.9.x",
     "chai": "3.5.x",
     "mocha": "2.5.x",
     "sinon": "1.17.x"

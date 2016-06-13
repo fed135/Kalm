@@ -23,6 +23,8 @@ Simplify and optimize your Socket communications with:
 
  * NODE >= 6.0.0
 
+ * Webpack 1 || 2.1.x
+
 
 ## Performance analysis
 
