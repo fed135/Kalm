@@ -51,7 +51,7 @@ class Server extends EventEmitter {
 	 * Server lift method
 	 */
 	listen() {
-		var adapter = adapters.resolve(this.options.adapter);
+		let adapter = adapters.resolve(this.options.adapter);
 
 		if (adapter) {
 			debug(
@@ -115,6 +115,8 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	unsubscribe(name, handler) {
+		this.channels[name + ''] = null;
+
 		this.connections.forEach((client) => {
 			client.unsubscribe(name, handler);
 		});
@@ -128,12 +130,12 @@ class Server extends EventEmitter {
 	 */
 	dump() {
 		return this.connections.map((client) => {
-			return Object.keys(client.channels).map((channel) => {
-				return {
-					channel: channel,
-					packets: client.channels[channel].packets
-				}
-			});
+			let res = Object.assign({}, client.options);
+			res.channels = {};
+			for (let channel in client.channels) {
+				res.channels[channel] = client.channels[channel].packets;
+			}
+			return res;
 		});
 	}
 
@@ -145,7 +147,7 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	broadcast(channel, payload) {
-		for (var i = this.connections.length - 1; i >= 0; i--) {
+		for (let i = this.connections.length - 1; i >= 0; i--) {
 			this.connections[i].send(channel, payload);
 		}
 
@@ -175,12 +177,13 @@ class Server extends EventEmitter {
 	 * Closes the server
 	 * @param {function} callback The callback method for the operation
 	 */
-	stop(callback) {
-		callback = callback || function() {};
-
-		var adapter = adapters.resolve(this.options.adapter);
+	stop(callback=()=>{}) {
+		let adapter = adapters.resolve(this.options.adapter);
 
 		debug('warn: stopping server');
+
+		if (this._timer) this._timer.stop();
+
 		if (this.listener) {
 			this.connections.forEach(adapter.disconnect);
 			this.connections.length = 0;
@@ -188,7 +191,8 @@ class Server extends EventEmitter {
 			this.listener = null;
 		}
 		else {
-			return callback();
+			this.listener = null;
+			process.nextTick(callback);
 		}
 	}
 
@@ -218,7 +222,7 @@ class Server extends EventEmitter {
 	 * @param {Socket} socket The received connection socket
 	 */
 	handleRequest(socket) {
-		var client = this.createClient({
+		let client = this.createClient({
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
 			channels: this.channels,

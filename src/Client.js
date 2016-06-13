@@ -41,7 +41,7 @@ class Client extends EventEmitter{
 			// Encoding
 			encoder: options.encoder || defaults.encoder,
 			// Transformations (middleware)
-			bundler: options.bundler || defaults.bundler,
+			bundler: Object.assign({}, defaults.bundler, options.bundler || {}),
 			// Wether to output statistics in stdout
 			stats: options.stats || defaults.stats,
 			// Socket timeout
@@ -59,7 +59,7 @@ class Client extends EventEmitter{
 
 		// Populate channels
 		if (options.channels) {
-			for (var c in options.channels) {
+			for (let c in options.channels) {
 				this.subscribe(c, options.channels[c]);
 			}
 		}
@@ -152,7 +152,7 @@ class Client extends EventEmitter{
 		this.emit('connection', socket);
 
 		// In the case of a reconnection, we want to resume channel bundlers
-		for (var channel in this.channels) {
+		for (let channel in this.channels) {
 			if (this.channels[channel].packets.length) {
 				this.channels[channel].startBundler();
 			}
@@ -225,7 +225,7 @@ class Client extends EventEmitter{
 	 * @param {string} channel The channel targeted for transfer
 	 */
 	_emit(channel, packets) {
-		var payload = encoders.resolve(this.options.encoder).encode([
+		let payload = encoders.resolve(this.options.encoder).encode([
 			channel,
 			packets
 		]);
@@ -248,7 +248,7 @@ class Client extends EventEmitter{
 	 * @param {Buffer} evt The data received
 	 */
 	handleRequest(evt) {
-		var raw = encoders.resolve(this.options.encoder).decode(evt);
+		let raw = encoders.resolve(this.options.encoder).decode(evt);
 
 		if (raw && raw.length) {
 			if (this.channels.hasOwnProperty(raw[0])) {
@@ -263,7 +263,7 @@ class Client extends EventEmitter{
 	destroy() {
 		adapters.resolve(this.options.adapter).disconnect(this);
 		this.socket = null;
-		for (var channel in this.channels) {
+		for (let channel in this.channels) {
 			this.channels[channel].resetBundler();
 		}
 	}

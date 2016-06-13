@@ -53,7 +53,7 @@ class Channel {
 		this.packets.push(payload);
 
 		// Bundling process
-		if (this.packets.length >= this.options.maxPackets) {			
+		if (this.packets.length >= this.options.maxPackets) {		
 			this._emit();
 			return;
 		}
@@ -113,7 +113,7 @@ class Channel {
 	 * @param {function} method The method to bind
 	 */
 	removeHandler(method) {
-		var index = this.handlers.indexOf(method);
+		let index = this.handlers.indexOf(method);
 		if (index > -1) this.handlers.splice(index, 1);
 	}
 
@@ -129,11 +129,11 @@ class Channel {
 	 * @param {array} payload The received payload
 	 */
 	handleData(payload) {
-		var _reqs = payload.length;
-		var _listeners = this.handlers.length;
-		var reply = this.send.bind(this);
-		var i;
-		var c;
+		let _reqs = payload.length;
+		let _listeners = this.handlers.length;
+		let reply = this.send.bind(this);
+		let i;
+		let c;
 
 		if (this.splitBatches) {
 			for (i = 0; i < _reqs; i++) {

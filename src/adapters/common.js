@@ -30,7 +30,9 @@ class Adapter {
 	 * @param {function} callback The success callback for the operation
 	 */
 	stop(server, callback) {
-		server.listener.close(callback);
+		server.listener.close(() => {
+			process.nextTick(callback);
+		});
 	}
 
 	/**

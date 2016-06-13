@@ -36,7 +36,7 @@ class UDP extends Adapter {
 	 * @param {object} origin The call origin info
 	 */ 
 	_handleNewSocket(server, data, origin) {
-		var key = [origin.address, _keySeparator, origin.port].join();
+		let key = [origin.address, _keySeparator, origin.port].join();
 
 		if (!server.__clients) server.__clients = {};
 		if (!(key in server.__clients)) {
@@ -94,11 +94,11 @@ class UDP extends Adapter {
 	 * @param {function} callback The success callback for the operation
 	 */
 	stop(server, callback) {
-		for (var client in server.__clients) {
+		for (let client in server.__clients) {
 			this.disconnect(server.__clients[client]);
 		}
 		server.listener.close();
-		if (callback) callback();
+		process.nextTick(callback);
 	}
 
 	/**
@@ -110,7 +110,7 @@ class UDP extends Adapter {
 	createSocket(client, soc) {
 		if (soc) return soc;
 
-		var socket = dgram.createSocket(_socketType);
+		let socket = dgram.createSocket(_socketType);
 		socket.__port = client.options.port;
 		socket.__hostname = client.options.hostname;
 
