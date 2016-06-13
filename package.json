@@ -1,6 +1,6 @@
 {
   "name": "kalm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
