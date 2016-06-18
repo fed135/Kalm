@@ -8,6 +8,7 @@
 /* Requires ------------------------------------------------------------------*/
 
 const net = require('net');
+const split = require('binary-split');
 
 const Adapter = require('./common');
 
@@ -41,11 +42,11 @@ class TCP extends Adapter {
 	 */
 	createSocket(client, socket) {
 		if (!socket) {
-			socket = new net.Socket({ allowHalfOpen: true });
-			socket.connect(client.options.port, client.options.hostname);
+			socket = net.connect(client.options.port, client.options.hostname);
 		}
 
-		socket.on('data', client.handleRequest.bind(client));
+		let stream = socket.pipe(split());
+		stream.on('data', client.handleRequest.bind(client));
 		
 		// Emit on error
 		socket.on('error', client.handleError.bind(client));

@@ -21,7 +21,10 @@ describe('Client', () => {
 		on: function() {},
 		setTimeout: function() {},
 		end: function() {},
-		destroy: function() {}
+		write: function() {},
+		once: function() {},
+		destroy: function() {},
+		pipe: function() {}
 	};
 
 	describe('#constructor(options, socket)', () => {

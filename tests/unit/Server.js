@@ -64,7 +64,7 @@ describe('Server', () => {
 			});
 
 			testServer.subscribe('test', testHandler);
-			expect(testServer.channels.test).to.equal(testHandler);
+			expect(testServer.channels.test).to.deep.equal([['test', testHandler, undefined]]);
 			expect(testSubscribe.calledOnce).to.be.true;
 		});
 	});
@@ -82,7 +82,7 @@ describe('Server', () => {
 				unsubscribe: testUnsubscribe
 			});
 			testServer.unsubscribe('test', testHandler);
-			expect(testServer.channels.test).to.be.null;
+			expect(testServer.channels.test).to.be.array;
 			expect(testUnsubscribe.calledOnce).to.be.true;
 		});
 	});
@@ -94,7 +94,8 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -132,7 +133,8 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -151,7 +153,8 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -199,7 +202,8 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {}
 			};
 
 			testServer = new testModule();

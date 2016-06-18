@@ -41,7 +41,15 @@ class Server extends EventEmitter {
 		};
 
 		this.connections = [];
-		this.channels = options.channels || {};
+		this.channels = {};
+
+		if (options.channels) {
+			for (let c in options.channels) {
+				if (options.channels.hasOwnProperty(c)) {
+					this.subscribe(c, options.channels[c]);
+				}
+			}
+		}
 
 		this.listen();
 		this.setTick(this.options.tick);
@@ -99,7 +107,10 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	subscribe(name, handler, options) {
-		this.channels[name + ''] = handler;
+		if (!this.channels.hasOwnProperty(name)) {
+			this.channels[name] = [];
+		}
+		this.channels[name].push([name + '', handler, options]);
 
 		this.connections.forEach((client) => {
 			client.subscribe(name, handler, options);
@@ -115,11 +126,15 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	unsubscribe(name, handler) {
-		this.channels[name + ''] = null;
+		if (this.channels.hasOwnProperty(name)) {
+			this.channels[name].forEach((subs, i) => {
+				if (subs[1] === handler) this.channels[name].splice(i, 1);
+			});
 
-		this.connections.forEach((client) => {
-			client.unsubscribe(name, handler);
-		});
+			this.connections.forEach((client) => {
+				client.unsubscribe(name, handler);
+			});
+		}
 
 		return this;
 	}
@@ -206,7 +221,13 @@ class Server extends EventEmitter {
 	 * @returns {Client} The newly created client
 	 */
 	createClient(options, socket) {
-		return new Client(options, socket);
+		let client = new Client(options, socket);
+		Object.keys(this.channels).forEach((channel) => {
+			this.channels[channel].forEach((subs) => {
+				client.subscribe.apply(client, subs);
+			});
+		});
+		return client
 	}
 
 	/**
@@ -227,7 +248,6 @@ class Server extends EventEmitter {
 		let client = this.createClient({
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
-			channels: this.channels,
 			tick: this._timer
 		}, socket);
 		this.connections.push(client);

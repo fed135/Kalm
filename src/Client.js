@@ -60,7 +60,9 @@ class Client extends EventEmitter{
 		// Populate channels
 		if (options.channels) {
 			for (let c in options.channels) {
-				this.subscribe(c, options.channels[c]);
+				if (options.channels.hasOwnProperty(c)) {
+					this.subscribe(c, options.channels[c]);
+				}
 			}
 		}
 
@@ -248,8 +250,8 @@ class Client extends EventEmitter{
 	 * @param {Buffer} evt The data received
 	 */
 	handleRequest(evt) {
+		if (evt.length === 0) return;
 		let raw = encoders.resolve(this.options.encoder).decode(evt);
-
 		if (raw && raw.length) {
 			if (this.channels.hasOwnProperty(raw[0])) {
 				this.channels[raw[0]].handleData(raw[1]);

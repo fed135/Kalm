@@ -83,12 +83,20 @@ describe('TCP', () => {
 		it('should send the payload through the socket', () => {
 			var testPayload = new Buffer(JSON.stringify({foo:'bar'}));
 			var socketMock = sinon.mock({
-				end: function() {}
+				end: function() {},
+				once: function() {}
 			});
 
 			socketMock.expects('end')
 				.once()
 				.withArgs(testPayload);
+
+			/*
+			// For subsequent calls
+			socketMock.expects('once')
+				.once()
+				.withArgs('drain');
+			*/
 
 			testModule.send(socketMock.object, testPayload);
 			socketMock.verify();
