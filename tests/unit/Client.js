@@ -13,6 +13,8 @@ var Channel = require('../../src/Channel');
 var defaults = require('../../src/defaults');
 var adapters = require('../../src/adapters');
 
+const EventEmitter = require('events').EventEmitter;
+
 /* Tests ---------------------------------------------------------------------*/
 
 describe('Client', () => {
@@ -24,7 +26,9 @@ describe('Client', () => {
 		write: function() {},
 		once: function() {},
 		destroy: function() {},
-		pipe: function() {}
+		pipe: function() {
+			return new EventEmitter();
+		}
 	};
 
 	describe('#constructor(options, socket)', () => {

@@ -13,6 +13,8 @@ var testModule = require('../../../src/adapters/tcp');
 
 var net = require('net');
 
+const EventEmitter = require('events').EventEmitter;
+
 /* Tests ---------------------------------------------------------------------*/
 
 describe('TCP', () => {
@@ -83,20 +85,11 @@ describe('TCP', () => {
 		it('should send the payload through the socket', () => {
 			var testPayload = new Buffer(JSON.stringify({foo:'bar'}));
 			var socketMock = sinon.mock({
-				end: function() {},
-				once: function() {}
+				write: function() {}
 			});
 
-			socketMock.expects('end')
-				.once()
-				.withArgs(testPayload);
-
-			/*
-			// For subsequent calls
-			socketMock.expects('once')
-				.once()
-				.withArgs('drain');
-			*/
+			socketMock.expects('write')
+				.twice();
 
 			testModule.send(socketMock.object, testPayload);
 			socketMock.verify();
@@ -107,11 +100,14 @@ describe('TCP', () => {
 		it('should create a socket client and return it', () => {
 			var netMock = sinon.mock(net);
 
-			netMock.expects('Socket')
+			netMock.expects('connect')
 				.once()
-				.withArgs({ allowHalfOpen: true })
+				.withArgs(9000, '0.0.0.0')
 				.returns({
 					on:function() {},
+					pipe: function() {
+						return new EventEmitter();
+					},
 					setTimeout: function() {},
 					connect: function() {}
 				});

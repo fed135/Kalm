@@ -59,25 +59,21 @@ class Server extends EventEmitter {
 	 * Server lift method
 	 */
 	listen() {
-		let adapter = adapters.resolve(this.options.adapter);
-
-		if (adapter) {
-			debug(
-				'log: listening ' + 
-				this.options.adapter + 
-				'://0.0.0.0:' + 
-				this.options.port
-			);
+		debug(
+			'log: listening ' + 
+			this.options.adapter + 
+			'://0.0.0.0:' + 
+			this.options.port
+		);
 			
-			adapter.listen(this, () => {
-				process.nextTick(() => {
-					this.emit('ready');
+		Promise.resolve()
+			.then(() => {
+				adapters.resolve(this.options.adapter).listen(this, () => {
+					process.nextTick(() => {
+						this.emit('ready');
+					});
 				});
-			});
-		}
-		else {
-			debug('error: no adapter found "' + this.options.adapter + '"');
-		}
+			}).then(null, this.handleError);
 	}
 
 	/**
@@ -202,10 +198,13 @@ class Server extends EventEmitter {
 		if (this._timer) this._timer.stop();
 
 		if (this.listener) {
-			this.connections.forEach(adapter.disconnect);
-			this.connections.length = 0;
-			adapter.stop(this, callback);
-			this.listener = null;
+			Promise.resolve()
+				.then(() => {
+					this.connections.forEach(adapter.disconnect);
+					this.connections.length = 0;
+					adapter.stop(this, callback);
+					this.listener = null;
+				}).then(null, this.handleError);
 		}
 		else {
 			this.listener = null;

@@ -13,6 +13,8 @@ var defaults = require('../../src/defaults');
 var adapters = require('../../src/adapters');
 var Client = require('../../src/Client');
 
+const EventEmitter = require('events').EventEmitter;
+
 /* Tests ---------------------------------------------------------------------*/
 
 describe('Server', () => {
@@ -95,7 +97,9 @@ describe('Server', () => {
 				setTimeout: function() {},
 				end: function() {},
 				destroy: function() {},
-				pipe: function() {}
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -134,7 +138,9 @@ describe('Server', () => {
 				setTimeout: function() {},
 				end: function() {},
 				destroy: function() {},
-				pipe: function() {}
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -154,7 +160,9 @@ describe('Server', () => {
 				setTimeout: function() {},
 				end: function() {},
 				destroy: function() {},
-				pipe: function() {}
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -203,7 +211,9 @@ describe('Server', () => {
 				setTimeout: function() {},
 				end: function() {},
 				destroy: function() {},
-				pipe: function() {}
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 
 			testServer = new testModule();
