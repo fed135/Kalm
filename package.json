@@ -1,6 +1,6 @@
 {
   "name": "kalm",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
@@ -40,6 +40,7 @@
     "sinon": "1.17.x"
   },
   "dependencies": {
+    "binary-split": "1.0.x",
     "debug": "2.2.x"
   }
 }

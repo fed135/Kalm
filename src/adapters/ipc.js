@@ -9,6 +9,7 @@
 
 const net = require('net');
 const fs = require('fs');
+const split = require('binary-split');
 
 const Adapter = require('./common');
 
@@ -41,16 +42,6 @@ class IPC extends Adapter {
 	}
 
 	/**
-	 * Sends a message with a socket client
-	 * @placeholder
-	 * @param {Socket} socket The socket to use
-	 * @param {Buffer} payload The body of the request
-	 */
-	send(socket, payload) {
-		if (socket) socket.write(payload);
-	}
-
-	/**
 	 * Creates a client and adds the data listener(s) to it
 	 * @param {Client} client The client to create the socket for
 	 * @param {Socket} socket Optionnal existing socket object.
@@ -61,7 +52,8 @@ class IPC extends Adapter {
 			socket = net.connect(_path + client.options.port);
 		}
 
-		socket.on('data', client.handleRequest.bind(client));
+		let stream = socket.pipe(split());
+		stream.on('data', client.handleRequest.bind(client));
 
 		// Emit on error
 		socket.on('error', client.handleError.bind(client));

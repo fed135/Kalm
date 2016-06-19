@@ -14,6 +14,8 @@ var testModule = require('../../../src/adapters/ipc');
 var net = require('net');
 var fs = require('fs');
 
+const EventEmitter = require('events').EventEmitter;
+
 /* Local variables -----------------------------------------------------------*/
 
 const _path = '/tmp/app.socket-';
@@ -97,8 +99,7 @@ describe('IPC', () => {
 			});
 
 			socketMock.expects('write')
-				.once()
-				.withArgs(testPayload);
+				.twice();
 
 			testModule.send(socketMock.object, testPayload);
 			socketMock.verify();
@@ -115,7 +116,10 @@ describe('IPC', () => {
 				.returns({
 					on:function() {},
 					setTimeout: function() {},
-					connect: function() {}
+					connect: function() {},
+					pipe: function() {
+						return new EventEmitter();
+					}
 				});
 
 			var result = testModule.createSocket({

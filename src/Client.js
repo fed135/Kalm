@@ -60,7 +60,9 @@ class Client extends EventEmitter{
 		// Populate channels
 		if (options.channels) {
 			for (let c in options.channels) {
-				this.subscribe(c, options.channels[c]);
+				if (options.channels.hasOwnProperty(c)) {
+					this.subscribe(c, options.channels[c]);
+				}
 			}
 		}
 
@@ -121,8 +123,7 @@ class Client extends EventEmitter{
 	 */
 	use(socket) {
 		if (this.socket) {
-			debug('log: disconnecting current socket');
-			adapters.resolve(this.options.adapter).disconnect(this);
+			this.destroy();
 		}
 
 		this.socket = this.createSocket(socket);
@@ -230,10 +231,13 @@ class Client extends EventEmitter{
 			packets
 		]);
 
-		adapters.resolve(this.options.adapter).send(
-			this.socket, 
-			payload
-		);
+		Promise.resolve()
+			.then(() => { 
+				adapters.resolve(this.options.adapter).send(
+					this.socket, 
+					payload
+				);
+			}).then(null, this.handleError);
 
 		if (this.options.stats) {
 			statsOut(JSON.stringify({
@@ -248,8 +252,8 @@ class Client extends EventEmitter{
 	 * @param {Buffer} evt The data received
 	 */
 	handleRequest(evt) {
+		if (evt.length === 0) return;
 		let raw = encoders.resolve(this.options.encoder).decode(evt);
-
 		if (raw && raw.length) {
 			if (this.channels.hasOwnProperty(raw[0])) {
 				this.channels[raw[0]].handleData(raw[1]);
@@ -261,10 +265,17 @@ class Client extends EventEmitter{
 	 * Destroys the client and connection
 	 */
 	destroy() {
-		adapters.resolve(this.options.adapter).disconnect(this);
-		this.socket = null;
+		Promise.resolve()
+			.then(() => {
+				adapters.resolve(this.options.adapter).disconnect(this);
+				this.socket = null;
+			})
+			.then(null, this.handleError);
+		
 		for (let channel in this.channels) {
-			this.channels[channel].resetBundler();
+			if (this.channels.hasOwnProperty(channel)) {
+				this.channels[channel].resetBundler();
+			}
 		}
 	}
 }

@@ -13,6 +13,8 @@ var defaults = require('../../src/defaults');
 var adapters = require('../../src/adapters');
 var Client = require('../../src/Client');
 
+const EventEmitter = require('events').EventEmitter;
+
 /* Tests ---------------------------------------------------------------------*/
 
 describe('Server', () => {
@@ -64,7 +66,7 @@ describe('Server', () => {
 			});
 
 			testServer.subscribe('test', testHandler);
-			expect(testServer.channels.test).to.equal(testHandler);
+			expect(testServer.channels.test).to.deep.equal([['test', testHandler, undefined]]);
 			expect(testSubscribe.calledOnce).to.be.true;
 		});
 	});
@@ -82,7 +84,7 @@ describe('Server', () => {
 				unsubscribe: testUnsubscribe
 			});
 			testServer.unsubscribe('test', testHandler);
-			expect(testServer.channels.test).to.be.null;
+			expect(testServer.channels.test).to.be.array;
 			expect(testUnsubscribe.calledOnce).to.be.true;
 		});
 	});
@@ -94,7 +96,10 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -132,7 +137,10 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -151,7 +159,10 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 			testServer.connections.push(new Client({
 				bundler: {
@@ -199,7 +210,10 @@ describe('Server', () => {
 				on: function() {},
 				setTimeout: function() {},
 				end: function() {},
-				destroy: function() {}
+				destroy: function() {},
+				pipe: function() {
+					return new EventEmitter();
+				}
 			};
 
 			testServer = new testModule();

@@ -4,6 +4,10 @@
 
 'use strict';
 
+/* Local variables -----------------------------------------------------------*/
+
+const SEP = new Buffer('\n');
+
 /* Methods -------------------------------------------------------------------*/
 
 class Adapter {
@@ -44,7 +48,10 @@ class Adapter {
 	 * @param {Buffer} payload The body of the request
 	 */
 	send(socket, payload) {
-		if (socket) socket.end(payload);
+		if (socket) {
+			socket.write(payload);
+			socket.write(SEP);
+		}
 	}
 
 	/**

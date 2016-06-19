@@ -30,7 +30,7 @@ Simplify and optimize your Socket communications with:
 
 **Requests per minute**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v100.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v110.png">
 
 *Benchmarks based on a single-thread queue test with Kalm default bundling settings*
 
@@ -103,7 +103,7 @@ Simplify and optimize your Socket communications with:
 - tcp (bundled)
 - udp (bundled)
 - [kalm-websocket](https://github.com/fed135/kalm-websocket)
-- [kalm-webrtc](https://github.com/fed135/kalm-webrtc)
+- [kalm-webrtc](#) (In-dev) 
 
 
 ## Encoders
@@ -111,7 +111,7 @@ Simplify and optimize your Socket communications with:
 - json (bundled)
 - [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
 - [kalm-snappy](https://github.com/fed135/kalm-snappy)
-- [kalm-protocol-buffer](https://github.com/fed135/kalm-msgpack)
+- [kalm-protocol-buffer](#) (In-dev)
 
 
 ## Loading custom adapters
