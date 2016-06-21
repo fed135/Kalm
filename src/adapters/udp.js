@@ -16,6 +16,7 @@ const Adapter = require('./common');
 const _socketType = 'udp4';
 const _startByte = 0;
 const _keySeparator = ':';
+const _localAddress = '0.0.0.0';
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -65,7 +66,7 @@ class UDP extends Adapter {
 			this._handleNewSocket(server, data, origin)
 		});
 		server.listener.on('error', server.handleError.bind(server));
-		server.listener.bind(server.options.port, '127.0.0.1');
+		server.listener.bind(server.options.port, _localAddress);
 		
 		return callback();
 	}
@@ -111,12 +112,18 @@ class UDP extends Adapter {
 	createSocket(client, soc) {
 		if (soc) return soc;
 
+		// Create a UDP writing socket
 		let socket = dgram.createSocket(_socketType);
 		socket.__port = client.options.port;
 		socket.__hostname = client.options.hostname;
 
 		// Emit on error
 		socket.on('error', client.handleError.bind(client));
+
+		// Bind socket to also listen on it's address
+		socket.bind(null, _localAddress);
+
+		socket.on('message', client.handleRequest.bind(client));
 
 		// Emit on connect
 		process.nextTick(client.handleConnect.bind(client));
