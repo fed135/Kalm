@@ -49,7 +49,7 @@ describe('UDP', () => {
 
 			listenerTest.expects('bind')
 				.once()
-				.withArgs(port, '127.0.0.1');
+				.withArgs(port, '0.0.0.0');
 			
 			testModule.listen(serverTest, () => {
 				expect(serverTest.listener).to.be.not.null;
@@ -120,7 +120,8 @@ describe('UDP', () => {
 				.once()
 				.withArgs('udp4')
 				.returns({
-					on:function(){}
+					on: function() {},
+					bind: function() {}
 				});
 
 			var result = testModule.createSocket({
@@ -129,7 +130,8 @@ describe('UDP', () => {
 					port: 9000
 				},
 				handleError: function() {},
-				handleConnect: function() {}
+				handleConnect: function() {},
+				handleRequest: function() {}
 			});
 
 			expect(result.__port).to.equal(9000);
