@@ -41,7 +41,7 @@ class UDP extends Adapter {
 
 		if (!server.__clients) server.__clients = {};
 		if (!(key in server.__clients)) {
-			server.__clients[key] = server.createClient.call(server, {
+			server.__clients[key] = server.createClient({
 				hostname: origin.address,
 				port: origin.port,
 				adapter: this.type,

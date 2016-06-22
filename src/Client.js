@@ -59,11 +59,9 @@ class Client extends EventEmitter{
 
 		// Populate channels
 		if (options.channels) {
-			for (let c in options.channels) {
-				if (options.channels.hasOwnProperty(c)) {
-					this.subscribe(c, options.channels[c]);
-				}
-			}
+			Object.keys(options.channels).forEach((c) => {
+				this.subscribe(c, options.channels[c])
+			});
 		}
 
 		// Socket object
@@ -176,26 +174,25 @@ class Client extends EventEmitter{
 	/**
 	 * Queues a packet for transfer on the given channel
 	 * @param {string} name The channel to send to data through
-	 * @param {string|object} payload The payload to send 
+	 * @param {string|object} payload The payload to send
+	 * @param {boolean} once Wether to override packets with this one
 	 * @returns {Client} The client, for chaining
 	 */
-	send(name, payload) {
+	send(name, payload, once) {
 		this.subscribe(name);
 		
-		this.channels[name].send(payload);
+		this.channels[name].send(payload, once);
 		return this;
 	}
 
 	/**
-	 * Trumps other packets on the given channel, will only send the latest
+	 * Shortcut to send-once. This overrides other packets on the given channel
 	 * @param {string} name The channel to send to data through
 	 * @param {string|object} payload The payload to send 
 	 * @returns {Client} The client, for chaining
 	 */
 	sendOnce(name, payload) {
-		this.subscribe(name);
-		
-		this.channels[name].sendOnce(payload);
+		this.send(name, payload, true);
 		return this;
 	}
 
