@@ -8,6 +8,13 @@
 
 const Store = require('../Store');
 
+// If running in the browser, do not load net adapters
+const is_browser = (process.env.NODE_ENV === 'browser');
+
+const ipc = (is_browser)?null:require('./ipc');
+const tcp = (is_browser)?null:require('./tcp');
+const udp = (is_browser)?null:require('./udp');
+
 /* Methods -------------------------------------------------------------------*/
 
 class Adapters extends Store {
@@ -18,12 +25,9 @@ class Adapters extends Store {
 	constructor() {
 		super('adapter');
 
-		// If running in the browser, do not load net adapters
-		if (process.env.NODE_ENV !== 'browser') {
-			this.list.ipc = require('./ipc');
-			this.list.tcp = require('./tcp');
-			this.list.udp = require('./udp');
-		}
+		this.list.ipc = ipc;
+		this.list.tcp = tcp;
+		this.list.udp = udp;
 	}
 }
 

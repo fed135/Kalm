@@ -46,25 +46,17 @@ class Channel {
 	/**
 	 * Tells the channel to process the payload to send
 	 * @param {object|string} payload The payload to process
+	 * @param {boolean} once Wether to override other packets
 	 */
-	send(payload) {
-		this.packets.push(payload);
+	send(payload, once) {
+		if (once) this.packets = [payload];
+		else this.packets.push(payload);
 
 		// Bundling process
 		if (this.packets.length >= this.options.maxPackets) {		
 			this._emit();
 			return;
 		}
-
-		this.startBundler();
-	}
-
-	/**
-	 * Sends the latest payload only
-	 * @param {object|string} payload The payload to send
-	 */
-	sendOnce(payload) {
-		this.packets = [payload];
 
 		this.startBundler();
 	}

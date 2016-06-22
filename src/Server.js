@@ -44,11 +44,9 @@ class Server extends EventEmitter {
 		this.channels = {};
 
 		if (options.channels) {
-			for (let c in options.channels) {
-				if (options.channels.hasOwnProperty(c)) {
-					this.subscribe(c, options.channels[c]);
-				}
-			}
+			Object.keys(options.channels).forEach((c) => {
+				this.subscribe(c, options.channels[c])
+			});
 		}
 
 		this.listen();

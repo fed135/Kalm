@@ -55,16 +55,14 @@ describe('Channel', () => {
 			expect(testChannel.packets).to.include(packet);
 			bundlerStub.restore();
 		});
-	});
 
-	describe('#sendOnce(payload)', () => {
 		it('should replace all packet with the payload', () => {
 			var packet = {foo: 'bar'};
 			var testChannel = new testModule('test', {}, mockClient);
 			var bundlerStub = sinon.stub(testChannel, 'startBundler');
 
-			testChannel.sendOnce(packet);
-			testChannel.sendOnce(packet);
+			testChannel.send(packet, true);
+			testChannel.send(packet, true);
 			expect(testChannel.packets).to.deep.equal([packet]);
 			bundlerStub.restore();
 		});
