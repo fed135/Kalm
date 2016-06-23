@@ -30,7 +30,7 @@ Simplify and optimize your Socket communications with:
 
 **Requests per minute**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v110.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v120.png">
 
 *Benchmarks based on a single-thread queue test with Kalm default bundling settings*
 
