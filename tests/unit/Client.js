@@ -42,7 +42,8 @@ describe('Client', () => {
 				encoder: defaults.encoder,
 				bundler: defaults.bundler,
 				stats: defaults.stats,
-				socketTimeout: defaults.socketTimeout
+				socketTimeout: defaults.socketTimeout,
+				rejectForeign: defaults.rejectForeign
 			});
 			expect(result.channels).to.not.be.object;
 			expect(result.fromServer).to.be.false;
@@ -181,7 +182,7 @@ describe('Client', () => {
 	});
 
 	describe('#handleRequest(evt)', () => {
-		it('should call handleData on the appropriate channels', () => {
+		it('should call handleData on the appropriate channels', (done) => {
 			var testClient = new testModule({}, testSocket);
 			var testHandler1 = sinon.spy();
 			var testHandler2 = sinon.spy();
@@ -190,8 +191,11 @@ describe('Client', () => {
 
 			testClient.handleRequest(JSON.stringify(['test', ['data']]));
 
-			expect(testHandler1.withArgs('data').calledOnce).to.be.true;
-			expect(testHandler2.calledOnce).to.be.false;
+			setTimeout(() => {
+				expect(testHandler1.withArgs('data').calledOnce).to.be.true;
+				expect(testHandler2.calledOnce).to.be.false;
+				done();
+			},1);
 		});
 	});
 

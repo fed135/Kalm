@@ -45,7 +45,9 @@ class Client extends EventEmitter{
 			// Wether to output statistics in stdout
 			stats: options.stats || defaults.stats,
 			// Socket timeout
-			socketTimeout: options.socketTimeout || defaults.socketTimeout
+			socketTimeout: options.socketTimeout || defaults.socketTimeout,
+			// Reject invalid communication attempts
+			rejectForeign: options.rejectForeign || defaults.rejectForeign
 		};
 
 		// List of channels 
@@ -223,39 +225,56 @@ class Client extends EventEmitter{
 	 * @param {string} channel The channel targeted for transfer
 	 */
 	_emit(channel, packets) {
-		let payload = encoders.resolve(this.options.encoder).encode([
-			channel,
-			packets
-		]);
-
 		Promise.resolve()
-			.then(() => { 
-				adapters.resolve(this.options.adapter).send(
-					this.socket, 
-					payload
-				);
-			}).then(null, this.handleError);
+			.then(() => {
+				return encoders.resolve(this.options.encoder).encode([channel, packets]);
+			})
+			.then((payload) => {
+				Promise.resolve()
+					.then(() => { 
+						adapters.resolve(this.options.adapter).send(
+							this.socket, 
+							payload
+						);
+					}).then(null, this.handleError);
 
-		if (this.options.stats) {
-			statsOut(JSON.stringify({
-				packets: packets.length, 
-				bytes: payload.length
-			}));
-		}
+				if (this.options.stats) {
+					statsOut(JSON.stringify({
+						packets: packets.length, 
+						bytes: payload.length
+					}));
+				}
+			}, this.handleError);
 	}
 
 	/**
 	 * Handler for receiving data through the listener
+	 * Malformed or invalid payloads should result in a killing of the socket
 	 * @param {Buffer} evt The data received
 	 */
 	handleRequest(evt) {
 		if (evt.length === 0) return;
-		let raw = encoders.resolve(this.options.encoder).decode(evt);
-		if (raw && raw.length) {
-			if (this.channels.hasOwnProperty(raw[0])) {
-				this.channels[raw[0]].handleData(raw[1]);
-			}
-		}
+		
+		Promise.resolve()
+			.then(() => {
+				return encoders.resolve(this.options.encoder).decode(evt);
+			})
+			.then((raw) => {
+				if (raw && raw.length) {
+					if (this.channels.hasOwnProperty(raw[0])) {
+						this.channels[raw[0]].handleData(raw[1]);
+						return;
+					}
+				}
+
+				if (this.fromServer && this.options.rejectForeign) {
+					this.handleError('malformed payload:'+ evt); // Error Class is too heavy
+					this.destroy();
+				}
+			}, (err) => {
+				this.handleError(err);
+				this.destroy();
+			});
 	}
 
 	/**

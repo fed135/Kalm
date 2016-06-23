@@ -37,7 +37,8 @@ class Server extends EventEmitter {
 			encoder: options.encoder || defaults.encoder,
 			port: options.port || defaults.port,
 			tick: options.tick || defaults.tick,
-			socketTimeout: options.socketTimeout || defaults.socketTimeout
+			socketTimeout: options.socketTimeout || defaults.socketTimeout,
+			rejectForeign: options.rejectForeign || defaults.rejectForeign
 		};
 
 		this.connections = [];

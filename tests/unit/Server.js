@@ -38,7 +38,8 @@ describe('Server', () => {
 				encoder: defaults.encoder,
 				port: defaults.port,
 				tick: defaults.tick,
-				socketTimeout: defaults.socketTimeout
+				socketTimeout: defaults.socketTimeout,
+				rejectForeign: defaults.rejectForeign
 			});
 			expect(testServer.connections).to.be.array;
 			expect(testServer.channels).to.be.object;
@@ -124,7 +125,8 @@ describe('Server', () => {
 					hostname: '0.0.0.0',
 					port: 3000,
 					socketTimeout: 30000,
-					stats: false
+					stats: false,
+					rejectForeign: true
 				}
 			]);
 		});
@@ -231,7 +233,8 @@ describe('Server', () => {
 						splitBatches: true
 					},
 					socketTimeout: 30000,
-					stats: false
+					stats: false,
+					rejectForeign: true
 				});
 				done();
 			});
