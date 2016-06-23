@@ -84,7 +84,7 @@ class Channel {
 	 */
 	_emit() {
 		if (this.packets.length > 0) {
-			this._emitter(this.name, this.packets);
+			this._emitter(this.name, this.packets.concat());
 			this.packets.length = 0;
 		}
 

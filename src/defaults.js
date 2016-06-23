@@ -14,6 +14,7 @@ module.exports = {
 	stats: false,
 	tick: null,
 	socketTimeout: 1000 * 30,	// 30 seconds
+	rejectForeign: true,	// Destroys bad connection attempts
 	bundler: {
 		maxPackets: 2048,
 		serverTick: false,
