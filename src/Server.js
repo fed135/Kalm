@@ -72,7 +72,8 @@ class Server extends EventEmitter {
 						this.emit('ready');
 					});
 				});
-			}).then(null, this.handleError);
+			}).then(null, this.handleError.bind(this))
+			.catch(console.error);
 	}
 
 	/**
@@ -174,8 +175,8 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	whisper(channel, payload) {
-		for (var i = this.connections.length - 1; i >= 0; i--) {
-			for (var u in this.connections[i].channels) {
+		for (let i = this.connections.length - 1; i >= 0; i--) {
+			for (let u in this.connections[i].channels) {
 				if (this.connections[i].channels[u].name === channel) {
 					this.connections[i].channels[u].send(payload);
 				}
@@ -203,7 +204,7 @@ class Server extends EventEmitter {
 					this.connections.length = 0;
 					adapter.stop(this, callback);
 					this.listener = null;
-				}).then(null, this.handleError);
+				}).then(null, this.handleError.bind(this))
 		}
 		else {
 			this.listener = null;
@@ -233,7 +234,7 @@ class Server extends EventEmitter {
 	 * @param {Error} err The triggered error
 	 */
 	handleError(err) {
-		debug('error: ' + err);
+		debug('error: ', err);
 		this.emit('error', err);
 	}
 

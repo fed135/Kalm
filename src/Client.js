@@ -135,8 +135,7 @@ class Client extends EventEmitter{
 	 * @param {Error} err The socket triggered error
 	 */
 	handleError(err) {
-		debug('error: ' + err.message);
-		debug(err.stack);
+		debug('error: ', err);
 		this.emit('error', err);
 	}
 
@@ -236,7 +235,7 @@ class Client extends EventEmitter{
 							this.socket, 
 							payload
 						);
-					}).then(null, this.handleError);
+					}).then(null, this.handleError.bind(this));
 
 				if (this.options.stats) {
 					statsOut(JSON.stringify({
@@ -244,7 +243,7 @@ class Client extends EventEmitter{
 						bytes: payload.length
 					}));
 				}
-			}, this.handleError);
+			}, this.handleError.bind(this));
 	}
 
 	/**
@@ -274,7 +273,8 @@ class Client extends EventEmitter{
 			}, (err) => {
 				this.handleError(err);
 				this.destroy();
-			});
+			})
+			.catch(console.error);
 	}
 
 	/**
@@ -286,7 +286,7 @@ class Client extends EventEmitter{
 				adapters.resolve(this.options.adapter).disconnect(this);
 				this.socket = null;
 			})
-			.then(null, this.handleError);
+			.then(null, this.handleError.bind(this));
 		
 		for (let channel in this.channels) {
 			if (this.channels.hasOwnProperty(channel)) {
