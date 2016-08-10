@@ -12,11 +12,11 @@ const crypto = require('crypto');
 const debug = require('debug')('kalm');
 const statsOut = require('debug')('kalm:stats');
 
-var defaults = require('./defaults');
-var adapters = require('./adapters');
-var encoders = require('./encoders');
+const defaults = require('./defaults');
+const adapters = require('./adapters');
+const encoders = require('./encoders');
 
-var Channel = require('./Channel');
+const Channel = require('./Channel');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -228,7 +228,7 @@ class Client extends EventEmitter{
 			.then(() => {
 				return encoders.resolve(this.options.encoder).encode([channel, packets]);
 			})
-			.then((payload) => {
+			.then(payload => {
 				Promise.resolve()
 					.then(() => { 
 						adapters.resolve(this.options.adapter).send(
@@ -258,7 +258,7 @@ class Client extends EventEmitter{
 			.then(() => {
 				return encoders.resolve(this.options.encoder).decode(evt);
 			})
-			.then((raw) => {
+			.then(raw => {
 				if (raw && raw.length) {
 					if (this.channels.hasOwnProperty(raw[0])) {
 						this.channels[raw[0]].handleData(raw[1]);
@@ -270,11 +270,10 @@ class Client extends EventEmitter{
 					this.handleError('malformed payload:'+ evt); // Error Class is too heavy
 					this.destroy();
 				}
-			}, (err) => {
+			}, err => {
 				this.handleError(err);
 				this.destroy();
-			})
-			.catch(console.error);
+			});
 	}
 
 	/**

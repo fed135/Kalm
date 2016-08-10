@@ -34,7 +34,7 @@ describe('Adapters', () => {
 
 	describe('#register(name, mod)', () => {
 		it('can register a valid adapter', () => {
-			var adapterTest = {foo: 'bar'};
+			var adapterTest = {listen: 'bar', createSocket: 'baz'};
 			testModule.register('foo', adapterTest);
 			expect(testModule.resolve('foo')).to.eql(adapterTest);
 		});

@@ -34,7 +34,7 @@ describe('Encoders', () => {
 
 	describe('#register(name, mod)', () => {
 		it('can register a valid encoder', () => {
-			var encoderTest = {foo: 'bar'};
+			var encoderTest = {encode: 'bar', decode: 'baz'};
 			testModule.register('foo', encoderTest);
 			expect(testModule.resolve('foo')).to.eql(encoderTest);
 		});

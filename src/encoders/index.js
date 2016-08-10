@@ -6,7 +6,7 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var json = require('./json');
+const json = require('./json');
 
 const Store = require('../Store');
 
@@ -18,7 +18,11 @@ class Encoders extends Store {
 	 * Encoders constructor
 	 */
 	constructor() {
-		super('encoder');
+		super('encoder', [
+			'encode',
+			'decode'
+		]);
+
 		this.list.json = json;
 	}
 }
