@@ -12,11 +12,11 @@ const crypto = require('crypto');
 const debug = require('debug')('kalm');
 const statsOut = require('debug')('kalm:stats');
 
-var defaults = require('./defaults');
-var adapters = require('./adapters');
-var encoders = require('./encoders');
+const defaults = require('./defaults');
+const adapters = require('./adapters');
+const encoders = require('./encoders');
 
-var Channel = require('./Channel');
+const Channel = require('./Channel');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -135,8 +135,7 @@ class Client extends EventEmitter{
 	 * @param {Error} err The socket triggered error
 	 */
 	handleError(err) {
-		debug('error: ' + err.message);
-		debug(err.stack);
+		debug('error: ', err);
 		this.emit('error', err);
 	}
 
@@ -229,14 +228,14 @@ class Client extends EventEmitter{
 			.then(() => {
 				return encoders.resolve(this.options.encoder).encode([channel, packets]);
 			})
-			.then((payload) => {
+			.then(payload => {
 				Promise.resolve()
 					.then(() => { 
 						adapters.resolve(this.options.adapter).send(
 							this.socket, 
 							payload
 						);
-					}).then(null, this.handleError);
+					}).then(null, this.handleError.bind(this));
 
 				if (this.options.stats) {
 					statsOut(JSON.stringify({
@@ -244,7 +243,7 @@ class Client extends EventEmitter{
 						bytes: payload.length
 					}));
 				}
-			}, this.handleError);
+			}, this.handleError.bind(this));
 	}
 
 	/**
@@ -259,7 +258,7 @@ class Client extends EventEmitter{
 			.then(() => {
 				return encoders.resolve(this.options.encoder).decode(evt);
 			})
-			.then((raw) => {
+			.then(raw => {
 				if (raw && raw.length) {
 					if (this.channels.hasOwnProperty(raw[0])) {
 						this.channels[raw[0]].handleData(raw[1]);
@@ -271,7 +270,7 @@ class Client extends EventEmitter{
 					this.handleError('malformed payload:'+ evt); // Error Class is too heavy
 					this.destroy();
 				}
-			}, (err) => {
+			}, err => {
 				this.handleError(err);
 				this.destroy();
 			});
@@ -286,7 +285,7 @@ class Client extends EventEmitter{
 				adapters.resolve(this.options.adapter).disconnect(this);
 				this.socket = null;
 			})
-			.then(null, this.handleError);
+			.then(null, this.handleError.bind(this));
 		
 		for (let channel in this.channels) {
 			if (this.channels.hasOwnProperty(channel)) {

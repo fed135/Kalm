@@ -15,9 +15,10 @@ class Store {
 	/**
 	 * Store constructor
 	 */
-	constructor(type) {
+	constructor(type, template) {
 		this.type = type;
 		this.list = {};
+		this.template = template;
 	}
 
 	/**
@@ -42,8 +43,25 @@ class Store {
 	 */
 	register(name, mod) {
 		debug('log: registering new key "' + name + '" in ' + this.type + 's');
-		this.list[name] = mod;
+		if (this.validate(mod)) {
+			this.list[name] = mod;
+		}
+		else {
+			throw new Error(this.type + ' must contain ' + JSON.stringify(
+				this.template
+			));
+		}
 	}
+
+	/**
+	 * Validate a component against a template
+	 * @param {object} template The template to validate against
+	 * @param {object} candidate The component to validate
+	 * @returns {boolean} Wether the candidate is valid or not
+	 */
+	 validate(candidate) {
+	 	return this.template.every(key => key in candidate);
+	 }
 }
 
 /* Exports -------------------------------------------------------------------*/

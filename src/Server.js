@@ -11,10 +11,10 @@ const crypto = require('crypto');
 
 const debug = require('debug')('kalm');
 
-var defaults = require('./defaults');
-var Client = require('./Client');
-var Timer = require('./Timer');
-var adapters = require('./adapters');
+const defaults = require('./defaults');
+const Client = require('./Client');
+const Timer = require('./Timer');
+const adapters = require('./adapters');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -45,7 +45,7 @@ class Server extends EventEmitter {
 		this.channels = {};
 
 		if (options.channels) {
-			Object.keys(options.channels).forEach((c) => {
+			Object.keys(options.channels).forEach(c => {
 				this.subscribe(c, options.channels[c])
 			});
 		}
@@ -72,7 +72,7 @@ class Server extends EventEmitter {
 						this.emit('ready');
 					});
 				});
-			}).then(null, this.handleError);
+			}).then(null, this.handleError.bind(this));
 	}
 
 	/**
@@ -85,8 +85,8 @@ class Server extends EventEmitter {
 		
 		// Reset timer
 		if (this._timer) {
-				this._timer.stop();
-				this._timer = null;
+			this._timer.stop();
+			this._timer = null;
 		}
 
 		if (delay) this._timer = new Timer(delay);
@@ -107,7 +107,7 @@ class Server extends EventEmitter {
 		}
 		this.channels[name].push([name + '', handler, options]);
 
-		this.connections.forEach((client) => {
+		this.connections.forEach(client => {
 			client.subscribe(name, handler, options);
 		});
 
@@ -126,7 +126,7 @@ class Server extends EventEmitter {
 				if (subs[1] === handler) this.channels[name].splice(i, 1);
 			});
 
-			this.connections.forEach((client) => {
+			this.connections.forEach(client => {
 				client.unsubscribe(name, handler);
 			});
 		}
@@ -139,7 +139,7 @@ class Server extends EventEmitter {
 	 * @returns {array} The unset packets
 	 */
 	dump() {
-		return this.connections.map((client) => {
+		return this.connections.map(client => {
 			let res = Object.assign({}, client.options);
 			res.channels = {};
 			for (let channel in client.channels) {
@@ -174,8 +174,8 @@ class Server extends EventEmitter {
 	 * @returns {Server} Returns itself for chaining
 	 */
 	whisper(channel, payload) {
-		for (var i = this.connections.length - 1; i >= 0; i--) {
-			for (var u in this.connections[i].channels) {
+		for (let i = this.connections.length - 1; i >= 0; i--) {
+			for (let u in this.connections[i].channels) {
 				if (this.connections[i].channels[u].name === channel) {
 					this.connections[i].channels[u].send(payload);
 				}
@@ -203,7 +203,7 @@ class Server extends EventEmitter {
 					this.connections.length = 0;
 					adapter.stop(this, callback);
 					this.listener = null;
-				}).then(null, this.handleError);
+				}).then(null, this.handleError.bind(this))
 		}
 		else {
 			this.listener = null;
@@ -220,8 +220,8 @@ class Server extends EventEmitter {
 	 */
 	createClient(options, socket) {
 		let client = new Client(options, socket);
-		Object.keys(this.channels).forEach((channel) => {
-			this.channels[channel].forEach((subs) => {
+		Object.keys(this.channels).forEach(channel => {
+			this.channels[channel].forEach(subs => {
 				client.subscribe.apply(client, subs);
 			});
 		});
@@ -233,7 +233,7 @@ class Server extends EventEmitter {
 	 * @param {Error} err The triggered error
 	 */
 	handleError(err) {
-		debug('error: ' + err);
+		debug('error: ', err);
 		this.emit('error', err);
 	}
 
@@ -249,7 +249,7 @@ class Server extends EventEmitter {
 			tick: this._timer
 		}, socket);
 		this.connections.push(client);
-		client.on('disconnect', (socket) => {
+		client.on('disconnect', socket => {
 			this.emit('disconnect', socket);
 			this.emit('disconnection', socket);
 		});

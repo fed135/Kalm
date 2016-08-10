@@ -23,7 +23,10 @@ class Adapters extends Store {
 	 * Adapters constructor
 	 */
 	constructor() {
-		super('adapter');
+		super('adapter', [
+			'listen',
+			'createSocket'
+		]);
 
 		this.list.ipc = ipc;
 		this.list.tcp = tcp;
