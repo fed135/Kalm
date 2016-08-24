@@ -35,7 +35,7 @@ declare namespace KalmJ {
         eventNames(): string[];
         listenerCount(type: string): number;
     }
-    export class Client {
+    export class Client implements NodeJS.EventEmitter {
         constructor(options: {
             hostname: string,
             port: number,
@@ -50,6 +50,20 @@ declare namespace KalmJ {
         sendOnce(channel: string, payload): void;
         subscribe(channel: string, handler: Handler): void;
         unsubscribe(channel: string, handler: Handler): void;
+
+		addListener(event: string, listener: Function): this;
+        on(event: string, listener: Function): this;
+        once(event: string, listener: Function): this;
+        prependListener(event: string, listener: Function): this;
+        prependOnceListener(event: string, listener: Function): this;
+        removeListener(event: string, listener: Function): this;
+        removeAllListeners(event?: string): this;
+        setMaxListeners(n: number): this;
+        getMaxListeners(): number;
+        listeners(event: string): Function[];
+        emit(event: string, ...args: any[]): boolean;
+        eventNames(): string[];
+        listenerCount(type: string): number;
     }
     export class Channel {
         public id: string;
