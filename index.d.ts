@@ -1,8 +1,8 @@
 /// <reference types="node" />
-declare module 'kalm' {
-	export = Kalm;
+declare module 'kalm-j' {
+	export = KalmJ;
 }
-declare namespace Kalm {
+declare namespace KalmJ {
     type Reply = (payload) => void;
     type Handler = (payload, reply: Reply, channel: Channel) => void;
     export class Server implements NodeJS.EventEmitter {
