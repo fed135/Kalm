@@ -3,7 +3,7 @@ declare module 'kalm-j' {
 	export = KalmJ;
 }
 declare namespace KalmJ {
-    type Reply = (payload) => void;
+    type Reply = (channel: string, payload) => void;
     type Handler = (payload, reply: Reply, channel: Channel) => void;
     export class Server implements NodeJS.EventEmitter {
         constructor(options: {
