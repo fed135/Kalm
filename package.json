@@ -1,15 +1,12 @@
 {
-  "name": "kalm",
-  "version": "1.3.0",
+  "name": "kalm-j",
+  "version": "1.3.4",
   "description": "The socket optimizer",
   "main": "./index.js",
+  "typings": "./index.d.ts",
   "scripts": {
     "test": "mocha tests/unit --recursive && mocha tests/integration",
     "build": "webpack -p -d -j --define process.env.NODE_ENV='\"browser\"' --config ./webpack.config && babel --no-comments --compact \"true\" --minified --plugins transform-es2015-parameters -o ./bin/kalm.min.js < ./bin/kalm.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/fed135/Kalm.git"
   },
   "keywords": [
     "socket",
@@ -28,11 +25,8 @@
   ],
   "author": "frederic charette <fredericcharette@gmail.com>",
   "license": "GPL-3.0",
-  "bugs": {
-    "url": "https://github.com/fed135/Kalm/issues"
-  },
-  "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
+    "@types/node": "^6.0.37",
     "babel-cli": "6.10.x",
     "babel-plugin-transform-es2015-parameters": "6.9.x",
     "chai": "3.5.x",
@@ -42,5 +36,16 @@
   "dependencies": {
     "binary-split": "1.0.x",
     "debug": "2.2.x"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joesonw/kalm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joesonw/kalm/issues"
+  },
+  "homepage": "https://github.com/joesonw/kalm#readme"
 }
