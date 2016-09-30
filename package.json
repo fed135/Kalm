@@ -27,7 +27,7 @@
     "queue"
   ],
   "author": "frederic charette <fredericcharette@gmail.com>",
-  "license": "GPL-3.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/fed135/Kalm/issues"
   },
