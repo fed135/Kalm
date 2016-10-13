@@ -1,12 +1,12 @@
 /**
- * Kalm micro-service creation entry point
+ * Kalm entry point
  */
 
 'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
-var Kalm = require('./src');
+const Kalm = require('./src');
 
 /* Exports -------------------------------------------------------------------*/
 

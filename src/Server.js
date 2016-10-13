@@ -24,8 +24,9 @@ class Server extends EventEmitter {
 	 * Server constructor
 	 * @param {object} options The configuration options for the server
 	 */
-	constructor(options={}) {
+	constructor(options) {
 		super();
+		options = options || {};
 
 		this.id = crypto.randomBytes(20).toString('hex');
 
@@ -43,6 +44,7 @@ class Server extends EventEmitter {
 
 		this.connections = [];
 		this.channels = {};
+		this.catch = options.catch || function() {};
 
 		if (options.channels) {
 			Object.keys(options.channels).forEach(c => {
@@ -189,7 +191,8 @@ class Server extends EventEmitter {
 	 * Closes the server
 	 * @param {function} callback The callback method for the operation
 	 */
-	stop(callback=()=>{}) {
+	stop(callback) {
+		callback = callback || function() {};
 		let adapter = adapters.resolve(this.options.adapter);
 
 		debug('warn: stopping server');
@@ -246,7 +249,8 @@ class Server extends EventEmitter {
 		let client = this.createClient({
 			adapter: this.options.adapter,
 			encoder: this.options.encoder,
-			tick: this._timer
+			tick: this._timer,
+			catch: this.catch
 		}, socket);
 		this.connections.push(client);
 		client.on('disconnect', socket => {

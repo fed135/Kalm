@@ -27,8 +27,9 @@ class Client extends EventEmitter{
 	 * @param {Socket} socket An optionnal socket object to use for communication
 	 * @param {object} options The configuration options for the client
 	 */
-	constructor(options={}, socket=null) {
+	constructor(options, socket) {
 		super();
+		options = options || {};
 
 		this.id = crypto.randomBytes(20).toString('hex');
 
@@ -66,6 +67,8 @@ class Client extends EventEmitter{
 			});
 		}
 
+		this.catch = options.catch || function() {};
+
 		// Socket object
 		this.socket = null;
 		this.use(socket);
@@ -78,7 +81,8 @@ class Client extends EventEmitter{
 	 * @params {object} options The options object for the channel
 	 * @returns {Client} The client, for chaining
 	 */
-	subscribe(name, handler, options={}) {
+	subscribe(name, handler, options) {
+		options = options || {}
 		name = name + '';	// Stringification
 
 		if (!this.channels.hasOwnProperty(name)) {
@@ -264,12 +268,14 @@ class Client extends EventEmitter{
 						this.channels[raw[0]].handleData(raw[1]);
 						return;
 					}
+					else return this.catch(evt);
 				}
 
 				if (this.fromServer && this.options.rejectForeign) {
 					this.handleError('malformed payload:'+ evt); // Error Class is too heavy
 					this.destroy();
 				}
+				
 			}, err => {
 				this.handleError(err);
 				this.destroy();
