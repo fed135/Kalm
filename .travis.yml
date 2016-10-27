@@ -1,4 +1,4 @@
 language: node_js
 node_js:
-  - "6.0"
+  - "6.9"
 script: "npm run-script test && node tests/benchmarks/index.js"

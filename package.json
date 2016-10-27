@@ -35,7 +35,8 @@
   "devDependencies": {
     "babel-cli": "6.10.x",
     "chai": "3.5.x",
-    "mocha": "2.5.x"
+    "mocha": "3.1.x",
+    "sinon": "1.17.x"
   },
   "dependencies": {
     "binary-split": "1.0.x",
