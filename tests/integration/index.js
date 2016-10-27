@@ -6,9 +6,8 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var sinon = require('sinon');
-var expect = require('chai').expect;
-var Kalm = require('../../index');
+const expect = require('chai').expect;
+const Kalm = require('../../index');
 
 /* Suite --------------------------------------------------------------------*/
 
@@ -16,7 +15,7 @@ describe('Integration tests', () => {
 
 	['ipc', 'tcp', 'udp'].forEach((adapter) => {
 		describe('Testing ' + adapter + ' adapter', () => {
-			var server;
+			let server;
 
 			/* --- Setup ---*/
 
@@ -37,19 +36,19 @@ describe('Integration tests', () => {
 			/* --- Tests --- */
 
 			it('should work with ' + adapter, (done) => {
-				var payload = {foo:'bar'};
+				let payload = {foo:'bar'};
 				server.subscribe('test', (data) => {
 					expect(data).to.eql(payload);
 					done();
 				});
 
-				var client = new Kalm.Client({adapter:adapter});
+				let client = new Kalm.Client({adapter:adapter});
 				client.send('test', payload);
 			});
 
 			it('should handle large payloads with ' + adapter, (done) => {
-				var largePayload = [];
-				while(largePayload.length < 1024) {
+				let largePayload = [];
+				while(largePayload.length < 2048) {
 					largePayload.push({foo: 'bar'});
 				}
 
@@ -58,7 +57,7 @@ describe('Integration tests', () => {
 					done();
 				});
 
-				var client = new Kalm.Client({adapter:adapter});
+				let client = new Kalm.Client({adapter:adapter});
 				client.send('test', largePayload);
 			});
 		});

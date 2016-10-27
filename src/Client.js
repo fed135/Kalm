@@ -18,6 +18,8 @@ const encoders = require('./encoders');
 
 const Channel = require('./Channel');
 
+Promise = require('bluebird');
+
 /* Methods -------------------------------------------------------------------*/
 
 class Client extends EventEmitter{
@@ -256,11 +258,14 @@ class Client extends EventEmitter{
 	 * @param {Buffer} evt The data received
 	 */
 	handleRequest(evt) {
-		if (evt.length === 0) return;
-		
+		if (evt.length <= 1) return;
+
 		Promise.resolve()
 			.then(() => {
 				return encoders.resolve(this.options.encoder).decode(evt);
+			}, err => {
+				this.handleError(err);
+				this.destroy();
 			})
 			.then(raw => {
 				if (raw && raw.length) {
@@ -268,17 +273,13 @@ class Client extends EventEmitter{
 						this.channels[raw[0]].handleData(raw[1]);
 						return;
 					}
-					else return this.catch(evt);
+					else return this.catch(evt, this);
 				}
 
 				if (this.fromServer && this.options.rejectForeign) {
 					this.handleError('malformed payload:'+ evt); // Error Class is too heavy
 					this.destroy();
 				}
-				
-			}, err => {
-				this.handleError(err);
-				this.destroy();
 			});
 	}
 

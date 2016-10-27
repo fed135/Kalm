@@ -27,7 +27,7 @@
     "queue"
   ],
   "author": "frederic charette <fredericcharette@gmail.com>",
-  "license": "GPL-3.0",
+  "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/fed135/Kalm/issues"
   },
@@ -35,11 +35,11 @@
   "devDependencies": {
     "babel-cli": "6.10.x",
     "chai": "3.5.x",
-    "mocha": "2.5.x",
-    "sinon": "1.17.x"
+    "mocha": "2.5.x"
   },
   "dependencies": {
     "binary-split": "1.0.x",
+    "bluebird": "3.4.x",
     "debug": "2.2.x"
   }
 }

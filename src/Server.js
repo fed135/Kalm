@@ -16,6 +16,8 @@ const Client = require('./Client');
 const Timer = require('./Timer');
 const adapters = require('./adapters');
 
+Promise = require('bluebird');
+
 /* Methods -------------------------------------------------------------------*/
 
 class Server extends EventEmitter {
