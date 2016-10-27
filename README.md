@@ -16,14 +16,13 @@ Simplify and optimize your Socket communications with:
 - Configurable packet bundling (High-level Naggle's algorithm implementation)
 - Multiplexing for all protocols
 - Ultra-flexible and extensible, load your own adapters and encoders
+- Can be used between servers or in the browser
 
 ---
 
 ## Compatibility
 
- * NODE >= 6.0.0
-
- * Webpack 1 || 2.1.x
+ * NODE >= 4.0.0
 
 
 ## Performance analysis
@@ -103,7 +102,7 @@ Simplify and optimize your Socket communications with:
 - tcp (bundled)
 - udp (bundled)
 - [kalm-websocket](https://github.com/fed135/kalm-websocket)
-- [kalm-webrtc](#) (In-dev) 
+- [kalm-webrtc](#) (On hold) 
 
 
 ## Encoders
@@ -111,7 +110,7 @@ Simplify and optimize your Socket communications with:
 - json (bundled)
 - [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
 - [kalm-snappy](https://github.com/fed135/kalm-snappy)
-- [kalm-protocol-buffer](#) (In-dev)
+- [kalm-compactr](#) (In-dev)
 
 
 ## Loading custom adapters
@@ -121,15 +120,15 @@ The framework is flexible enough so that you can load your own custom adapters, 
 ```node
     // Custom adapter loading example
     var Kalm = require('kalm');
-    var WebRTC = require('kalm-webrtc');
+    var ws = require('kalm-websocket');
     var msgpack = require('kalm-msgpack');
 
-    Kalm.adapters.register('webrtc', WebRTC);
+    Kalm.adapters.register('ws', ws);
     Kalm.encoders.register('msg-pack', msgpack);
 
     var server = new Kalm.Server({
       port: 3000,
-      adapter: 'webrtc',
+      adapter: 'ws',
       encoder: 'msg-pack'
     });
 ```
