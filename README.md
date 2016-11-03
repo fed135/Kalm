@@ -29,16 +29,14 @@ Simplify and optimize your Socket communications with:
 
 **Requests per minute**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v120.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v140.png">
 
 *Benchmarks based on a single-thread queue test with Kalm default bundling settings*
 
 **Bytes transfered**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v100.png">
-
-*Number of protocol overhead bytes saved per request*
-
+Bundled calls means that you only send the protocol headers (40 bytes + application overhead) once.
+This makes a huge difference when you need to send a large number of small packets.
 
 ## Installation
 
@@ -50,22 +48,22 @@ Simplify and optimize your Socket communications with:
 **Server**
 
 ```node
-    var Kalm = require('kalm');
+    const Kalm = require('kalm');
 
     // Create a server, listening for incoming connections
-    var server = new Kalm.Server({
+    let server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
       encoder: 'json',
       channels: {
-        messageEvent: function(data) {               // Handler - new connections will register to these events
+        messageEvent: (data) => {               // Handler - new connections will register to these events
           console.log('User sent message ' + data.body);
         }
       }
     });
 
     // When a connection is received, send a message to all connected users
-    server.on('connection', function(client) {    // Handler, where client is an instance of Kalm.Client
+    server.on('connection', (client) => {    // Handler, where client is an instance of Kalm.Client
       server.broadcast('userEvent', 'A new user has connected');  
     });
     
@@ -75,13 +73,13 @@ Simplify and optimize your Socket communications with:
 
 ```node
     // Opens a connection to the server
-    var client = new Kalm.Client({
+    let client = new Kalm.Client({
       hostname: '0.0.0.0', // Server's IP
       port: 6000, // Server's port
       adapter: 'udp', // Server's adapter
       encoder: 'json', // Server's encoder
       channels: {
-        'userEvent': function(data) {
+        'userEvent': (data) => {
           console.log('Server: ' + data);
         }
       }
@@ -119,14 +117,14 @@ The framework is flexible enough so that you can load your own custom adapters, 
 
 ```node
     // Custom adapter loading example
-    var Kalm = require('kalm');
-    var ws = require('kalm-websocket');
-    var msgpack = require('kalm-msgpack');
+    const Kalm = require('kalm');
+    const ws = require('kalm-websocket');
+    const msgpack = require('kalm-msgpack');
 
     Kalm.adapters.register('ws', ws);
     Kalm.encoders.register('msg-pack', msgpack);
 
-    var server = new Kalm.Server({
+    let server = new Kalm.Server({
       port: 3000,
       adapter: 'ws',
       encoder: 'msg-pack'
