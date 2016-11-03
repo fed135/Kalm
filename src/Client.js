@@ -6,6 +6,9 @@
 
 /* Requires ------------------------------------------------------------------*/
 
+// If running in the browser, do not load net adapters
+const is_browser = (require('os').platform() === 'browser');
+
 const EventEmitter = require('events').EventEmitter;
 const crypto = require('crypto');
 
@@ -18,7 +21,7 @@ const encoders = require('./encoders');
 
 const Channel = require('./Channel');
 
-Promise = require('bluebird');
+if (!is_browser) Promise = require('bluebird');
 
 /* Methods -------------------------------------------------------------------*/
 

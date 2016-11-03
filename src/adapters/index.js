@@ -9,7 +9,7 @@
 const Store = require('../Store');
 
 // If running in the browser, do not load net adapters
-const is_browser = (process.env.NODE_ENV === 'browser');
+const is_browser = (require('os').platform() === 'browser');
 
 const ipc = (is_browser)?null:require('./ipc');
 const tcp = (is_browser)?null:require('./tcp');
