@@ -7,7 +7,6 @@
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
 [![Gitter](https://img.shields.io/gitter/room/fed135/kalm.svg)](https://gitter.im/fed135/Kalm)
-[![Flattr](https://button.flattr.com/flattr-badge-large.png)](https://flattr.com/submit/auto?fid=y7rx65&url=https%3A%2F%2Fgithub.com%2Ffed135%2FKalm)
 
 ---
 
@@ -17,30 +16,27 @@ Simplify and optimize your Socket communications with:
 - Configurable packet bundling (High-level Naggle's algorithm implementation)
 - Multiplexing for all protocols
 - Ultra-flexible and extensible, load your own adapters and encoders
+- Can be used between servers or in the browser
 
 ---
 
 ## Compatibility
 
- * NODE >= 6.0.0
-
- * Webpack 1 || 2.1.x
+ * NODE >= 4.0.0
 
 
 ## Performance analysis
 
 **Requests per minute**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v120.png">
+<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v140.png">
 
 *Benchmarks based on a single-thread queue test with Kalm default bundling settings*
 
 **Bytes transfered**
 
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/transfered_v100.png">
-
-*Number of protocol overhead bytes saved per request*
-
+Bundled calls means that you only send the protocol headers (40 bytes + application overhead) once.
+This makes a huge difference when you need to send a large number of small packets.
 
 ## Installation
 
@@ -52,22 +48,22 @@ Simplify and optimize your Socket communications with:
 **Server**
 
 ```node
-    var Kalm = require('kalm');
+    const Kalm = require('kalm');
 
     // Create a server, listening for incoming connections
-    var server = new Kalm.Server({
+    let server = new Kalm.Server({
       port: 6000,
       adapter: 'udp',
       encoder: 'json',
       channels: {
-        messageEvent: function(data) {               // Handler - new connections will register to these events
+        messageEvent: (data) => {               // Handler - new connections will register to these events
           console.log('User sent message ' + data.body);
         }
       }
     });
 
     // When a connection is received, send a message to all connected users
-    server.on('connection', function(client) {    // Handler, where client is an instance of Kalm.Client
+    server.on('connection', (client) => {    // Handler, where client is an instance of Kalm.Client
       server.broadcast('userEvent', 'A new user has connected');  
     });
     
@@ -77,13 +73,13 @@ Simplify and optimize your Socket communications with:
 
 ```node
     // Opens a connection to the server
-    var client = new Kalm.Client({
+    let client = new Kalm.Client({
       hostname: '0.0.0.0', // Server's IP
       port: 6000, // Server's port
       adapter: 'udp', // Server's adapter
       encoder: 'json', // Server's encoder
       channels: {
-        'userEvent': function(data) {
+        'userEvent': (data) => {
           console.log('Server: ' + data);
         }
       }
@@ -104,7 +100,7 @@ Simplify and optimize your Socket communications with:
 - tcp (bundled)
 - udp (bundled)
 - [kalm-websocket](https://github.com/fed135/kalm-websocket)
-- [kalm-webrtc](#) (In-dev) 
+- [kalm-webrtc](#) (On hold) 
 
 
 ## Encoders
@@ -112,7 +108,7 @@ Simplify and optimize your Socket communications with:
 - json (bundled)
 - [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
 - [kalm-snappy](https://github.com/fed135/kalm-snappy)
-- [kalm-protocol-buffer](#) (In-dev)
+- [kalm-compactr](#) (In-dev)
 
 
 ## Loading custom adapters
@@ -121,16 +117,16 @@ The framework is flexible enough so that you can load your own custom adapters, 
 
 ```node
     // Custom adapter loading example
-    var Kalm = require('kalm');
-    var WebRTC = require('kalm-webrtc');
-    var msgpack = require('kalm-msgpack');
+    const Kalm = require('kalm');
+    const ws = require('kalm-websocket');
+    const msgpack = require('kalm-msgpack');
 
-    Kalm.adapters.register('webrtc', WebRTC);
+    Kalm.adapters.register('ws', ws);
     Kalm.encoders.register('msg-pack', msgpack);
 
-    var server = new Kalm.Server({
+    let server = new Kalm.Server({
       port: 3000,
-      adapter: 'webrtc',
+      adapter: 'ws',
       encoder: 'msg-pack'
     });
 ```
