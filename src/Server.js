@@ -71,7 +71,7 @@ class Server extends EventEmitter {
 			
 		Promise.resolve()
 			.then(() => {
-				adapters.resolve(this.options.adapter).listen(this, () => {
+				adapters.resolve(this.options.adapter).listen.call(null, this, () => {
 					process.nextTick(() => {
 						this.emit('ready');
 					});
@@ -204,9 +204,9 @@ class Server extends EventEmitter {
 		if (this.listener) {
 			Promise.resolve()
 				.then(() => {
-					this.connections.forEach(adapter.disconnect);
+					this.connections.forEach(adapter.disconnect.bind(null));
 					this.connections.length = 0;
-					adapter.stop(this, callback);
+					adapter.stop.call(null, this, callback);
 					this.listener = null;
 				}).then(null, this.handleError.bind(this))
 		}

@@ -225,7 +225,7 @@ class Client extends EventEmitter{
 	 * @returns {Socket} The created or attached socket for the client
 	 */
 	createSocket(socket) {
-		return adapters.resolve(this.options.adapter).createSocket(this, socket);
+		return adapters.resolve(this.options.adapter).createSocket.call(null, this, socket);
 	}
 
 	/**
@@ -235,12 +235,13 @@ class Client extends EventEmitter{
 	_emit(channel, packets) {
 		Promise.resolve()
 			.then(() => {
-				return encoders.resolve(this.options.encoder).encode([channel, packets]);
+				return encoders.resolve(this.options.encoder).encode.call(null, [channel, packets]);
 			})
 			.then(payload => {
 				Promise.resolve()
 					.then(() => { 
-						adapters.resolve(this.options.adapter).send(
+						adapters.resolve(this.options.adapter).send.call(
+							null,
 							this.socket, 
 							payload
 						);
@@ -265,7 +266,7 @@ class Client extends EventEmitter{
 
 		Promise.resolve()
 			.then(() => {
-				return encoders.resolve(this.options.encoder).decode(evt);
+				return encoders.resolve(this.options.encoder).decode.call(null, evt);
 			}, err => {
 				this.handleError(err);
 				this.destroy();
@@ -292,7 +293,7 @@ class Client extends EventEmitter{
 	destroy() {
 		Promise.resolve()
 			.then(() => {
-				adapters.resolve(this.options.adapter).disconnect(this);
+				adapters.resolve(this.options.adapter).disconnect.call(null, this);
 				this.socket = null;
 			})
 			.then(null, this.handleError.bind(this));

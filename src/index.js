@@ -15,7 +15,6 @@ const adapters = require('./adapters');
 const encoders = require('./encoders');
 const defaults = require('./defaults');
 const Adapter = require('./adapters/common');
-const Encoder = require('./encoders/common');
 
 /* Exports -------------------------------------------------------------------*/
 
@@ -25,6 +24,5 @@ module.exports = {
 	adapters,
 	encoders,
 	defaults,
-	Adapter,
-	Encoder
+	Adapter
 };

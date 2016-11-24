@@ -11,29 +11,21 @@ const net = require('net');
 const fs = require('fs');
 const split = require('binary-split');
 
-const Adapter = require('./common');
-
 /* Local variables -----------------------------------------------------------*/
 
 const _path = '/tmp/app.socket-';
+const SEP = new Buffer('\n');
 
 /* Methods -------------------------------------------------------------------*/
 
-class IPC extends Adapter {
-
-	/**
-	 * IPC adapter constructor
-	 */
-	constructor() {
-		super('ipc');
-	}
+class IPC {
 
 	/**
 	 * Listens for ipc connections, updates the 'listener' property of the server
 	 * @param {Server} server The server object
 	 * @param {function} callback The callback for the operation
 	 */
-	listen(server, callback) {
+	static listen(server, callback) {
 		fs.unlink(_path + server.options.port, () => {
 			server.listener = net.createServer(server.handleRequest.bind(server));
 			server.listener.listen(_path + server.options.port, callback);
@@ -47,7 +39,7 @@ class IPC extends Adapter {
 	 * @param {Socket} socket Optionnal existing socket object.
 	 * @returns {Socket} The created ipc socket
 	 */
-	createSocket(client, socket) {
+	static createSocket(client, socket) {
 		if (!socket) {
 			socket = net.connect(_path + client.options.port);
 		}
@@ -69,8 +61,45 @@ class IPC extends Adapter {
 
 		return socket;
 	}
+
+	/**
+	 * Stops the server
+	 * @placeholder
+	 * @param {Server} server The server object
+	 * @param {function} callback The success callback for the operation
+	 */
+	static stop(server, callback) {
+		server.listener.close(() => {
+			process.nextTick(callback);
+		});
+	}
+
+	/**
+	 * Sends a message with a socket client
+	 * @placeholder
+	 * @param {Socket} socket The socket to use
+	 * @param {Buffer} payload The body of the request
+	 */
+	static send(socket, payload) {
+		if (socket) {
+			socket.write(payload);
+			socket.write(SEP);
+		}
+	}
+
+	/**
+	 * @placeholder
+	 * Attempts to disconnect the client's connection
+	 * @param {Client} client The client to disconnect
+	 */
+	static disconnect(client) {
+		if (client.socket && client.socket.destroy) {
+			client.socket.destroy();
+			process.nextTick(client.handleDisconnect.bind(client));
+		}
+	}
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = new IPC;
+module.exports = IPC;
