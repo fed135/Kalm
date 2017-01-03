@@ -1,12 +1,13 @@
 - on/off methods for event listener
 - once for channel events
-- pool messages until client connects
-- udp stream ???
-- read connection status 
 - **Check for leaks**
 - Improve browser version where applicable (limit polyfilling)
 - in all send methods, can override settings, like encoder
 - Encode packets as they enter the queue, only keep binaries in the queue
+- remove load_batches option
+- Kalm.naggle settings: heartbeat, threshold, dynamic
+- replace max Packets with max bytes
+- request_id/ transactions 
 
 
 //
@@ -14,5 +15,21 @@ client.send(payload, {
 	now: true,
 	once: true,
 	encoder: 'json',	// Or null if they are already encoded - this is how to properly integrate compactr!
-	delay: 10			// Overrides the channel's timer for this batch
 })
+
+
+client.subscribe('channel', (payload, reply, metadata))
+
+// Metadata
+{
+	requestId: 'xyz'
+	channel: 'xyz'
+	client: { ... }
+	stats: {
+		payload_bytes: 123
+		payload_messages: 2
+		message_index: 0
+	}
+}
+
+---------------- TARGET RPM: {"raw_ipc":250157,"kalm_ipc":2512703,"raw_tcp":133579,"kalm_tcp":4810559,"raw_udp":128506,"kalm_udp":7354175}

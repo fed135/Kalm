@@ -76,7 +76,10 @@ class Client extends EventEmitter{
 
 		// Socket object
 		this.socket = null;
+		this.connected = false;
 		this.use(socket);
+
+		this.backlog = [];
 	}
 
 	/**
@@ -131,7 +134,7 @@ class Client extends EventEmitter{
 	 * @returns {Client} The client, for chaining
 	 */
 	use(socket) {
-		if (this.socket) {
+		if (this.socket ) {
 			this.destroy();
 		}
 
@@ -157,12 +160,13 @@ class Client extends EventEmitter{
 			'log: ' + ((this.fromServer)?'server':'client') + 
 			' connection established'
 		);
+		this.connected = true;
 		this.emit('connect', socket);
 		this.emit('connection', socket);
 
 		// In the case of a reconnection, we want to resume channel bundlers
 		for (let channel in this.channels) {
-			if (this.channels[channel].packets.length) {
+			if (this.channels[channel].packets.length > 0) {
 				this.channels[channel].startBundler();
 			}
 		}
@@ -176,6 +180,7 @@ class Client extends EventEmitter{
 			'warn: ' + ((this.fromServer)?'server':'client') + 
 			' connection lost'
 		);
+		this.connected = false;
 		this.emit('disconnect');
 		this.emit('disconnection');
 		this.socket = null;
@@ -189,8 +194,9 @@ class Client extends EventEmitter{
 	 * @returns {Client} The client, for chaining
 	 */
 	send(name, payload, once) {
-		this.subscribe(name);
-		
+		if (this.channels[name] === undefined) {
+			this.subscribe(name);
+		}
 		this.channels[name].send(payload, once);
 		return this;
 	}
@@ -212,9 +218,7 @@ class Client extends EventEmitter{
 	 * @param {string|object} payload The payload to send 
 	 * @returns {Client} The client, for chaining
 	 */
-	sendNow(name, payload) {
-		this.subscribe(name);
-		
+	sendNow(name, payload) {		
 		this._emit(name, [payload]);
 		return this;
 	}
@@ -225,7 +229,8 @@ class Client extends EventEmitter{
 	 * @returns {Socket} The created or attached socket for the client
 	 */
 	createSocket(socket) {
-		return adapters.resolve(this.options.adapter).createSocket.call(null, this, socket);
+		return adapters.resolve(this.options.adapter)
+			.createSocket(this, socket);
 	}
 
 	/**
@@ -233,27 +238,18 @@ class Client extends EventEmitter{
 	 * @param {string} channel The channel targeted for transfer
 	 */
 	_emit(channel, packets) {
-		Promise.resolve()
-			.then(() => {
-				return encoders.resolve(this.options.encoder).encode.call(null, [channel, packets]);
-			})
-			.then(payload => {
-				Promise.resolve()
-					.then(() => { 
-						adapters.resolve(this.options.adapter).send.call(
-							null,
-							this.socket, 
-							payload
-						);
-					}).then(null, this.handleError.bind(this));
+		const payload = encoders.resolve(this.options.encoder)
+			.encode([channel, packets]);
 
-				if (this.options.stats) {
-					statsOut(JSON.stringify({
-						packets: packets.length, 
-						bytes: payload.length
-					}));
-				}
-			}, this.handleError.bind(this));
+		adapters.resolve(this.options.adapter)
+			.send(this.socket, payload);
+
+		if (this.options.stats) {
+			statsOut(JSON.stringify({
+				packets: packets.length, 
+				bytes: payload.length
+			}));
+		}
 	}
 
 	/**
@@ -266,7 +262,8 @@ class Client extends EventEmitter{
 
 		Promise.resolve()
 			.then(() => {
-				return encoders.resolve(this.options.encoder).decode.call(null, evt);
+				return encoders.resolve(this.options.encoder)
+					.decode(evt);
 			}, err => {
 				this.handleError(err);
 				this.destroy();
@@ -293,7 +290,7 @@ class Client extends EventEmitter{
 	destroy() {
 		Promise.resolve()
 			.then(() => {
-				adapters.resolve(this.options.adapter).disconnect.call(null, this);
+				adapters.resolve(this.options.adapter).disconnect(this);
 				this.socket = null;
 			})
 			.then(null, this.handleError.bind(this));

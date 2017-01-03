@@ -24,8 +24,9 @@ class Channel {
 		this.name = name;
 		this.options = options;
 
-		this._client = client;
+		this.client = client;
 		this._emitter = client._emit.bind(client);
+		this._semitter = this._emit.bind(this);
 
 		this._timer = null;
 		this._bound = false;	// For serverTick
@@ -36,7 +37,7 @@ class Channel {
 
 		// Bind to server tick 
 		if (this.options.serverTick) {
-			if (!client.tick) {
+			if (client.tick) {
 				debug('warn: no server heartbeat, ignoring serverTick config');
 				this.options.serverTick = false;
 			}
@@ -68,12 +69,12 @@ class Channel {
 		if (this.options.serverTick) {
 			if (!this._bound) {
 				this._bound = true;
-				this._client.tick.once('step', this._emit.bind(this));
+				this.client.tick.once('step', this._semitter);
 			}
 		}
 		else {
-			if (this._timer === null) {
-				this._timer = setTimeout(this._emit.bind(this), this.options.delay);
+			if (!this._timer) {
+				this._timer = setTimeout(this._semitter, this.options.delay);
 			}
 		}
 	}
@@ -83,9 +84,10 @@ class Channel {
 	 * @private
 	 */
 	_emit() {
-		if (this.packets.length > 0) {
-			this._emitter(this.name, this.packets.concat());
-			this.packets.length = 0;
+		if (this.client.connected || this.client.fromServer) {
+			while (this.packets.length !== 0) {
+				this._emitter(this.name, this.packets.splice(0, this.options.maxPackets));
+			}
 		}
 
 		this.resetBundler();
@@ -125,7 +127,7 @@ class Channel {
 	 * Destroys the client and connection
 	 */
 	destroy() {
-		this._client.destroy();
+		this.client.destroy();
 	}
 
 	/**
