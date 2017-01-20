@@ -47,20 +47,12 @@ class TCP extends Adapter {
 
 		let stream = socket.pipe(split());
 		stream.on('data', client.handleRequest.bind(client));
-		
-		// Emit on error
 		socket.on('error', client.handleError.bind(client));
-
-		// Emit on connect
 		socket.on('connect', client.handleConnect.bind(client));
-
-		// Will auto-reconnect
 		socket.on('close', client.handleDisconnect.bind(client));
 
 		// Add timeout listener, sever connection
 		socket.on('timeout', () => this.disconnect(client));
-
-		// Set timeout
 		socket.setTimeout(client.options.socketTimeout);
 
 		return socket;

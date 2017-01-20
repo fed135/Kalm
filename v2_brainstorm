@@ -1,13 +1,14 @@
-- on/off methods for event listener
+- on/off methods for event listener - NO
 - once for channel events
-- **Check for leaks**
-- Improve browser version where applicable (limit polyfilling)
-- in all send methods, can override settings, like encoder
-- Encode packets as they enter the queue, only keep binaries in the queue
-- remove load_batches option
-- Kalm.naggle settings: heartbeat, threshold, dynamic
-- replace max Packets with max bytes
-- request_id/ transactions 
+- **Check for leaks** - OK
+- Improve browser version where applicable (limit polyfilling) - use DISK
+- in all send methods, can override settings, like encoder - ?
+- Encode packets as they enter the queue, only keep binaries in the queue - OK 
+- remove load_batches option - OK
+- Kalm.naggle settings: heartbeat, threshold, dynamic - OK
+- replace max Packets with max bytes - OK
+- request_id/ transactions - NEH
+- Serialize the same way Compactr2 does, not 1
 
 
 //
@@ -18,18 +19,43 @@ client.send(payload, {
 })
 
 
-client.subscribe('channel', (payload, reply, metadata))
+client.subscribe('channel', (request, reply, metadata))
 
 // Metadata
 {
-	requestId: 'xyz'
-	channel: 'xyz'
+	body: { ... }	
 	client: { ... }
-	stats: {
-		payload_bytes: 123
+	frame: {
+		id: 0-255
+		channel: 'xyz'
+		payload_bytes: 123...
 		payload_messages: 2
 		message_index: 0
 	}
 }
 
 ---------------- TARGET RPM: {"raw_ipc":250157,"kalm_ipc":2512703,"raw_tcp":133579,"kalm_tcp":4810559,"raw_udp":128506,"kalm_udp":7354175}
+
+
+
+
+Sending:
+Server -> Client -> Queues
+
+Receiving:
+Server -> Client
+
+
+// Behaviors
+
+Send
+
+- Put in queue
+- Start queue if needed
+
+SendNow
+
+- Put in queue
+- Process queue now
+
+Deprecate SendOnce (Application logic)

@@ -70,11 +70,8 @@ class Adapter {
 	 * Attempts to disconnect the client's connection
 	 * @param {Client} client The client to disconnect
 	 */
-	disconnect(client) {
-		if (client.socket && client.socket.destroy) {
-			client.socket.destroy();
-			process.nextTick(client.handleDisconnect.bind(client));
-		}
+	disconnect(socket) {
+		if (socket && socket.destroy) socket.destroy();
 	}
 }
 
