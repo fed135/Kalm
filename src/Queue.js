@@ -9,6 +9,7 @@
 const Queue = {
 	pending: [],
 	queues: {},
+	profile: null,
 
 	add: function(packet) {
 

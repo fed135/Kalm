@@ -4,9 +4,6 @@
 
 'use strict';
 
-/* Requires ------------------------------------------------------------------*/
-
-
 /* Methods -------------------------------------------------------------------*/
 
 const Multiplexed = {
@@ -50,8 +47,11 @@ const Multiplexed = {
 	},
 
 	trigger: function(name, params) {
-		(this.channels[config.name] || [])
-			.forEach()
+		this.channels[config.name] = (this.channels[config.name] || [])
+			.filter((event) => {
+				event.handler.apply(null, params);
+				return !event.once;
+			});
 	}
 }
 

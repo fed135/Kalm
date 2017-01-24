@@ -12,10 +12,7 @@ const crypto = require('crypto');
 const debug = require('debug')('kalm');
 
 const Client = require('./Client');
-const Timer = require('./Timer');
-const adapters = require('./adapters');
-
-Promise = require('bluebird');
+const Multiplexed = require('./Multiplexed');
 
 /* Methods -------------------------------------------------------------------*/
 

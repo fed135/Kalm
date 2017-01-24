@@ -11,9 +11,10 @@ const crypto = require('crypto');
 
 const debug = require('debug')('kalm');
 
-const Serializer = require('./Serializer');
+const Serialized = require('./Serializer');
 const Profiles = require('./Profiles')
-const Queue = require('./Queue');
+const Queued = require('./Queue');
+const Multiplexed = require('./Multiplexed');
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -77,7 +78,10 @@ const Actions = {
 
 function create(options) {
 	return Object.assign(
-		{ id: crypto.randomBytes(20).toString('hex') },
+		{ 
+			id: crypto.randomBytes(20).toString('hex'), 
+			profile: Profiles.dynamic
+		},
 		Multiplexed,
 		Queued,
 		Serialized,
