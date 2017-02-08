@@ -189,7 +189,7 @@ describe('Client', () => {
 			testClient.subscribe('test', testHandler1);
 			testClient.subscribe('test2', testHandler2);
 
-			testClient.handleRequest(JSON.stringify(['test', ['data']]));
+			testClient.handleRequest(new Buffer(JSON.stringify(['test', ['data']])));
 
 			setTimeout(() => {
 				expect(testHandler1.withArgs('data').calledOnce).to.be.true;
