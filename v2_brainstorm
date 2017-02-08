@@ -1,15 +1,18 @@
-- on/off methods for event listener - NO
-- once for channel events
 - **Check for leaks** - OK
-- Improve browser version where applicable (limit polyfilling) - use DISK
-- in all send methods, can override settings, like encoder - ?
+- in all send methods, can pass binary as payload (skip serialization) - YES
 - Encode packets as they enter the queue, only keep binaries in the queue - OK 
 - remove load_batches option - OK
 - Kalm.naggle settings: heartbeat, threshold, dynamic - OK
 - replace max Packets with max bytes - OK
-- request_id/ transactions - NEH
-- Serialize the same way Compactr2 does, not 1
+- transactions - YES
+- If serialization fails, just plop the binary ? - YES
+- transmit connection events (event shim it for udp) - YES
+- deterministic uuids - 
 
+
+// Leaks
+
+- Connection objects (clients) are not cleaned up when they disconnect
 
 //
 client.send(payload, {
@@ -53,9 +56,5 @@ Send
 - Put in queue
 - Start queue if needed
 
-SendNow
-
-- Put in queue
-- Process queue now
-
+Deprecate SendNow (profile setting)
 Deprecate SendOnce (Application logic)

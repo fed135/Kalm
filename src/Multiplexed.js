@@ -7,8 +7,6 @@
 /* Methods -------------------------------------------------------------------*/
 
 const Multiplexed = {
-	channels: {},
-
 	/**
 	 * Creates a channel for the client
 	 * @param {string} name The name of the channel.
@@ -22,11 +20,8 @@ const Multiplexed = {
 		}, options);
 
 		config.name = '' + name;
-		this.channels[config.name] = this.channels[config.name] || [];
-		this.channels[config.name].push(config);
-		this.emit('subscribe', name, options);
-
-		return this;
+		channels[config.name] = channels[config.name] || [];
+		channels[config.name].push(config);
 	},
 
 	/**
@@ -39,15 +34,12 @@ const Multiplexed = {
 		const config = Object.assign({}, options);
 
 		config.name = '' + name;
-		this.channels[config.name] = (this.channels[config.name] || [])
+		channels[config.name] = (channels[config.name] || [])
 			.filter((event) => event.handler !== config.handler && config.handler !== undefined);
-
-		this.emit('unsubscribe', name, options);
-		return this;
 	},
 
 	trigger: function(name, params) {
-		this.channels[config.name] = (this.channels[config.name] || [])
+		channels[config.name] = (channels[config.name] || [])
 			.filter((event) => {
 				event.handler.apply(null, params);
 				return !event.once;

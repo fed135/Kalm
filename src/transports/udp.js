@@ -1,6 +1,6 @@
 /**
- * UDP connector methods
- * @module adapters/udp
+ * UDP transport methods
+ * @module transports.UDP
  */
 
 'use strict';
@@ -12,9 +12,9 @@ const dgram = require('dgram');
 /* Local variables -----------------------------------------------------------*/
 
 const _socketType = 'udp4';
-const _startByte = 0;
 const _keySeparator = ':';
 const _localAddress = '0.0.0.0';
+const reuseAddr = true;
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -41,58 +41,50 @@ function _handleNewSocket(server, data, origin) {
 		server.__clients[key].handleRequest(data);
 	}
 
-class UDP {
+const actions = {
 
 	/**
 	 * Listens for udp connections, updates the 'listener' property of the server
 	 * @param {Server} server The server object
 	 * @param {function} callback The success callback for the operation
 	 */
-	static listen(server, callback) {
-		server.listener = dgram.createSocket({
-			type: _socketType,
-			reuseAddr: true
-		});
-		server.listener.on('message', (data, origin) => {
-			_handleNewSocket(server, data, origin)
-		});
-		server.listener.on('error', server.handleError.bind(server));
-		server.listener.bind(server.options.port, _localAddress);
+	listen: function(server, options, callback) {
+		const listener = dgram.createSocket({ type: _socketType, reuseAddr });
+		listener.on('message', _handleNewSocket.bind(null, server))
+		listener.on('error', server.handleError.bind(server));
+		listener.bind(options.port, _localAddress);
 		
-		return callback();
-	}
+		return Promise.resolve(listener);
+	},
+
+	getOrigin: function(socket) {
+		return {
+			host: socket.hostname,
+			port: socket.port
+		};
+	},
 
 	/**
 	 * Sends a message with a socket client
 	 * @param {Socket} socket The socket to use
 	 * @param {Buffer} payload The body of the request
 	 */
-	static send(socket, payload) {
-		if (socket) {
-			socket.send(
-				payload, 
-				_startByte, 
-				payload.length, 
-				socket.__port, 
-				socket.__hostname
-			);
-		}
-	}
+	send: function(socket, payload) {
+		socket.send(payload, 0, payload.length, socket._port, socket._hostname);
+	},
 
 	/**
 	 * Stops the server.
 	 * @param {Server} server The server object
 	 * @param {function} callback The success callback for the operation
 	 */
-	static stop(server, callback) {
-		for (let client in server.__clients) {
-			if (server.__clients.hasOwnProperty(client)) {
-				UDP.disconnect.call(null, server.__clients[client]);
-			}
-		}
+	stop: function(server, callback) {
+		Object.keys(server.__clients).forEach((client) => {
+			actions.disconnect(server.__clients[client])
+		});
 		server.listener.close();
-		process.nextTick(callback);
-	}
+		setTimeout(callback, 0);
+	},
 
 	/**
 	 * Creates a client
@@ -100,38 +92,33 @@ class UDP {
 	 * @param {Socket} soc Optionnal existing socket object. - Not used for UPC
 	 * @returns {Socket} The created tcp client
 	 */
-	static createSocket(client, soc) {
-		if (soc) return soc;
-
-		// Create a UDP writing socket
+	createSocket: function(options) {
 		let socket = dgram.createSocket(_socketType);
-		socket.__port = client.options.port;
-		socket.__hostname = client.options.hostname;
+		socket._port = options.port;
+		socket._hostname = options.hostname;
+		setTimeout(client.handleConnect.bind(client), 0);
 
-		// Emit on error
+		return socket;
+	},
+
+	attachSocket: function(socket, client) {
 		socket.on('error', client.handleError.bind(client));
+		socket.on('message', client.handleRequest.bind(client));
 
 		// Bind socket to also listen on it's address
 		socket.bind(null, _localAddress);
-
-		socket.on('message', client.handleRequest.bind(client));
-
-		// Emit on connect
-		process.nextTick(client.handleConnect.bind(client));
-
-		return socket;
-	}
+	},
 
 	/**
 	 * Attempts to disconnect the client's connection
 	 * @param {Client} client The client to disconnect
 	 */
-	static disconnect(client) {
+	disconnect: function(client) {
 		// Nothing to do
-		process.nextTick(client.handleDisconnect.bind(client));
+		setTimeout(client.handleDisconnect.bind(client), 0);
 	}
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = UDP;
+module.exports = actions;

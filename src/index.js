@@ -6,17 +6,22 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-// If running in the browser, do not load server module
-const is_browser = (require('os').platform() === 'browser');
-
-const Server = (is_browser)?null:require('./Server');
+const Server = require('./Server');
 const Client = require('./Client');
-const Adapter = require('./adapters/common');
+const serials = require('./serials');
+const transports = require('./transports');
+
+/* Methods -------------------------------------------------------------------*/
+
+function listen(params) {
+	return Server(params);
+}
+
+function connect(params) {
+	return Client(params);
+}
+
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = {
-	Client,
-	Server,
-	Adapter
-};
+module.exports = { listen, connect, serials, transports };

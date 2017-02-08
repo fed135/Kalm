@@ -1,6 +1,6 @@
 /**
- * InterProcessCall connector methods
- * @module adapters/ipc
+ * IPC transport methods
+ * @module transports.IPC
  */
 
 'use strict';
@@ -14,24 +14,34 @@ const split = require('binary-split');
 /* Local variables -----------------------------------------------------------*/
 
 const _path = '/tmp/app.socket-';
-const SEP = new Buffer('\n');
 
 /* Methods -------------------------------------------------------------------*/
 
-class IPC {
+const actions = {
 
 	/**
-	 * Listens for ipc connections, updates the 'listener' property of the server
+	 * Returns a new listener
 	 * @param {Server} server The server object
+	 * @param {object} options The options for the listener
 	 * @param {function} callback The callback for the operation
+	 * @returns {Promise(object)} The new listener
 	 */
-	static listen(server, callback) {
-		fs.unlink(_path + server.options.port, () => {
-			server.listener = net.createServer(server.handleRequest.bind(server));
-			server.listener.listen(_path + server.options.port, callback);
-			server.listener.on('error', server.handleError.bind(server));
+	listen: function(server, options, callback) {
+		const res = Promise.defer();
+		fs.unlink(_path + options.port, (err) => {
+			const listener = net.createServer(server.handleRequest.bind(server));
+			listener.on('error', server.handleError.bind(server));
+			listener.listen(_path + options.port, res.resolve.bind(res, listener));
 		});
-	}
+		return res.promise;
+	},
+
+	getOrigin: function(socket) {
+		return {
+			host: socket.remoteAddress,
+			port: socket.remotePort
+		};
+	},
 
 	/**
 	 * Creates a client and adds the data listener(s) to it
@@ -39,11 +49,11 @@ class IPC {
 	 * @param {Socket} socket Optionnal existing socket object.
 	 * @returns {Socket} The created ipc socket
 	 */
-	static createSocket(client, socket) {
-		if (!socket) {
-			socket = net.connect(_path + client.options.port);
-		}
+	createSocket: function(options) {
+		return net.connect(_path + options.port);
+	},
 
+	attachSocket: function(socket, client) {
 		let stream = socket.pipe(split());
 		stream.on('data', client.handleRequest.bind(client));
 
@@ -58,9 +68,7 @@ class IPC {
 
 		// Add timeout listener, sever connection
 		socket.on('timeout', () => this.disconnect(client));
-
-		return socket;
-	}
+	},
 
 	/**
 	 * Stops the server
@@ -68,11 +76,9 @@ class IPC {
 	 * @param {Server} server The server object
 	 * @param {function} callback The success callback for the operation
 	 */
-	static stop(server, callback) {
-		server.listener.close(() => {
-			process.nextTick(callback);
-		});
-	}
+	stop: function(server, callback) {
+		server.listener.close(() => setTimeout(callback, 0));
+	},
 
 	/**
 	 * Sends a message with a socket client
@@ -80,26 +86,21 @@ class IPC {
 	 * @param {Socket} socket The socket to use
 	 * @param {Buffer} payload The body of the request
 	 */
-	static send(socket, payload) {
-		if (socket) {
-			socket.write(payload);
-			socket.write(SEP);
-		}
-	}
+	send: function(socket, payload) {
+		socket.write(payload);
+	},
 
 	/**
 	 * @placeholder
 	 * Attempts to disconnect the client's connection
 	 * @param {Client} client The client to disconnect
 	 */
-	static disconnect(client) {
-		if (client.socket && client.socket.destroy) {
-			client.socket.destroy();
-			process.nextTick(client.handleDisconnect.bind(client));
-		}
+	disconnect: function(client, socket) {
+		socket.destroy();
+		setTimeout(client.handleDisconnect.bind(client), 0);
 	}
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = IPC;
+module.exports = actions;

@@ -19,7 +19,7 @@ var _maxCount = null;
 var _curr = 0;
 
 var Suite = {
-	ipc: IPC,
+	//ipc: IPC,
 	tcp: TCP,
 	udp: UDP
 };

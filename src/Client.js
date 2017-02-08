@@ -77,9 +77,8 @@ const Actions = {
 }
 
 function create(options) {
-	return Object.assign(
-		{ 
-			id: crypto.randomBytes(20).toString('hex'), 
+	return Object.assign({ 
+			id: options.id || crypto.randomBytes(8).toString('hex'), 
 			profile: Profiles.dynamic
 		},
 		Multiplexed,

@@ -20,6 +20,8 @@ function serialize(frame, channel, packets) {
 		);
 	});
 
+	result.push(10);
+
 	return Buffer.from(result);
 }
 

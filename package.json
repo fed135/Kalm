@@ -41,7 +41,7 @@
     "webpack": "^1.13.0"
   },
   "dependencies": {
-    "binary-split": "1.0.x",
+    "binary-split": "git://github.com/fahisl/binary-split.git",
     "bluebird": "3.4.x",
     "debug": "2.2.x"
   }
