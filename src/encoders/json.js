@@ -35,7 +35,7 @@ class JSONEncoder extends Encoder {
 	 * @returns {object} The decoded payload
 	 */
 	decode(payload) {
-		return JSON.parse(payload.toString());
+		return JSON.parse(String.fromCharCode.apply(null, payload));
 	}
 }
 

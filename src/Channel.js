@@ -55,7 +55,6 @@ class Channel {
 		// Bundling process
 		if (this.packets.length >= this.options.maxPackets) {		
 			this._emit();
-			return;
 		}
 
 		this.startBundler();
