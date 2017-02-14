@@ -44,5 +44,9 @@
   "dependencies": {
     "bsplit": "1.0.x",
     "debug": "2.6.x"
+  },
+  "babel": {
+	  "presets": ["es2015"],
+	  "ignore": ["ipc.js", "tcp.js", "udp.js", "Server.js"]
   }
 }
