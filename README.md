@@ -5,7 +5,6 @@
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
-[![Code Climate](https://codeclimate.com/github/fed135/Kalm/badges/gpa.svg)](https://codeclimate.com/github/fed135/Kalm)
 [![Gitter](https://img.shields.io/gitter/room/fed135/kalm.svg)](https://gitter.im/fed135/Kalm)
 
 ---
@@ -72,6 +71,8 @@ This makes a huge difference when you need to send a large number of small packe
 **Client**
 
 ```node
+    import Kalm from 'kalm';
+
     // Opens a connection to the server
     let client = new Kalm.Client({
       hostname: '0.0.0.0', // Server's IP
@@ -150,7 +151,7 @@ You can also gather optimization statistics by piping `kalm:stats`
 
 ## Roadmap
 
-[Milestones](https://github.com/fed135/Kalm/milestones)
+[Version 2.0.0](https://github.com/fed135/Kalm/projects/2)
 
 
 ## Presentations
