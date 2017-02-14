@@ -1,4 +1,4 @@
 {
 	"presets": ["es2015"],
-	"ignore": ["ipc.js", "tcp.js", "udp.js", "Server.js"]
+	"ignore": ["./src/adapters/ipc.js", "./src/adapters/tcp.js", "./src/adapters/udp.js", "./src/Server.js"]
 }
