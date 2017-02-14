@@ -22,7 +22,7 @@ function encode(payload) {
  * @returns {object} The decoded payload
  */
 function decode(payload) {
-	return JSON.parse(payload.toString());
+	return JSON.parse(String.fromCharCode.apply(null, payload));
 }
 
 /* Exports -------------------------------------------------------------------*/

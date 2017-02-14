@@ -7,7 +7,7 @@
 /* Methods -------------------------------------------------------------------*/
 
 function serialize(frame, channel, packets) {
-	const result = [frame, channel.length];
+	let result = [frame, channel.length];
 
 	for (let letter = 0; letter < channel.length; letter++) {
 		result.push(channel.charCodeAt(letter));
@@ -25,7 +25,7 @@ function serialize(frame, channel, packets) {
 	return Buffer.from(result);
 }
 
-function uint16_size(packet) {
+function uint16_size(value) {
 	return [value >>> 8, value & 0xff];
 }
 
@@ -35,7 +35,7 @@ function numeric_size(a, b) {
 
 function deserialize(payload) {
 	const result = {
-		id: payload[0],
+		frame: payload[0],
 		channel: '',
 		payload_bytes: payload.length,
 		packets: []
@@ -48,15 +48,15 @@ function deserialize(payload) {
 	for (let letter = 2; letter < channel_len + 2; letter++) {
 		letters.push(payload[letter]);
 	}
-	frame.channel = String.fromCharCode.apply(null, letters);
+	result.channel = String.fromCharCode.apply(null, letters);
 
-	while(caret < frame.payload_bytes) {
+	while(caret < result.payload_bytes) {
 		let packet_len = numeric_size(payload[caret], payload[caret + 1]);
 		let packet = [];
 		for (let byte = caret + 2; byte < packet_len + caret + 2; byte++) {
 			packet.push(payload[byte]);
 		}
-		frame.packets.push(packet);
+		result.packets.push(packet);
 
 		caret = caret + packet_len + 2;
 	}

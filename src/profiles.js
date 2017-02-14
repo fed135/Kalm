@@ -27,6 +27,10 @@ function threshold(options) {
 	}, options || {});
 }
 
+function manual() {
+	return { tick: null, maxBytes: null };
+}
+
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = { dynamic, heartbeat, threshold };
+module.exports = { dynamic, heartbeat, threshold, manual };

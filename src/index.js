@@ -6,22 +6,23 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-const Server = require('./Server');
-const Client = require('./Client');
+const clientFactory = require('./clientFactory');
+const serverFactory = require('./serverFactory');
+const profiles = require('./profiles');
 const serials = require('./serials');
 const transports = require('./transports');
 
 /* Methods -------------------------------------------------------------------*/
 
-function listen(params) {
-	return Server(params);
+function listen(options) {
+	return serverFactory.create(options);
 }
 
-function connect(params) {
-	return Client(params);
+function connect(options) {
+	return clientFactory.create(options);
 }
 
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = { listen, connect, serials, transports };
+module.exports = { listen, connect, serials, transports, profiles };

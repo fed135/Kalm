@@ -8,11 +8,11 @@ const sessions = {};
 /* Methods -------------------------------------------------------------------*/
 
 function resolve(id) {
-	if (!session.hasOwnProperty(id)) {
-		session[id] = { data: {} }
+	if (!sessions.hasOwnProperty(id)) {
+		sessions[id] = { data: {} }
 	}
-	session[id].lastUpdated = Date.now();
-	return session[id].data;
+	sessions[id].lastUpdated = Date.now();
+	return sessions[id].data;
 }
 
 function cleanup(id) {

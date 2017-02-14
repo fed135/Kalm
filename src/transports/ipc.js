@@ -9,7 +9,7 @@
 
 const net = require('net');
 const fs = require('fs');
-const split = require('binary-split');
+const split = require('/home/frederic/Documents/workspace/bsplit');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -26,7 +26,7 @@ const actions = {
 	 * @param {function} callback The callback for the operation
 	 * @returns {Promise(object)} The new listener
 	 */
-	listen: function(server, options, callback) {
+	listen: (server, options, callback) => {
 		const res = Promise.defer();
 		fs.unlink(_path + options.port, (err) => {
 			const listener = net.createServer(server.handleRequest.bind(server));
@@ -36,7 +36,7 @@ const actions = {
 		return res.promise;
 	},
 
-	getOrigin: function(socket) {
+	getOrigin: (socket) => {
 		return {
 			host: socket.remoteAddress,
 			port: socket.remotePort
@@ -49,11 +49,11 @@ const actions = {
 	 * @param {Socket} socket Optionnal existing socket object.
 	 * @returns {Socket} The created ipc socket
 	 */
-	createSocket: function(options) {
+	createSocket: (options) => {
 		return net.connect(_path + options.port);
 	},
 
-	attachSocket: function(socket, client) {
+	attachSocket: (socket, client) => {
 		let stream = socket.pipe(split());
 		stream.on('data', client.handleRequest.bind(client));
 
@@ -76,7 +76,7 @@ const actions = {
 	 * @param {Server} server The server object
 	 * @param {function} callback The success callback for the operation
 	 */
-	stop: function(server, callback) {
+	stop: (server, callback) => {
 		server.listener.close(() => setTimeout(callback, 0));
 	},
 
@@ -86,7 +86,7 @@ const actions = {
 	 * @param {Socket} socket The socket to use
 	 * @param {Buffer} payload The body of the request
 	 */
-	send: function(socket, payload) {
+	send: (socket, payload) => {
 		socket.write(payload);
 	},
 
@@ -95,7 +95,7 @@ const actions = {
 	 * Attempts to disconnect the client's connection
 	 * @param {Client} client The client to disconnect
 	 */
-	disconnect: function(client, socket) {
+	disconnect: (client, socket) => {
 		socket.destroy();
 		setTimeout(client.handleDisconnect.bind(client), 0);
 	}
