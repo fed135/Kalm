@@ -1,5 +1,4 @@
 {
 	"presets": ["es2015"],
-	"plugins": ["babel-plugin-add-module-exports"],
 	"ignore": ["ipc.js", "tcp.js", "udp.js", "Server.js"]
 }
