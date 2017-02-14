@@ -5,7 +5,7 @@
   "main": "./index.js",
   "scripts": {
     "test": "mocha tests/unit --recursive && mocha tests/integration",
-    "test.watch": "mocha tests/unit --recursive --watch",
+    "test.watch": "mocha tests/unit --recursive --watch"
   },
   "repository": {
     "type": "git",
@@ -42,8 +42,8 @@
     "debug": "2.6.x"
   },
   "browser": {
-	  "fs": false,
-	  "net": false,
+    "fs": false,
+    "net": false,
     "dgram": false
   }
 }
