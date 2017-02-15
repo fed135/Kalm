@@ -12,23 +12,19 @@
 <br/>
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
+[![Node](https://img.shields.io/badge/node->%3D4.0-blue.svg)](https://nodejs.org)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
 [![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Gitter](https://img.shields.io/gitter/room/fed135/kalm.svg)](https://gitter.im/fed135/Kalm)
-[![Node](https://img.shields.io/badge/node->%3D4.0-blue.svg)](https://nodejs.org)
+
 
 ---
 
-Simplify and optimize your Socket communications with:
-
-- Easy-to-use single syntax for all protocols
-- Configurable packet bundling (High-level Nagle's algorithm implementation)
-- Multiplexing for all protocols
-- Ultra-flexible and extensible, load your own transports and serializers
-- Can be used between servers or in the browser
-- >50x better throughtput  
-- Lower resource footprint
-- Get started in seconds
+- **Easy-to-use syntax** and feature parity for all protocols
+- Flexible and extensible, load your own transports and serializers
+- **Multiplexing, session stores and transactions**
+- Can be used between servers or in the **browser**
+- Lower resource footprint and over **50x better throughtput** than plain sockets
 
 
 ## How it works
@@ -36,7 +32,7 @@ Simplify and optimize your Socket communications with:
 **Bytes transfered**
 
 Call buffering can reduce payload sizes at the cost of some initial latency. 
-This makes a huge difference when you need to send a large number of small packets, such as multiplayer games do. See [Nagle's algorithm](https://www.google.ca/url?sa=t&rct=j&q=&esrc=s&source=web&cd=2&cad=rja&uact=8&ved=0ahUKEwjIxNrWk5PSAhWH14MKHaqkDEEQFggiMAE&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNagle%27s_algorithm&usg=AFQjCNGydotOm34Q_mtojPHsoFsh32ZbFA&sig2=2yH5dyzeTT3V3xj1oczoxg).
+This makes a huge difference when you need to send a large number of small packets, such as multiplayer games do. See [Nagle's algorithm](https://en.wikipedia.org/wiki/Nagle's_algorithm).
 
 
 ## Usage
@@ -82,10 +78,6 @@ This makes a huge difference when you need to send a large number of small packe
     client.subscribe('user.join', () => { //... });
 
 ```
-## Documentation
-
-[API docs](https://fed135.github.io/kalm.github.io)
-
 
 ## Options
 
@@ -131,6 +123,10 @@ manual | `Kalm.profiles.manual()` | Need to process queues by hand `{ step: null
       profile: Kalm.profiles.heartbeat({ step: 5 }) // Triggers every 5ms
     });
 ```
+
+## Documentation
+
+[API docs](https://fed135.github.io/kalm.github.io)
 
 
 ## Testing
