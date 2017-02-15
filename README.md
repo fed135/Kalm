@@ -1,6 +1,6 @@
 <h1 align="center">
   <a title="The socket optimizer" href="http://kalm.js.org">
-    <img alt="Kalm" width="320px" src="http://res.cloudinary.com/kalm/image/upload/v1487202001/kalm_clear.png" />
+    <img alt="Kalm" width="320px" src="http://res.cloudinary.com/kalm/image/upload/v1487202241/kalm_header.png" />
     <br/><br/>
   </a>
   Kalm
