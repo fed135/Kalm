@@ -145,7 +145,3 @@ manual | `Kalm.profiles.manual()` | Need to process queues by hand `{ step: null
 Kalm uses [debug](https://github.com/visionmedia/debug)
 
 `export DEBUG=kalm`
-
-You can also gather optimization statistics by piping `kalm:stats`
-
-`export DEBUG=kalm:stats myApp.js > stats.log`
