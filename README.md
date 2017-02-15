@@ -1,12 +1,15 @@
 <h1 align="center">
   <a title="The socket optimizer" href="http://kalm.js.org">
-    <br/><br/><br/>
-    <img alt="Kalm" src="http://res.cloudinary.com/kalm/image/upload/v1487196605/kalm.png" />
-    <br/><br/><br/><br/>
+    <img alt="Kalm" width="320px" src="http://res.cloudinary.com/kalm/image/upload/v1487196605/kalm.png" />
+    <br/><br/>
   </a>
   Kalm
 </h1>
-<h3 align="center">*The Socket Optimizer*</h3>
+<h3 align="center">
+  The Socket Optimizer
+  <br/><br/><br/>
+</h3>
+<br/>
 
 [![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
 [![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
@@ -23,17 +26,12 @@ Simplify and optimize your Socket communications with:
 - Multiplexing for all protocols
 - Ultra-flexible and extensible, load your own transports and serializers
 - Can be used between servers or in the browser
+- >50x better throughtput  
+- Lower resource footprint
+- Get started in seconds
 
----
 
-
-## Performance analysis
-
-**Requests per minute**
-
-<img src="http://i231.photobucket.com/albums/ee109/FeD135/perf_v140.png">
-
-*Benchmarks based on a single-thread queue test with Kalm default bundling settings*
+## How it works
 
 **Bytes transfered**
 
@@ -92,25 +90,30 @@ This makes a huge difference when you need to send a large number of small packe
 ## Options
 
 **Transports**
-| --- | --- |
-| IPC | `Kalm.transports.IPC` |
-| TCP | `Kalm.transports.TCP` |
-| UDP | `Kalm.transports.UDP` |
-| WebSockets | [kalm-websocket](https://github.com/fed135/kalm-websocket) |
+
+Name | Module
+--- | ---
+IPC | `Kalm.transports.IPC`
+TCP | `Kalm.transports.TCP`
+UDP | `Kalm.transports.UDP`
+WebSockets | [kalm-websocket](https://github.com/fed135/kalm-websocket)
 
 **Serializers**
-| --- | --- |
-| JSON | `Kalm.serials.JSON` |
-| MSG-PACK | [kalm-msgpack](https://github.com/fed135/kalm-msgpack) |
-| Snappy | [kalm-snappy](https://github.com/fed135/kalm-snappy) |
+
+Name | Module
+--- | ---
+JSON | `Kalm.serials.JSON`
+MSG-PACK | [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
+Snappy | [kalm-snappy](https://github.com/fed135/kalm-snappy)
 
 **Profiles**
 
-| --- | --- | --- |
-| dynamic | `Kalm.profiles.dynamic()` | Triggers based on buffer size and maximum time range (default) |
-| heartbeat | `Kalm.profiles.heartbeat()` | Triggers at a fixed time interval | 
-| threshold | `Kalm.profiles.threshold()` | Triggers when buffer reaches a certain size |
-| manual | `Kalm.profiles.manual()` | Need to process queues by hand |
+Name | Module | Condition
+--- | --- | --- |
+dynamic | `Kalm.profiles.dynamic()` | Triggers based on buffer size and maximum time range (default) `{ step: 16, maxBytes: 1400 }`
+heartbeat | `Kalm.profiles.heartbeat()` | Triggers at a fixed time interval `{ step: 16, maxBytes: null }`
+threshold | `Kalm.profiles.threshold()` | Triggers when buffer reaches a certain size `{ step: null, maxBytes: 1400 }`
+manual | `Kalm.profiles.manual()` | Need to process queues by hand `{ step: null, maxBytes: null }`
 
 
 **Loading transports, profiles and serializers**
