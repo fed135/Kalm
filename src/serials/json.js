@@ -13,7 +13,7 @@
  * @returns {Buffer} The encoded payload
  */
 function encode(payload) {
-	return new Buffer(JSON.stringify(payload));
+	return (Buffer.isBuffer(payload)) ? payload : new Buffer(JSON.stringify(payload));
 }
 
 /**

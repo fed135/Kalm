@@ -24,7 +24,9 @@ function create(options) {
 		id: crypto.randomBytes(8).toString('hex'),
 		profile: profiles.dynamic(),
 		serial: serials.JSON,
-		transport: transports.TCP
+		transport: transports.TCP,
+		channels: {},
+		connections: []
 	};
 
 	Object.assign(server,

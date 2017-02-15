@@ -1,9 +1,0 @@
-Before:
-
-{ foo: 'bar' } => { c:'test', p: [{ foo: 'bar' }] } 	// 26 Bytes
-
-{ c: 'test', }
-
-After:
-
-{ foo: 'bar' } => 0 4 test 11 { foo: 'bar' } 			// 19 Bytes

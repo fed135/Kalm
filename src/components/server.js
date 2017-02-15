@@ -15,15 +15,14 @@ const crypto = require('crypto');
 
 function Server(scope) {
 	return {
-		connections: [],
-
 		/**
 		 * Server lift method
 		 */
 		listen: () => {
 			debug(`log: listening ${scope.transport}://0.0.0.0:${scope.port}`);
 				
-			scope.transport.listen(null, () => scope.emit('ready'));
+			scope.transport.listen()
+				.then(listener => scope.listener = listener);
 		},
 
 		/**
@@ -101,6 +100,7 @@ function Server(scope) {
 
 			scope.on('subscribe', client.subscribe.bind(client));
 			scope.on('unsubscribe', client.unsubscribe.bind(client));
+			client.on('disconnect', scope.emit.bind('disconnection'));
 			return client;
 		}
 	};

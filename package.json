@@ -1,11 +1,10 @@
 {
   "name": "kalm",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "The socket optimizer",
   "main": "./index.js",
   "scripts": {
-    "test": "mocha tests/unit --recursive && mocha tests/integration",
-    "build": "webpack --config ./webpack.config"
+    "test": "mocha tests/unit --recursive && mocha tests/integration"
   },
   "repository": {
     "type": "git",
@@ -33,15 +32,17 @@
   },
   "homepage": "https://github.com/fed135/Kalm#readme",
   "devDependencies": {
-    "babel-loader": "^6.2.0",
-    "babel-preset-es2015": "^6.18.0",
     "chai": "^3.5.0",
     "mocha": "^3.1.0",
-    "sinon": "^1.17.0",
-    "webpack": "^1.13.0"
+    "sinon": "^1.17.0"
   },
   "dependencies": {
     "bsplit": "1.0.x",
     "debug": "2.6.x"
+  },
+  "browser": {
+    "net": false,
+    "fs": false,
+    "dgram": false
   }
 }

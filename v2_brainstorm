@@ -1,5 +1,5 @@
-- **Check for leaks** - OK
-- in all send methods, can pass binary as payload (skip serialization) - YES
+  - **Check for leaks** - OK
+  - in all send methods, can pass binary as payload (skip serialization) - YES
 - Encode packets as they enter the queue, only keep binaries in the queue - OK 
 - remove load_batches option - OK
 - Kalm.naggle settings: heartbeat, threshold, dynamic - OK
@@ -7,7 +7,8 @@
 - transactions - YES
 - If serialization fails, just plop the binary ? - YES
 - transmit connection events (event shim it for udp) - YES
-- deterministic uuids - 
+- deterministic uuids - YES
+- Disconnection handler (server) - YES
 
 
 // Leaks

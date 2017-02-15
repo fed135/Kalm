@@ -9,6 +9,7 @@
 const serializer = require('../utils/serializer');
 const debug = require('debug')('kalm');
 const profiles = require('../profiles');
+const sessions = require('../utils/sessions');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -25,7 +26,7 @@ function Client(scope) {
 		 * @param {boolean} once Wether to override packets with scope one
 		 * @returns {Client} The client, for chaining
 		 */
-		send: (name, payload) => {
+		write: (name, payload) => {
 			scope.queue(name)
 				.add(scope.serial.encode(payload));
 			return scope;
@@ -87,7 +88,8 @@ function Client(scope) {
 						payload_bytes: raw.payload_bytes,
 						payload_messages: raw.packets.length,
 						message_index
-					}
+					},
+					session: sessions.resolve(scope.id)
 				});
 			});
 		},

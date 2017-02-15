@@ -23,7 +23,8 @@ function create(options) {
 	const client = { 
 		transport: transports.TCP,
 		serial: serials.JSON,
-		profile: profiles.dynamic()
+		profile: profiles.dynamic(),
+		channels: {}
 	};
 	
 	Object.assign(client,
