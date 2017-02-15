@@ -124,11 +124,6 @@ manual | `Kalm.profiles.manual()` | Need to process queues by hand `{ step: null
     });
 ```
 
-## Documentation
-
-[API docs](https://fed135.github.io/kalm.github.io)
-
-
 ## Testing
 
 **Unit + Smoke tests**
