@@ -1,15 +1,15 @@
 /**
  * JSON Encoder 
- * @module encoders/json
+ * @module serials/json
  */
 
 'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
-var expect = require('chai').expect;
-var sinon = require('sinon');
-var testModule = require('../../../src/encoders/json');
+const expect = require('chai').expect;
+const sinon = require('sinon');
+const testModule = require('../../../src/serials/json');
 
 /* Tests ---------------------------------------------------------------------*/
 

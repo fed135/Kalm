@@ -14,7 +14,7 @@ const dgram = require('dgram');
 const _socketType = 'udp4';
 const _keySeparator = ':';
 const _localAddress = '0.0.0.0';
-const reuseAddr = true;
+const _reuseAddr = true;
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -49,7 +49,7 @@ const actions = {
 	 * @param {function} callback The success callback for the operation
 	 */
 	listen: function(server, options, callback) {
-		const listener = dgram.createSocket({ type: _socketType, reuseAddr });
+		const listener = dgram.createSocket({ type: _socketType, reuseAddr: _reuseAddr });
 		listener.on('message', _handleNewSocket.bind(null, server))
 		listener.on('error', server.handleError.bind(server));
 		listener.bind(options.port, _localAddress);

@@ -1,61 +1,27 @@
-  - **Check for leaks** - OK
-  - in all send methods, can pass binary as payload (skip serialization) - YES
-- Encode packets as they enter the queue, only keep binaries in the queue - OK 
-- remove load_batches option - OK
-- Kalm.naggle settings: heartbeat, threshold, dynamic - OK
-- replace max Packets with max bytes - OK
-- transactions - YES
-- If serialization fails, just plop the binary ? - YES
-- transmit connection events (event shim it for udp) - YES
-- deterministic uuids - YES
-- Disconnection handler (server) - YES
+## Improvements
+
+x - in all send methods, can pass binary as payload (skip serialization)
+x - Encode packets as they enter the queue, only keep binaries in the queue
+x - remove load_batches option
+x - Kalm.profiles settings: heartbeat, threshold, dynamic
+x - replace max Packets with max bytes
+x - transactions
+x - No serializer (null) are defined, just shoot the binary to the handler
+x - transmit connection events (event shim it for udp)
+x - deterministic uuids
+x - Disconnection handler (server)
+x - Deprecate SendNow (profile setting)
+x - Deprecate SendOnce (Application logic)
+x - queue packets when socket is offline
 
 
-// Leaks
+## Leak concerns
 
-- Connection objects (clients) are not cleaned up when they disconnect
+- Disconnected clients
+- Expired sessions
 
-//
-client.send(payload, {
-	now: true,
-	once: true,
-	encoder: 'json',	// Or null if they are already encoded - this is how to properly integrate compactr!
-})
+## Performance targets
 
-
-client.subscribe('channel', (request, reply, metadata))
-
-// Metadata
-{
-	body: { ... }	
-	client: { ... }
-	frame: {
-		id: 0-255
-		channel: 'xyz'
-		payload_bytes: 123...
-		payload_messages: 2
-		message_index: 0
-	}
-}
-
----------------- TARGET RPM: {"raw_ipc":250157,"kalm_ipc":2512703,"raw_tcp":133579,"kalm_tcp":4810559,"raw_udp":128506,"kalm_udp":7354175}
-
-
-
-
-Sending:
-Server -> Client -> Queues
-
-Receiving:
-Server -> Client
-
-
-// Behaviors
-
-Send
-
-- Put in queue
-- Start queue if needed
-
-Deprecate SendNow (profile setting)
-Deprecate SendOnce (Application logic)
+- IPC: 20M RPM
+- TCP: 40M RPM
+- UDP: 70M RPM

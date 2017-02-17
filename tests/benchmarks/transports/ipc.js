@@ -27,7 +27,6 @@ function _absorb(err) {
 
 function setup(resolve) {
 	server = net.createServer(function(socket) {
-		console.log(socket);
 		socket.on('error', _absorb);
 		socket.on('data', function() {
 			count++;

@@ -1,9 +1,7 @@
 module.exports = {
-	adapter: 'tcp',
-	encoder: 'json',
+	transport: 'TCP',
 	port: 3000,
-	bundlerDelay: 16,
-	bundlerMaxPackets: 2048,
+	profile: { step: 16, maxBytes: 9000 },
 	testDuration: 1000 * 1,
 	testPayload: { foo: 'bar'},
 	testChannel: 'test'

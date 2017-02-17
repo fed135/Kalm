@@ -20,11 +20,14 @@ const Client = require('./components/client');
 /* Methods -------------------------------------------------------------------*/
 
 function create(options) {
-	const client = { 
+	const client = {
+		port: 3000,
+		hostname: '0.0.0.0',
 		transport: transports.TCP,
 		serial: serials.JSON,
 		profile: profiles.dynamic(),
-		channels: {}
+		channels: {},
+		backlog: []
 	};
 	
 	Object.assign(client,

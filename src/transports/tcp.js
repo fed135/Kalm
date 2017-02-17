@@ -12,7 +12,7 @@ const split = require('/home/frederic/Documents/workspace/bsplit');
 
 /* Local variables -----------------------------------------------------------*/
 
-const socket_timeout = 300000;	// 5 Minutes
+const _socketTimeout = 300000;	// 5 Minutes
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -51,9 +51,8 @@ function attachSocket(socket, client) {
 	socket.on('error', client.handleError.bind(client));
 	socket.on('connect', client.handleConnect.bind(client));
 	socket.on('close', client.handleDisconnect.bind(client));
-	// Add timeout listener, sever connection
 	socket.on('timeout', () => this.disconnect(client));
-	socket.setTimeout(client.socketTimeout || socket_timeout);
+	socket.setTimeout(client.socketTimeout || _socketTimeout);
 }
 
 /**

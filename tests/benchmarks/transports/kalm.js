@@ -20,10 +20,10 @@ var handbreak = true;
 /* Methods -------------------------------------------------------------------*/
 
 function setup(resolve) {
-	server = new Kalm.Server({
+	server = Kalm.listen({
 		port: settings.port,
-		adapter: settings.adapter,
-		encoder: settings.encoder,
+		transport: Kalm.transports[settings.transport],
+		profile: settings.profile
 	});
 
 	server.subscribe(settings.testChannel, function() {
@@ -31,7 +31,7 @@ function setup(resolve) {
 	});
 
 	handbreak = false;
-	server.on('ready', resolve);
+	setTimeout(resolve, 0);
 }
 
 function teardown(resolve) {
@@ -50,19 +50,14 @@ function stop(resolve) {
 function step(resolve) {
 	if (handbreak) return;
 	if (!client) {
-		client = new Kalm.Client({
+		client = Kalm.connect({
 			port: settings.port, 
-			adapter: settings.adapter, 
-			encoder: settings.encoder,
-			bundler: {
-				maxPackets: settings.bundlerMaxPackets,
-				delay: settings.bundlerDelay
-			},
-			hostname: '0.0.0.0'
+			transport: Kalm.transports[settings.transport], 
+			profile: settings.profile
 		});
 	}
 
-	client.send(settings.testChannel, settings.testPayload);
+	client.write(settings.testChannel, settings.testPayload);
 	resolve();
 }
 

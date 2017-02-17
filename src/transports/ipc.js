@@ -17,90 +17,79 @@ const _path = '/tmp/app.socket-';
 
 /* Methods -------------------------------------------------------------------*/
 
-const actions = {
+/**
+ * Returns a new listener
+ * @param {Server} server The server object
+ * @param {object} options The options for the listener
+ * @param {function} callback The callback for the operation
+ * @returns {Promise(object)} The new listener
+ */
+function listen(server, options, callback) {
+	const res = Promise.defer();
+	fs.unlink(_path + options.port, (err) => {
+		const listener = net.createServer(server.handleConnection.bind(server));
+		listener.on('error', server.handleError.bind(server));
+		listener.listen(_path + options.port, res.resolve.bind(res, listener));
+	});
+	return res.promise;
+}
 
-	/**
-	 * Returns a new listener
-	 * @param {Server} server The server object
-	 * @param {object} options The options for the listener
-	 * @param {function} callback The callback for the operation
-	 * @returns {Promise(object)} The new listener
-	 */
-	listen: (server, options, callback) => {
-		const res = Promise.defer();
-		fs.unlink(_path + options.port, (err) => {
-			const listener = net.createServer(server.handleRequest.bind(server));
-			listener.on('error', server.handleError.bind(server));
-			listener.listen(_path + options.port, res.resolve.bind(res, listener));
-		});
-		return res.promise;
-	},
+function getOrigin(socket) {
+	return {
+		host: socket._server._pipeName,
+		port: '' + socket._handle.fd
+	};
+}
 
-	getOrigin: (socket) => {
-		return {
-			host: socket.remoteAddress,
-			port: socket.remotePort
-		};
-	},
+/**
+ * Creates a client and adds the data listener(s) to it
+ * @param {Client} client The client to create the socket for
+ * @param {Socket} socket Optionnal existing socket object.
+ * @returns {Socket} The created ipc socket
+ */
+function createSocket(options) {
+	return net.connect(_path + options.port);
+}
 
-	/**
-	 * Creates a client and adds the data listener(s) to it
-	 * @param {Client} client The client to create the socket for
-	 * @param {Socket} socket Optionnal existing socket object.
-	 * @returns {Socket} The created ipc socket
-	 */
-	createSocket: (options) => {
-		return net.connect(_path + options.port);
-	},
+function attachSocket(socket, client) {
+	let stream = socket.pipe(split());
+	stream.on('data', client.handleRequest.bind(client));
+	socket.on('error', client.handleError.bind(client));
+	socket.on('connect', client.handleConnect.bind(client));
+	socket.on('close', client.handleDisconnect.bind(client));
+	socket.on('timeout', () => client.destroy.bind(client));
+}
 
-	attachSocket: (socket, client) => {
-		let stream = socket.pipe(split());
-		stream.on('data', client.handleRequest.bind(client));
+/**
+ * Stops the server
+ * @placeholder
+ * @param {Server} server The server object
+ * @param {function} callback The success callback for the operation
+ */
+function stop(server, callback) {
+	server.listener.close(() => setTimeout(callback, 0));
+}
 
-		// Emit on error
-		socket.on('error', client.handleError.bind(client));
+/**
+ * Sends a message with a socket client
+ * @placeholder
+ * @param {Socket} socket The socket to use
+ * @param {Buffer} payload The body of the request
+ */
+function send(socket, payload) {
+	socket.write(payload);
+}
 
-		// Emit on connect
-		socket.on('connect', client.handleConnect.bind(client));
-
-		// Will auto-reconnect
-		socket.on('close', client.handleDisconnect.bind(client));
-
-		// Add timeout listener, sever connection
-		socket.on('timeout', () => this.disconnect(client));
-	},
-
-	/**
-	 * Stops the server
-	 * @placeholder
-	 * @param {Server} server The server object
-	 * @param {function} callback The success callback for the operation
-	 */
-	stop: (server, callback) => {
-		server.listener.close(() => setTimeout(callback, 0));
-	},
-
-	/**
-	 * Sends a message with a socket client
-	 * @placeholder
-	 * @param {Socket} socket The socket to use
-	 * @param {Buffer} payload The body of the request
-	 */
-	send: (socket, payload) => {
-		socket.write(payload);
-	},
-
-	/**
-	 * @placeholder
-	 * Attempts to disconnect the client's connection
-	 * @param {Client} client The client to disconnect
-	 */
-	disconnect: (client, socket) => {
-		socket.destroy();
-		setTimeout(client.handleDisconnect.bind(client), 0);
-	}
+/**
+ * @placeholder
+ * Attempts to disconnect the client's connection
+ * @param {Client} client The client to disconnect
+ */
+function disconnect(client, socket) {
+	socket.destroy();
+	setTimeout(client.handleDisconnect.bind(client), 0);
 }
 
 /* Exports -------------------------------------------------------------------*/
 
-module.exports = actions;
+module.exports = { listen, getOrigin, stop, send, disconnect, createSocket, attachSocket };

@@ -6,36 +6,28 @@
 
 /* Requires ------------------------------------------------------------------*/
 
-var Kalm = require('./adapters/kalm');
-var TCP = require('./adapters/tcp');
-var IPC = require('./adapters/ipc');
-var UDP = require('./adapters/udp');
-
-var settings = require('./settings');
+const Kalm = require('./transports/kalm');
+const TCP = require('./transports/tcp');
+const IPC = require('./transports/ipc');
+const UDP = require('./transports/udp');
+const settings = require('./settings');
 
 /* Local variables -----------------------------------------------------------*/
 
-var _maxCount = null;
-var _curr = 0;
-
-var Suite = {
-	//ipc: IPC,
-	tcp: TCP,
-	udp: UDP
-};
-
-var tests = [];
-var adpts;
-var results = {};
+const _maxCount = null;
+let _curr = 0;
+const Suite = { IPC, TCP, UDP };
+const tests = [];
+const results = {};
 
 /* Methods -------------------------------------------------------------------*/
 
-function _measure(adapter, resolve) {
+function _measure(transport, resolve) {
 	_curr = 0;
-	adapter.setup(function _setupHandler() {
-		setTimeout(function _stopAdapter() {
-			adapter.stop(function _finish() {
-				adapter.teardown(resolve);
+	transport.setup(function _setupHandler() {
+		setTimeout(function _stoptransport() {
+			transport.stop(function _finish() {
+				transport.teardown(resolve);
 			});
 		}, settings.testDuration);
 
@@ -45,7 +37,7 @@ function _measure(adapter, resolve) {
 				_curr++;
 			}
 			setImmediate(function _stepHandler() {
-				adapter.step(_repeat);
+				transport.step(_repeat);
 			});
 		}
 
@@ -54,7 +46,7 @@ function _measure(adapter, resolve) {
 }
 
 function _updateSettings(obj, resolve) {
-	settings.adapter = obj.adapter || settings.adapter;
+	settings.transport = obj.transport || settings.transport;
 	resolve();
 }
 
@@ -76,8 +68,8 @@ settings.port = 3000 + Math.round(Math.random()*1000);
 
 var adpts = Object.keys(Suite).map(function(k) {
 	return {
-		adapter: k,
-		settings: {adapter: k},
+		transport: k,
+		settings: {transport: k},
 		raw: Suite[k],
 		kalm: Kalm
 	};
@@ -85,22 +77,22 @@ var adpts = Object.keys(Suite).map(function(k) {
 
 adpts.forEach(function(i) {
 	tests.push(function(resolve) {
-		console.log('Configuring ' + i.adapter);
+		console.log('Configuring ' + i.transport);
 		_updateSettings(i.settings, resolve);
 	});
 
 	tests.push(function(resolve) {
-		console.log('Measuring raw ' + i.adapter);
+		console.log('Measuring raw ' + i.transport);
 		_measure(i.raw, function(total) {
-			results['raw_' + i.adapter] = total;
+			results['raw_' + i.transport] = total;
 			resolve();
 		});
 	});
 
 	tests.push(function(resolve) {
-		console.log('Measuring Kalm ' + i.adapter);
+		console.log('Measuring Kalm ' + i.transport);
 		_measure(i.kalm, function(total) {
-			results['kalm_' + i.adapter] = total;
+			results['kalm_' + i.transport] = total;
 			resolve();
 		});
 	});

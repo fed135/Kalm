@@ -13,16 +13,15 @@ const Kalm = require('../../index');
 
 describe('Integration tests', () => {
 
-	['ipc', 'tcp', 'udp'].forEach((adapter) => {
-		describe('Testing ' + adapter + ' adapter', () => {
+	['IPC', 'TCP', 'UDP'].forEach((transport) => {
+		describe('Testing ' + transport + ' transport', () => {
 			let server;
 
 			/* --- Setup ---*/
 
 			// Create a server before each scenario
-			beforeEach((done) => {
-				server = new Kalm.Server({adapter: adapter});
-				server.on('ready', done);
+			beforeEach(() => {
+				server = Kalm.listen({ transport: Kalm.transports[transport] });
 			});
 
 			// Cleanup afterwards
@@ -35,18 +34,18 @@ describe('Integration tests', () => {
 
 			/* --- Tests --- */
 
-			it('should work with ' + adapter, (done) => {
+			it('should work with ' + transport, (done) => {
 				let payload = {foo:'bar'};
 				server.subscribe('test', (data) => {
 					expect(data).to.eql(payload);
 					done();
 				});
 
-				let client = new Kalm.Client({adapter:adapter});
-				client.send('test', payload);
+				let client = Kalm.connect({ transport: Kalm.transports[transport] });
+				client.write('test', payload);
 			});
 
-			it('should handle large payloads with ' + adapter, (done) => {
+			it('should handle large payloads with ' + transport, (done) => {
 				let largePayload = [];
 				while(largePayload.length < 2048) {
 					largePayload.push({foo: 'bar'});
@@ -57,8 +56,8 @@ describe('Integration tests', () => {
 					done();
 				});
 
-				let client = new Kalm.Client({adapter:adapter});
-				client.send('test', largePayload);
+				let client = Kalm.connect({ transport: Kalm.transports[transport] });
+				client.write('test', largePayload);
 			});
 		});
 	});

@@ -1,18 +1,18 @@
 /**
  * InterProcessCall connector methods
- * @module adapters/ipc
+ * @module transports/ipc
  */
 
 'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
-var expect = require('chai').expect;
-var sinon = require('sinon');
-var testModule = require('../../../src/adapters/ipc');
+const expect = require('chai').expect;
+const sinon = require('sinon');
+const testModule = require('../../../src/transports/ipc');
 
-var net = require('net');
-var fs = require('fs');
+const net = require('net');
+const fs = require('fs');
 
 const EventEmitter = require('events').EventEmitter;
 

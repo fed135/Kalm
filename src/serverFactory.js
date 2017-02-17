@@ -22,6 +22,7 @@ const Server = require('./components/server');
 function create(options) {
 	const server = {
 		id: crypto.randomBytes(8).toString('hex'),
+		port: 3000,
 		profile: profiles.dynamic(),
 		serial: serials.JSON,
 		transport: transports.TCP,

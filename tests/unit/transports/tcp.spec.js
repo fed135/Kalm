@@ -1,62 +1,64 @@
 /**
- * UDP connector methods
- * @module adapters/udp
+ * TCP connector methods
+ * @module transports/tcp
  */
 
 'use strict';
 
 /* Requires ------------------------------------------------------------------*/
 
-var expect = require('chai').expect;
-var sinon = require('sinon');
-var testModule = require('../../../src/adapters/udp');
+const expect = require('chai').expect;
+const sinon = require('sinon');
+const testModule = require('../../../src/transports/tcp');
 
-var dgram = require('dgram');
+const net = require('net');
+
+const EventEmitter = require('events').EventEmitter;
 
 /* Tests ---------------------------------------------------------------------*/
 
-describe('UDP', () => {
+describe('TCP', () => {
 	describe('#listen(server, callback)', () => {
 
 		afterEach(() => sinon.mock.restore());
-		
+
 		it('should bind to a defined port', (done) => {
 
-			var dgramMock = sinon.mock(dgram);
+			var netMock = sinon.mock(net);
 			var port = 9000;
 			var serverTest = { 
 				listener: null, 
 				handleError: function(){},
+				handleRequest: function(){},
 				options: {
 					port: port
 				}
 			};
 			var listenerTest = sinon.mock({
 				on: function(){},
-				bind: function(){}
+				listen: function(port, callback){
+					callback();
+				}
 			});
 
-			dgramMock.expects('createSocket')
+			netMock.expects('createServer')
 				.once()
-				.withArgs({
-					type: 'udp4',
-					reuseAddr: true
-				})
 				.returns(listenerTest.object);
 
 			listenerTest.expects('on')
-				.twice();
-
-			listenerTest.expects('bind')
 				.once()
-				.withArgs(port, '0.0.0.0');
+				.withArgs('error');
+
+			listenerTest.expects('listen')
+				.once()
+				.withArgs(port);
 			
-			testModule.listen(serverTest, () => {
-				expect(serverTest.listener).to.be.not.null;
-				listenerTest.verify();
-				dgramMock.verify();
-				done();
-			});
+			testModule.listen(serverTest);
+
+			expect(serverTest.listener).to.be.not.null;
+			listenerTest.verify();
+			netMock.verify();
+			done();
 		});
 	});
 
@@ -64,27 +66,18 @@ describe('UDP', () => {
 		it('should disconnect all sockets and close the server', (done) => {
 			var clientStub = sinon.stub(testModule, 'disconnect');
 			var serverClose = sinon.spy();
-			var clients = {
-				a: 'a',
-				b: 'b',
-				c: 'c'
-			};
 
 			var testServer = {
-				__clients: clients,
 				listener: {
 					close: serverClose
 				}
 			};
 
-			testModule.stop(testServer, () => {
-				expect(clientStub.withArgs('a').called).to.be.true;
-				expect(clientStub.withArgs('b').called).to.be.true;
-				expect(clientStub.withArgs('c').called).to.be.true;
-				expect(serverClose.calledOnce).to.be.true;
-				clientStub.restore();
-				done();
-			});
+			testModule.stop(testServer);
+			
+			expect(serverClose.calledOnce).to.be.true;
+			clientStub.restore();
+			done();
 		});
 	});
 
@@ -92,20 +85,11 @@ describe('UDP', () => {
 		it('should send the payload through the socket', () => {
 			var testPayload = new Buffer(JSON.stringify({foo:'bar'}));
 			var socketMock = sinon.mock({
-				send: function() {},
-				__port: 9000,
-				__hostname: '0.0.0.0'
+				write: function() {}
 			});
 
-			socketMock.expects('send')
-				.once()
-				.withArgs(
-					testPayload,
-					0,
-					testPayload.length,
-					9000,
-					'0.0.0.0'
-				);
+			socketMock.expects('write')
+				.twice();
 
 			testModule.send(socketMock.object, testPayload);
 			socketMock.verify();
@@ -114,14 +98,18 @@ describe('UDP', () => {
 
 	describe('#createSocket(client, socket)', () => {
 		it('should create a socket client and return it', () => {
-			var dgramMock = sinon.mock(dgram);
+			var netMock = sinon.mock(net);
 
-			dgramMock.expects('createSocket')
+			netMock.expects('connect')
 				.once()
-				.withArgs('udp4')
+				.withArgs(9000, '0.0.0.0')
 				.returns({
-					on: function() {},
-					bind: function() {}
+					on:function() {},
+					pipe: function() {
+						return new EventEmitter();
+					},
+					setTimeout: function() {},
+					connect: function() {}
 				});
 
 			var result = testModule.createSocket({
@@ -131,18 +119,19 @@ describe('UDP', () => {
 				},
 				handleError: function() {},
 				handleConnect: function() {},
-				handleRequest: function() {}
+				handleRequest: function() {},
+				handleDisconnect: function() {}
 			});
 
-			expect(result.__port).to.equal(9000);
-			expect(result.__hostname).to.equal('0.0.0.0');
-			dgramMock.verify();
+			netMock.verify();
 		});
 	});
 
 	describe('#disconnect(client)', () => {
 		it('should call the client\'s disconnect method', () => {
-			var testSocket = {foo: 'bar'};
+			var testSocket = {
+				destroy: function() {}
+			};
 			var clientMock = sinon.mock({
 				handleDisconnect: function() {},
 				socket: testSocket
