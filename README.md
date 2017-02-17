@@ -1,6 +1,6 @@
 <h1 align="center">
   <a title="The socket optimizer" href="http://kalm.js.org">
-    <img alt="Kalm" width="320px" src="http://res.cloudinary.com/kalm/image/upload/v1487196605/kalm.png" />
+    <img alt="Kalm" width="320px" src="http://res.cloudinary.com/kalm/image/upload/v1487202241/kalm_header.png" />
     <br/><br/>
   </a>
   Kalm
@@ -124,11 +124,6 @@ manual | `Kalm.profiles.manual()` | Need to process queues by hand `{ step: null
     });
 ```
 
-## Documentation
-
-[API docs](https://fed135.github.io/kalm.github.io)
-
-
 ## Testing
 
 **Unit + Smoke tests**
@@ -145,7 +140,3 @@ manual | `Kalm.profiles.manual()` | Need to process queues by hand `{ step: null
 Kalm uses [debug](https://github.com/visionmedia/debug)
 
 `export DEBUG=kalm`
-
-You can also gather optimization statistics by piping `kalm:stats`
-
-`export DEBUG=kalm:stats myApp.js > stats.log`
