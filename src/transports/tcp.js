@@ -8,7 +8,6 @@
 /* Requires ------------------------------------------------------------------*/
 
 const net = require('net');
-const split = require('/home/frederic/Documents/workspace/bsplit');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -46,8 +45,7 @@ function createSocket(options) {
 }
 
 function attachSocket(socket, client) {
-	let stream = socket.pipe(split());
-	stream.on('data', client.handleRequest.bind(client));
+	socket.on('data', client.handleRequest.bind(client));
 	socket.on('error', client.handleError.bind(client));
 	socket.on('connect', client.handleConnect.bind(client));
 	socket.on('close', client.handleDisconnect.bind(client));
@@ -80,8 +78,9 @@ function send(socket, payload) {
  * Attempts to disconnect the client's connection
  * @param {Client} client The client to disconnect
  */
-function disconnect(client, socket) {
-	socket.destroy();
+function disconnect(client) {
+	client.socket.end();
+	client.socket.destroy();
 	setTimeout(client.handleDisconnect.bind(client), 0);
 }
 

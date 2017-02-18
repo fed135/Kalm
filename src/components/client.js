@@ -48,9 +48,8 @@ function Client(scope) {
 		 * Destroys the client and connection
 		 */
 		destroy: () => {
-			Promise.resolve()
-				.then(scope.transport.disconnect.bind(null, scope))
-				.then(null, scope.handleError.bind(scope));
+			if (scope.socket.__connected) scope.transport.disconnect(scope, scope.socket);
+			
 			
 			for (let channel in scope.queues) {
 				if (scope.queues.hasOwnProperty(channel)) {
@@ -96,20 +95,22 @@ function Client(scope) {
 		},
 
 		handleRequest: (payload) => {
-			const raw = serializer.deserialize(payload);
-			raw.packets.forEach((packet, messageIndex) => {
-				scope.trigger(raw.channel, {
-					body: scope.serial ? scope.serial.decode(packet) : packet,
-					client: scope,
-					reply: scope.write.bind(null, raw.channel),
-					frame: {
-						id: raw.frame,
-						channel: raw.channel,
-						payloadBytes: raw.payloadBytes,
-						payloadMessages: raw.packets.length,
-						messageIndex
-					},
-					session: sessions.resolve(scope.id)
+			const frames = serializer.deserialize(payload);
+			frames.forEach((frame) => {
+				frame.packets.forEach((packet, messageIndex) => {
+					scope.trigger(frame.channel, {
+						body: scope.serial ? scope.serial.decode(packet) : packet,
+						client: scope,
+						reply: scope.write.bind(null, frame.channel),
+						frame: {
+							id: frame.frame,
+							channel: frame.channel,
+							payloadBytes: frame.payloadBytes,
+							payloadMessages: frame.packets.length,
+							messageIndex
+						},
+						session: sessions.resolve(scope.id)
+					});
 				});
 			});
 		},

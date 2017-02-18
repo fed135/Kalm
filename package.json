@@ -37,7 +37,6 @@
     "sinon": "^1.17.0"
   },
   "dependencies": {
-    "bsplit": "1.0.x",
     "debug": "2.6.x"
   },
   "browser": {

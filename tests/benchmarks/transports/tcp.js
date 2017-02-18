@@ -7,8 +7,6 @@
 /* Requires ------------------------------------------------------------------*/
 
 var net = require('net');
-const bsplit = require('/home/frederic/Documents/workspace/bsplit');
-
 var settings = require('../settings');
 
 /* Local variables -----------------------------------------------------------*/
@@ -28,8 +26,6 @@ function _absorb(err) {
 
 function setup(resolve) {
 	server = net.createServer(function(socket) {
-		let stream = socket.pipe(bsplit());
-		stream.on('data', (data) => console.log('data', data));
 		socket.on('data', function() {
 			count++;
 		});
