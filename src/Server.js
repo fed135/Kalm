@@ -16,7 +16,7 @@ const Client = require('./Client');
 const Timer = require('./Timer');
 const adapters = require('./adapters');
 
-Promise = require('bluebird');
+//Promise = require('bluebird');
 
 /* Methods -------------------------------------------------------------------*/
 

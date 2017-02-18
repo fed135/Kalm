@@ -8,12 +8,9 @@
 
 const Store = require('../Store');
 
-// If running in the browser, do not load net adapters
-const is_browser = (require('os').platform() === 'browser');
-
-const ipc = (is_browser)?null:require('./ipc');
-const tcp = (is_browser)?null:require('./tcp');
-const udp = (is_browser)?null:require('./udp');
+const ipc = require('./ipc');
+const tcp = require('./tcp');
+const udp = require('./udp');
 
 /* Methods -------------------------------------------------------------------*/
 

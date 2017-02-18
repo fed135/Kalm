@@ -9,7 +9,7 @@
 
 const net = require('net');
 const fs = require('fs');
-const split = require('binary-split');
+const bsplit = require('bsplit');
 
 const Adapter = require('./common');
 
@@ -52,7 +52,7 @@ class IPC extends Adapter {
 			socket = net.connect(_path + client.options.port);
 		}
 
-		let stream = socket.pipe(split());
+		let stream = socket.pipe(bsplit());
 		stream.on('data', client.handleRequest.bind(client));
 
 		// Emit on error
