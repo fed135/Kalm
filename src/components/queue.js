@@ -6,7 +6,7 @@
 
 /* Local variables -----------------------------------------------------------*/
 
-const reservedBytes = 20;
+const reservedBytes = 4;
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -24,38 +24,37 @@ function QueueManager(scope) {
 				bytes: 0
 			}, profile || scope.profile, scope.end);
 
-			scope.queues[name].reset(scope.queues[name].step);
-
 			return scope.queues[name];
-		}	
+		}
 	};
 }
 
 function Queue(scope, profile, end) {
-	return {
-		reset: (step) => {
-			clearInterval(scope.timer);
-			if (profile.tick !== null) {
-				scope.timer = setInterval(step, profile.tick);
-			}
-		},
-		add: (packet) => {
+	scope.timer = setInterval(step, profile.tick);
+	
+	function add(packet) {
+		if (profile.maxBytes !== null) {
+			if (bytes() + packet.length > profile.maxBytes) step();
 			scope.packets.push(packet);
-			
-			if (profile.maxBytes !== null) {
-				scope.bytes += packet.length;
-				if (scope.bytes >= (profile.maxBytes + reservedBytes)) scope.process();
-			}
-		},
-		step: () => {
-			if (scope.packets.length > 0) {
-				end(scope, scope.packets.concat());
-				scope.packets.length = 0;
-				scope.bytes = 0;
-				scope.frame++;
-			}
+			scope.bytes += packet.length;
 		}
-	};
+		else scope.packets.push(packet);
+	}
+
+	function bytes() {
+		return scope.bytes + scope.packets.length * 2 + scope.name.split('').length + reservedBytes;
+	}
+	
+	function step() {
+		if (scope.packets.length > 0) {
+			end(scope, scope.packets.concat());
+			scope.packets.length = 0;
+			scope.bytes = 0;
+			scope.frame++;
+		}
+	}
+
+	return { add, step };
 }
 
 /* Exports -------------------------------------------------------------------*/

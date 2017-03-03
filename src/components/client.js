@@ -12,6 +12,7 @@ const serializer = require('../utils/serializer');
 const debug = require('debug')('kalm');
 const profiles = require('../profiles');
 const sessions = require('../utils/sessions');
+const encrypter = require('../utils/encrypter');
 
 /* Local variables -----------------------------------------------------------*/
 
@@ -39,7 +40,8 @@ function Client(scope) {
 		 * @param {string} channel The channel targeted for transfer
 		 */
 		end: (queue, packets) => {
-			const payload = serializer.serialize(queue.frame, queue.name, packets);
+			let payload = serializer.serialize(queue.frame, queue.name, packets);
+			if (scope.secretKey !== null) payload = encrypter.encrypt(payload, scope.secretKey);
 			if (scope.socket.__connected) scope.transport.send(scope.socket, payload);
 			else scope.backlog.push(payload);
 		},
@@ -57,31 +59,6 @@ function Client(scope) {
 				}
 			}
 		},
-
-		transaction: (name, message) => {
-			const transactionId = crypto.randomBytes(8).toString('hex');
-			const ret = Promise.defer();
-
-			scope.subscribe(transactionId, (req) => {
-				scope.unsubscribe(transactionId);
-				ret.resolve(req);
-			});
-			scope.transport.send(
-				transactionId, 
-				serializer.serialize(0, name, scope.serial.encode(message))
-			);
-
-			return ret.promise;
-		},
-
-		handleTransaction: (req) => {
-			scope.trigger(req.body.channel, {
-				body: req.body.message,
-				client: scope,
-				frame: { channel: req.body.transactionId },
-				session: sessions.resolve(scope.id)
-			});
-		},
 		
 		handleConnect: () => {
 			scope.socket.__connected = true;
@@ -95,22 +72,27 @@ function Client(scope) {
 		},
 
 		handleRequest: (payload) => {
-			const frames = serializer.deserialize(payload);
+			const frames = serializer.deserialize((scope.secretKey !== null) ? encrypter.decrypt(payload, scope.secretKey) : payload);
 			frames.forEach((frame) => {
 				frame.packets.forEach((packet, messageIndex) => {
-					scope.trigger(frame.channel, {
-						body: scope.serial ? scope.serial.decode(packet) : packet,
-						client: scope,
-						reply: scope.write.bind(null, frame.channel),
-						frame: {
-							id: frame.frame,
-							channel: frame.channel,
-							payloadBytes: frame.payloadBytes,
-							payloadMessages: frame.packets.length,
-							messageIndex
-						},
-						session: sessions.resolve(scope.id)
-					});
+					Promise.resolve()
+						.then(() => scope.serial ? scope.serial.decode(packet) : packet)
+						.catch(err => packet)
+						.then((decodedPacket) => {
+							scope.trigger(frame.channel, {
+								body: decodedPacket,
+								client: scope,
+								reply: scope.write.bind(null, frame.channel),
+								frame: {
+									id: frame.frame,
+									channel: frame.channel,
+									payloadBytes: frame.payloadBytes,
+									payloadMessages: frame.packets.length,
+									messageIndex
+								},
+								session: sessions.resolve(scope.id)
+							});
+						});					
 				});
 			});
 		},

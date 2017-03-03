@@ -40,8 +40,8 @@ function getOrigin(socket) {
  * @param {Socket} socket Optionnal existing socket object.
  * @returns {Socket} The created tcp client
  */
-function createSocket(options) {
-	return net.connect(options.port, options.hostname);
+function createSocket(client) {
+	return net.connect(client.port, client.hostname);
 }
 
 function attachSocket(socket, client) {

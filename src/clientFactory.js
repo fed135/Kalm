@@ -25,6 +25,7 @@ function create(options) {
 		hostname: '0.0.0.0',
 		transport: transports.TCP,
 		serial: serials.JSON,
+		secretKey: null,
 		profile: profiles.dynamic(),
 		channels: {},
 		backlog: []

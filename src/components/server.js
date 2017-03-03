@@ -16,16 +16,6 @@ const crypto = require('crypto');
 function Server(scope) {
 	return {
 		/**
-		 * Server lift method
-		 */
-		listen: () => {
-			debug(`log: listening ${scope.transport}://0.0.0.0:${scope.port}`);
-				
-			scope.transport.listen()
-				.then(listener => scope.listener = listener);
-		},
-
-		/**
 		 * Sends data to all connected clients
 		 * @param {string} channel The name of the channel to send to
 		 * @param {string|object} payload The payload to send
@@ -91,15 +81,14 @@ function Server(scope) {
 				serial: scope.serial,
 				catch: scope.catch,
 				socket,
+				secretKey: scope.secretKey,
 				isServer: true,
-				channels: scope.channels
+				hostname: origin.host,
+				port: origin.port
 			});
 			
 			scope.connections.push(client);
 			scope.emit('connection', client, sessions.resolve(client.id));
-
-			scope.on('subscribe', client.subscribe.bind(client));
-			scope.on('unsubscribe', client.unsubscribe.bind(client));
 			client.on('disconnect', scope.emit.bind('disconnection'));
 			return client;
 		}

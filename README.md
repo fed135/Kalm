@@ -47,18 +47,20 @@ This makes a huge difference when you need to send a large number of small packe
       port: 6000
     });
 
-    server.on('connection', (client) => { //... });
-    // Broadcast to all connections subscribed to the channel 'user.join'
-    server.broadcast('user.join', { foo: 'bar' });
-    // Subscribe to 'user.action' channel
-    server.subscribe('user.action', (req) => {
-      /*
-        req.body       The body of the request
-        req.client     The connection handle reference
-        req.frame      The details of the network frame
-        req.session    The session store for that connection
-      */
-    })
+    server.on('connection', (client) => { 
+      // Subscribe to 'user.action' channel
+      client.subscribe('user.action', (req) => {
+        /*
+          req.body       The body of the request
+          req.client     The connection handle reference
+          req.frame      The details of the network frame
+          req.session    The session store for that connection
+        */
+      });
+
+      // Broadcast to all connections subscribed to the channel 'user.join'
+      server.broadcast('user.join', { foo: 'bar' });
+    });
     
 ```
 
@@ -97,6 +99,8 @@ Name | Module
 JSON | `Kalm.serials.JSON`
 MSG-PACK | [kalm-msgpack](https://github.com/fed135/kalm-msgpack)
 Snappy | [kalm-snappy](https://github.com/fed135/kalm-snappy)
+`null` | As-is
+
 
 **Profiles**
 

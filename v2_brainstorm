@@ -5,7 +5,6 @@ x - Encode packets as they enter the queue, only keep binaries in the queue
 x - remove load_batches option
 x - Kalm.profiles settings: heartbeat, threshold, dynamic
 x - replace max Packets with max bytes
-x - transactions
 x - No serializer (null) are defined, just shoot the binary to the handler
 x - transmit connection events (event shim it for udp)
 x - deterministic uuids
@@ -13,6 +12,11 @@ x - Disconnection handler (server)
 x - Deprecate SendNow (profile setting)
 x - Deprecate SendOnce (Application logic)
 x - queue packets when socket is offline
+  - Add encryption option
+x - fix udp circular dependency
+  - fail fast on failed deserialization 
+x - only clients own multiplexing
+x - validate frame overhead before adding packet in queue
 
 
 ## Leak concerns

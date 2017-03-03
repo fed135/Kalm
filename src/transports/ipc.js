@@ -46,8 +46,8 @@ function getOrigin(socket) {
  * @param {Socket} socket Optionnal existing socket object.
  * @returns {Socket} The created ipc socket
  */
-function createSocket(options) {
-	return net.connect(_path + options.port);
+function createSocket(client) {
+	return net.connect(_path + client.port);
 }
 
 function attachSocket(socket, client) {

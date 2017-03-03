@@ -16,6 +16,8 @@ const transports = require('./transports');
 const Multiplex = require('./components/multiplex');
 const Server = require('./components/server');
 
+const clientFactory = require('./clientFactory');
+
 
 /* Methods -------------------------------------------------------------------*/
 
@@ -25,20 +27,19 @@ function create(options) {
 		port: 3000,
 		profile: profiles.dynamic(),
 		serial: serials.JSON,
+		secretKey: null,
 		transport: transports.TCP,
-		channels: {},
 		connections: []
 	};
 
 	Object.assign(server,
 		options,
-		Multiplex(server),
 		Server(server),
 		EventEmitter.prototype
 	);
 
-	server.transport.listen(server, options)
-		.then((listener) => { server.listener = listener; });
+	server.transport.listen(server, options, clientFactory)
+		.then(listener => server.listener = listener);
 
 	return server;
 }

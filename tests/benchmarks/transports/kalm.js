@@ -23,12 +23,14 @@ function setup(resolve) {
 	server = Kalm.listen({
 		port: settings.port,
 		transport: Kalm.transports[settings.transport],
-		profile: settings.profile
+		profile: settings.profile,
+		secretKey: 'secretkeyshouldbeatleast16chars'
 	});
 
-	server.subscribe(settings.testChannel, function() {
-		count++;
+	server.on('connection', (c) => {
+		c.subscribe(settings.testChannel, () => count++);
 	});
+	
 
 	handbreak = false;
 	setTimeout(resolve, 0);
@@ -53,7 +55,8 @@ function step(resolve) {
 		client = Kalm.connect({
 			port: settings.port, 
 			transport: Kalm.transports[settings.transport], 
-			profile: settings.profile
+			profile: settings.profile,
+			secretKey: 'secretkeyshouldbeatleast16chars'
 		});
 	}
 
