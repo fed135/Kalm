@@ -1,11 +1,11 @@
-<img align="left" src="http://i231.photobucket.com/albums/ee109/FeD135/kalm_logo_bolded.png">
 # Kalm
 *The Socket Optimizer*
 
-[![Kalm](https://img.shields.io/npm/v/kalm.svg)](https://www.npmjs.com/package/kalm)
-[![Build Status](https://travis-ci.org/fed135/Kalm.svg?branch=master)](https://travis-ci.org/fed135/Kalm)
-[![Dependencies Status](https://david-dm.org/fed135/Kalm.svg)](https://www.npmjs.com/package/kalm)
-[![Gitter](https://img.shields.io/gitter/room/fed135/kalm.svg)](https://gitter.im/fed135/Kalm)
+---
+
+## Deprecated 
+
+See [Kalm v2](https://github.com/kalm/kalm.js)
 
 ---
 
@@ -147,13 +147,3 @@ Kalm uses [debug](https://github.com/visionmedia/debug)
 You can also gather optimization statistics by piping `kalm:stats`
 
     export DEBUG=kalm:stats myApp.js > stats.log
-
-
-## Roadmap
-
-[Version 2.0.0](https://github.com/fed135/Kalm/projects/2)
-
-
-## Presentations
-
-- [JS Montreal](http://www.meetup.com/js-montreal/events/224538913/) - June 14th 2016
