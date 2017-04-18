@@ -1,4 +1,6 @@
 # Kalm
+
+[![Join the chat at https://gitter.im/fed135/Kalm](https://badges.gitter.im/fed135/Kalm.svg)](https://gitter.im/fed135/Kalm?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 *The Socket Optimizer*
 
 ---
