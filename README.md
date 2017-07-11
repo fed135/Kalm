@@ -1,11 +1,6 @@
-# Kalm
-*The Socket Optimizer*
+# [Deprecated]
 
----
-
-## Deprecated 
-
-See [Kalm v2](https://github.com/kalm/kalm.js)
+**See [Kalm v2](https://github.com/kalm/kalm.js)**
 
 ---
 
